@@ -23,7 +23,7 @@ alias top="top -c"
 alias lfp="pgrep -aif"
 alias hdl="source /tools/handle_download_last.sh"
 alias systemctl="systemctl -l"
-alias vimc="vim -u <(curl https://xicod.com/vimrc)"
+alias vimc="vim -u <(curl https://xicod.github.io/v)"
 
 alias psmem='ps -eo pid,rss,args | sort -b -k2,2n | cut -c -`tput cols`'
 
