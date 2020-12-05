@@ -1,0 +1,1880 @@
+" debian only to prevent defaults.vim being loaded AFTER this file
+" and overriding mouse setting
+" https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=864074#95
+runtime! defaults.vim
+let g:skip_defaults_vim = 1
+
+" enter the current millennium
+set nocompatible
+
+" set term to avoid tmux issues
+set term=xterm-256color
+
+" default to unicode
+set encoding=utf-8
+scriptencoding utf-8
+
+set noswapfile
+
+" This is to avoid delay when exiting visual mode with ESC key
+set timeoutlen=1000 ttimeoutlen=0
+
+" ]s, [s to jump between misspelled words
+" z= to open suggestion dialog
+set nospell
+set spelllang=en
+
+" add characters that are still part of a word
+" (disabled because . and - are common for struct access)
+"set iskeyword+=.,-
+
+" enable syntax and plugins (for netrw)
+syntax on
+filetype plugin on
+filetype indent on
+
+" lets bouncing between buffers without saving
+set hidden
+
+" Set status line properties
+function! SetStatusLine(mode)
+	if a:mode == 1
+		" Not touching StatusLineNC because it's already nice
+		highlight StatusLine ctermfg=red ctermbg=white guifg=red guibg=white
+	else
+		highlight StatusLine ctermfg=darkblue ctermbg=white guifg=darkblue guibg=white
+	endif
+endfunction
+set laststatus=2
+set statusline=%(%y\ %)%f%(\ %m%)%(\ %r%)%=%l(%L),%c\ \[%{&fileformat}\]
+
+" always keep that many lines above and below cursor
+set scrolloff=20
+
+" place current line on top of window although scrolloff is set
+nnoremap zT :execute "normal! " . (line(".") + &scrolloff) . "Gzt"<CR>
+
+set mouse-=a
+set clipboard=unnamedplus
+
+set number relativenumber
+highlight CursorLineNr ctermfg=white guifg=white ctermbg=darkgrey guibg=darkgrey cterm=bold gui=bold
+if v:version >= 802
+	highlight LineNrAbove ctermfg=darkgreen guifg=darkgreen
+	highlight LineNrBelow ctermfg=darkgreen guifg=darkgreen
+else
+	highlight LineNr ctermfg=darkgreen guifg=darkgreen
+endif
+
+set hlsearch
+set incsearch
+set list listchars=tab:»·,trail:·
+set tabstop=4
+set shiftwidth=4
+set softtabstop=4
+set autoindent
+set smartindent
+set smarttab
+set noexpandtab
+set splitbelow
+set splitright
+set noequalalways
+" show menu even with one item and don't auto-insert it
+set completeopt=menuone,noinsert
+set cindent
+" :help cinoptions-values
+set cinoptions=(1s,m1,:0,g0,t0
+
+" disable automatic comment insertion
+autocmd FileType * setlocal formatoptions-=c formatoptions-=r formatoptions-=o
+
+set autoread
+autocmd CursorHold * checktime | call feedkeys("f\e", 'n') | let g:move_action_undo_join=0
+
+" each time entering insert mode, turn on autochdir for filename
+" completion relative to current file's path
+function! OnInsertEnter()
+	call SetStatusLine(1)
+	set ignorecase
+	execute "set tags=".getcwd()."/tags"
+	let g:insert_mode_save_cwd = getcwd()
+	set autochdir
+endfunction
+function! OnInsertLeave()
+	call SetStatusLine(0)
+	set noignorecase
+	set noautochdir
+	execute 'cd' fnameescape(g:insert_mode_save_cwd)
+	" create mark I for last global edit position
+	normal! mI
+endfunction
+autocmd InsertEnter * call OnInsertEnter()
+autocmd InsertLeave * call OnInsertLeave()
+function! s:OnResizeReloadManpageWindow()
+	let l:curr_window = win_getid()
+	for l:w in range(1, winnr('$'))
+		if bufname(winbufnr(l:w)) == "_Manpage"
+			execute l:w . "wincmd w"
+			call s:ManpageBufferLoad(0)
+			call win_gotoid(l:curr_window)
+			break
+		endif
+	endfor
+endfunction
+function! s:OnVimResized()
+	wincmd =
+	call s:OnResizeReloadManpageWindow()
+endfunction
+autocmd VimResized * call s:OnVimResized()
+
+" want to figure out if was called as pipe to something else
+let g:started_with_stdin = 0
+autocmd StdinReadPost * let g:started_with_stdin = 1
+
+function! OnVimEnter()
+	if &columns > 150 && empty(argv()) && !g:started_with_stdin
+		vsplit
+		wincmd h
+	endif
+	call SetStatusLine(0)
+endfunction
+autocmd VimEnter * call OnVimEnter()
+
+function! GetCurrentChar()
+	return strcharpart(getline('.')[col('.') - 1:], 0, 1)
+endfunction
+function! GetPreviousChar()
+	return strcharpart(getline('.')[col('.') - 2:], 0, 1)
+endfunction
+function! GetCharType(l, c)
+	" This is probably a bug. Need to query for type twice to get it right
+	let l:type = synIDattr(synID(a:l, a:c, 0), "name")
+	let l:type = synIDattr(synID(a:l, a:c, 0), "name")
+	return l:type
+endfunction
+function GetCurrentCharType()
+	return GetCharType(line('.'), col('.'))
+endfunction
+function! IsCharMatching(chr, pat)
+	return a:chr =~ '^[' . a:pat . ']\{1\}$'
+endfunction
+function! SkipNonAlnumForWord(cmd)
+	execute "normal! " . a:cmd
+	while !IsCharMatching(GetCurrentChar(), 'a-zA-Z0-9')
+		let l:prev_pos = CursorPositionStore()
+		execute "normal! " . a:cmd
+		if CursorPositionCompare(CursorPositionStore(), l:prev_pos) == 0
+			break
+		endif
+	endwhile
+endfunction
+nnoremap <silent> w :call SkipNonAlnumForWord("w")<CR>
+nnoremap <silent> b :call SkipNonAlnumForWord("b")<CR>
+inoremap <silent> <C-Right> <C-O>:call SkipNonAlnumForWord("w")<CR>
+inoremap <silent> <C-Left> <C-O>:call SkipNonAlnumForWord("b")<CR>
+
+let g:find_char_last_dir = 'f'
+let g:find_char_last_chr = ':'
+function! FindCharRepeating(dir, chr)
+	if a:dir == "go"
+		call UpOneCodeLevelMapping()
+	elseif IsCharMatching(a:dir, 'sS')
+		call FindCharLastInWord(a:dir, a:chr)
+	else
+		call FindCharFirstInWord(a:dir, a:chr)
+	endif
+endfunction
+function! FindCharLastInWord(dir, chr)
+	let g:find_char_last_dir = a:dir
+	let g:find_char_last_chr = a:chr
+	let l:pos = CursorPositionStore()
+	let l:orig_pos = CursorPositionStore()
+	while 1
+		execute "normal! " . (a:dir == 's' ? 'e' : 'ge')
+		if GetCurrentChar() == a:chr
+					\|| CursorPositionCompare(l:pos, CursorPositionStore()) == 0
+					\|| l:orig_pos['l'] < line('.')
+			break
+		endif
+		let l:pos = CursorPositionStore()
+	endwhile
+	if GetCurrentChar() != a:chr
+		call CursorPositionRestore(l:orig_pos)
+	endif
+endfunction
+function! FindCharFirstInWord(dir, chr)
+	let g:find_char_last_dir = a:dir
+	let g:find_char_last_chr = a:chr
+	let l:starting_pos = col('.')
+	if IsCharMatching(a:chr, 'a-zA-Z')
+		while 1
+			let l:prev_col = col('.')
+			execute "normal! " . a:dir . a:chr
+			if l:prev_col == col('.')
+				break
+			endif
+			if col('.') > 1
+				normal! h
+				let l:pre_char = GetCurrentChar()
+				normal! l
+				if (IsCharMatching(a:chr, 'a-z') && IsCharMatching(l:pre_char, 'a-z'))
+							\|| (IsCharMatching(a:chr, 'A-Z') && IsCharMatching(l:pre_char, 'A-Z'))
+							\|| (IsCharMatching(a:chr, 'a-z') && IsCharMatching(l:pre_char, 'A-Z'))
+					continue
+				else
+					return
+				endif
+			endif
+		endwhile
+	else
+		execute "normal! " . a:dir . a:chr
+		return
+	endif
+	call cursor(0, l:starting_pos)
+endfunction
+nnoremap <silent> f :call FindCharFirstInWord('f', nr2char(getchar()))<CR>
+nnoremap <silent> F :call FindCharFirstInWord('F', nr2char(getchar()))<CR>
+nnoremap <silent> s :call FindCharLastInWord('s', nr2char(getchar()))<CR>
+nnoremap <silent> S :call FindCharLastInWord('S', nr2char(getchar()))<CR>
+nnoremap <silent> ; :call FindCharRepeating(g:find_char_last_dir, g:find_char_last_chr)<CR>
+
+xnoremap [{ <ESC>`<O{<ESC>`>o}<ESC>=i{
+xnoremap [[ "zc[]<ESC>"zP
+xnoremap [( "zc()<ESC>"zP
+xnoremap [" "zc""<ESC>"zP
+xnoremap [' "zc''<ESC>"zP
+xnoremap [` "zc``<ESC>"zP
+xnoremap [< "zc<><ESC>"zP
+
+function! GetStringIndexesInLine(haystack, needle)
+	let l:ret = []
+	let l:s_len = strlen(a:haystack)
+	let l:pos = 0
+	while l:pos < l:s_len
+		let l:m = matchstr(a:haystack[l:pos : ], '^'.a:needle)
+		if strlen(l:m) > 0
+			let l:ret += [l:pos]
+			let l:pos += strlen(l:m)
+		else
+			let l:pos += 1
+		endif
+	endwhile
+	return l:ret
+endfunction
+function! ReplaceInCode(search, replace)
+	for p in reverse(GetStringIndexesInLine(getline('.'), a:search))
+		" convert index to column
+		let p += 1
+		if GetCharType(line('.'), p) !~ '\cstring\|\ccomment'
+			execute 's/\%'.p.'c'.a:search.'/'.a:replace.'/eg'
+		endif
+	endfor
+endfunction
+function! LightFormat(advanced)
+	" save original indentation
+	let l:orig_indent = substitute(getline('.'), '^\(\s*\).*', '\1', '')
+	" unstick comma and the next word
+	call ReplaceInCode('\s*,\s*', ', ')
+	" no space after (
+	call ReplaceInCode('(\s*', '(')
+	" no space before )
+	call ReplaceInCode('\s*)', ')')
+
+	if a:advanced
+		" unstick ==, <=, etc. and surrounding
+		call ReplaceInCode('\s*\([!=<>]\{2,}\)\s*', ' \1 ')
+		" unstick && and ||
+		call ReplaceInCode('\s*\([|&]\{2\}\)\s*', ' \1 ')
+		" unstick = for languages not sensitive to that
+		if index(['sh'], &filetype) < 0
+			call ReplaceInCode('\([^!=<>]\{1\}\)\s*=\s*\ze[^=]\{1\}', '\1 = ')
+		endif
+		" unstick <> comparison
+		s/\s*[^-]\+\zs\s*\([<>]\{1\}\)\s*\ze[^=]\+/ \1 /eg
+		" no spaces in <> inside and outside the bounds
+		call ReplaceInCode('\s*<\s*\([a-zA-Z0-9/_.,* ]\{-}\)\s*>\s*', '<\1>')
+		" add space after <>: like map<int, char> *mymap
+		call ReplaceInCode('\(<[a-zA-Z0-9/_.,* ]\{-}>\)\s*\([*a-zA-Z]\{1\}\)', '\1 \2')
+		" fix include lines
+		s/^\s*#\s*include\s*\([<"]\{1\}\)\s*\(\S\+\)\s*\([>"]\{1\}\)\s*$/#include \1\2\3/e
+		" replace :: temporarily
+		s/::/@@REPLACE_MEMBER_TEMP@@/eg
+		" space after :
+		call ReplaceInCode('\s*:\s*', ': ')
+		s/@@REPLACE_MEMBER_TEMP@@/::/eg
+		" no spaces near ::
+		call ReplaceInCode('\s*::\s*', '::')
+		" no spaces near ->
+		call ReplaceInCode('\s*->\s*', '->')
+	endif
+
+	" remove multiple whitespace
+	call ReplaceInCode('\s\+', ' ')
+	" remove space before [semi]colon at end of line
+	s/\s*\([:;]\{1\}\)\s*$/\1/e
+	" remove trailing whitespace
+	s/\s*$//e
+	" restore original indentation
+	execute 's/^\s*/'.l:orig_indent.'/'
+	normal! ==
+endfunction
+vnoremap <silent> ,= :call LightFormat(0)<CR>
+nnoremap <silent> ,= :call LightFormat(0)<CR>
+
+function! DeleteCurrentWrap(do_replace, to)
+	let l:pair_map = {'(': ')', '[': ']', '{': '}', '<': '>'}
+	let l:pair_chr = has_key(l:pair_map, a:to) ? l:pair_map[a:to] : a:to
+	let l:pos = CursorPositionStore()
+	call GotoTwinChar()
+	if CursorPositionCompare(CursorPositionStore(), l:pos) >= 0
+		let l:pos = CursorPositionStore()
+		call GotoTwinChar()
+	endif
+	if a:do_replace
+		execute "normal! r".l:pair_chr
+	else
+		normal! "_x
+	endif
+	call CursorPositionRestore(l:pos)
+	if a:do_replace
+		execute "normal! r".a:to
+	else
+		normal! "_x
+	endif
+endfunction
+nnoremap <silent> d[ :call DeleteCurrentWrap(0, '')<CR>
+nnoremap <silent> c[ :call DeleteCurrentWrap(1, nr2char(getchar()))<CR>
+
+""""""" Start of Delete Param functions
+function! CheckIfAccessOper()
+	if col('.') == 1
+		return 0
+	endif
+	return (GetCurrentChar() == '>' && GetPreviousChar() == '-')
+endfunction
+function! VregisterResetWorkaround()
+	" This is a workaround. Enter visual mode and exit it.
+	" ('x' makes it block until done)
+	" It prevents previous visual line selection mess up the `<`> markers
+	call feedkeys("v\<ESC>", 'nx')
+endfunction
+function! ParamFindStartPoint(do_change)
+	let l:first_param = 0
+	while 1
+		call SearchAndGo('?', '[][(){}<>''",]\{1\}')
+		if GetCurrentCharType() =~ '\cstring'
+			continue
+		endif
+		let l:matched_chr = GetCurrentChar()
+		if CheckIfAccessOper()
+			continue
+		endif
+		if index([')', ']', '}', '>', '"', "'"], l:matched_chr) >= 0
+			let l:tmp_pos = CursorPositionStore()
+			call GotoTwinChar()
+			if CursorPositionCompare(l:tmp_pos, CursorPositionStore()) >= 0
+				call CursorPositionRestore(l:tmp_pos)
+			endif
+			continue
+		endif
+		if index(['(', '[', '{', '<'], l:matched_chr) >= 0
+			let l:first_param = 1
+			call SearchAndGo('/', '\S')
+		elseif l:matched_chr == ',' && a:do_change
+			call SearchAndGo('/', '\S')
+		endif
+		break
+	endwhile
+	return l:first_param
+endfunction
+function! ParamFindEndPoint()
+	if index(['(', '[', '{', '''', '"'], GetCurrentChar()) >= 0
+		call GotoTwinChar()
+	endif
+	while 1
+		call SearchAndGo('/', '[][(){}<>''",]\{1\}')
+		if GetCurrentCharType() =~ '\cstring'
+			continue
+		endif
+		let l:matched_chr = GetCurrentChar()
+		if CheckIfAccessOper()
+			continue
+		endif
+		if index(['(', '[', '{', '<', '"', "'"], l:matched_chr) >= 0
+			let l:tmp_pos = CursorPositionStore()
+			call GotoTwinChar()
+			if CursorPositionCompare(CursorPositionStore(), l:tmp_pos) >= 0
+				call CursorPositionRestore(l:tmp_pos)
+			endif
+			continue
+		endif
+		break
+	endwhile
+endfunction
+function! DeleteParam(do_change, update_register)
+	let l:start_pos = CursorPositionStore()
+	let l:first_param = 0
+
+	call VregisterResetWorkaround()
+
+	" Look for starting point
+	let l:first_param = ParamFindStartPoint(a:do_change)
+	call setpos("'<", [0, line('.'), col('.'), 0])
+
+	" Look for end point
+	call CursorPositionRestore(l:start_pos)
+	call ParamFindEndPoint()
+	call setpos("'>", [0, line('.'), col('.'), 0])
+	normal! `>
+	if l:first_param && GetCurrentChar() == ',' && !a:do_change
+		call SearchAndGo('/', '\S\{1\}')
+		call setpos("'>", [0, line('.'), col('.'), 0])
+	endif
+
+	normal! `<
+	normal! "zd`>
+	let l:tmp = getreg('z')
+	let l:tmp = substitute(l:tmp, '\n', '', 'g')
+	let l:tmp = substitute(l:tmp, '^\s*[,]*\s*', '', '')
+	let l:tmp = substitute(l:tmp, '\s*[,]*\s*$', '', '')
+	call setreg((a:update_register && has('unnamedplus')) ? '+' : 'z', l:tmp)
+
+	if a:do_change
+		startinsert
+	endif
+endfunction
+function! AddParamAfter()
+	call ParamFindEndPoint()
+	let l:c = GetCurrentChar() == ',' ? "a ,\<LEFT>" : "i, "
+	call feedkeys(l:c, 'n')
+endfunction
+function! AddParamBefore()
+	call ParamFindStartPoint(0)
+	let l:c = GetCurrentChar() == ',' ? "a ,\<LEFT>" : "i, \<LEFT>\<LEFT>"
+	call feedkeys(l:c, 'n')
+endfunction
+function! MoveParam(dir)
+	let l:tmp = CursorPositionStore()
+	let l:first_param = ParamFindStartPoint(0)
+	call CursorPositionRestore(l:tmp)
+	if l:first_param && !a:dir
+		return
+	endif
+	call ParamFindEndPoint()
+	let l:curr_chr = GetCurrentChar()
+	call CursorPositionRestore(l:tmp)
+	if IsCharMatching(l:curr_chr, ']})>') && a:dir
+		return
+	endif
+	call DeleteParam(0, 0)
+	let l:tmp = getreg('z')
+	if a:dir
+		call AddParamAfter()
+	else
+		call AddParamBefore()
+	endif
+	call setreg('z', l:tmp)
+	call feedkeys("\<ESC>\"zp", 'nx')
+	normal! `[
+endfunction
+function! ParamGoNext()
+	call ParamFindEndPoint()
+	if IsCharMatching(GetCurrentChar(), ']})>')
+		let l:first_param = ParamFindStartPoint(0)
+		if l:first_param
+			return
+		endif
+	endif
+	call SearchAndGo('/', '\S')
+endfunction
+function! ParamGoPrevious()
+	call ParamFindStartPoint(0)
+	call ParamFindStartPoint(0)
+	if GetCurrentChar() == ','
+		call SearchAndGo('/', '\S')
+	endif
+endfunction
+nnoremap <silent> \a :call AddParamAfter()<CR>
+nnoremap <silent> \A :call AddParamBefore()<CR>
+nnoremap <silent> \d :call DeleteParam(0, 1)<CR>
+nnoremap <silent> \c :call DeleteParam(1, 1)<CR>
+nnoremap <silent> } :call ParamGoNext()<CR>
+nnoremap <silent> { :call ParamGoPrevious()<CR>
+nnoremap <silent> <A-h> :call MoveParam(0)<CR>
+nnoremap <silent> <A-l> :call MoveParam(1)<CR>
+""""""" End of Delete Param functions
+
+function! DeleteSubcall()
+	if GetCurrentChar() == '.'
+		return
+	endif
+	call VregisterResetWorkaround()
+	call SearchAndGo('?', '[.]\{1\}')
+	call setpos("'<", [0, line('.'), col('.'), 0])
+	normal! e
+	let l:tmp_pos = CursorPositionStore()
+	call SearchAndGo('/', '\S\{1\}')
+	let l:matched_chr = GetCurrentChar()
+	if l:matched_chr == '('
+		normal! %
+	else
+		call CursorPositionRestore(l:tmp_pos)
+	endif
+	call setpos("'>", [0, line('.'), col('.'), 0])
+	call feedkeys('gvx', 'nx')
+	if getline('.') =~ '^\s*$'
+		normal! "_dd
+	endif
+endfunction
+nnoremap <silent> ds :call DeleteSubcall()<CR>
+
+" select the last pasted text
+nnoremap gp `[v`]
+
+" always indent on insert
+nnoremap i i<C-f>
+
+" Escape everything
+nnoremap <Tab> <Esc>
+vnoremap <Tab> <Esc>gV
+onoremap <Tab> <Esc>
+"cnoremap <Tab> <C-C><Esc>
+inoremap <Tab> <Esc>`^:redraw!<CR>
+inoremap \<Tab> <Tab>
+
+inoremap {{ {<CR>}<ESC>ko
+inoremap [[ []<LEFT>
+inoremap (( ()<LEFT>
+inoremap "" ""<LEFT>
+inoremap '' ''<LEFT>
+inoremap `` ``<LEFT>
+inoremap << <><LEFT>
+inoremap <silent> <C-t> <LEFT><C-O>f><RIGHT></<C-X><C-O><CR><LEFT><C-O>cit
+
+inoremap <silent> <A-l> <C-o>"zx<C-o>"zp<LEFT>
+inoremap <silent> <A-h> <C-o>"zx<LEFT><C-o>"zP<LEFT>
+
+function! UpOneCodeLevel(gotobeginning)
+	if index(['python', 'yaml'], &filetype) >= 0
+		let l:curr_indent = indent('.')
+		while indent('.') > 0 && indent('.') >= l:curr_indent
+			call SearchAndGo('?', ':\s*$')
+		endwhile
+	else
+		normal! [{
+		if a:gotobeginning
+			call SearchAndGo('?', '\S')
+		endif
+	endif
+endfunction
+function! IdentifyCodePath()
+	let l:start_pos = CursorPositionStore()
+	let l:path = ['.']
+	while 1
+		let l:pos = CursorPositionStore()
+		call UpOneCodeLevel(0)
+		if CursorPositionCompare(CursorPositionStore(), l:pos) == 0
+			break
+		endif
+		call SearchAndGo('?', '\S')
+		if GetCurrentChar() == ')'
+			normal! %
+		endif
+		call SearchAndGo('?', '\S')
+		let l:curr = getline('.')
+		let l:curr = substitute(l:curr, '^\(.\{-}\)(.*$', '\1', '')
+		let l:curr = substitute(l:curr, '\s*[{:]*\s*$', '', '')
+		let l:curr = substitute(l:curr, '^\s*[}]*', '', '')
+		let l:path += [trim(l:curr)]
+	endwhile
+	echo "\r -> " . join(reverse(l:path), "\n -> ")
+	call CursorPositionRestore(l:start_pos)
+endfunction
+nnoremap <silent> <Space>o :call IdentifyCodePath()<CR>
+
+function! UpOneCodeLevelMapping()
+	" m' is to explicitly store location in jumplist
+	normal! m'
+	call UpOneCodeLevel(1)
+	normal! ^
+	let g:find_char_last_dir = "go"
+endfunction
+nnoremap <silent> go :call UpOneCodeLevelMapping()<CR>
+
+function! MoveToLastOfIndent(dir)
+	let l:curr_indent = indent('.')
+	while line('.') > 1 && line('.') < line('$')
+		execute "normal! " . a:dir
+		if indent('.') == 0 && getline('.') =~ '^\s*$'
+			continue
+		endif
+		if indent('.') < l:curr_indent
+			execute "normal! " . (a:dir == '+' ? '-' : '+')
+			break
+		endif
+	endwhile
+	if getline('.') =~ '^\s*$'
+		call SearchAndGo((a:dir == '+' ? '?' : '/'), '\S')
+	endif
+endfunction
+function! IsBracesDelimitedLang()
+	return index(['c', 'cpp', 'java', 'php', 'javascript', 'groovy'], &filetype) >= 0
+endfunction
+function! MarkCurrentBlock(go_up)
+	if a:go_up
+		if IsBracesDelimitedLang()
+			normal! [{
+			call SearchAndGo('?', '\S')
+			normal! ^
+		else
+			normal! ^
+			call SearchAndGo('?', '\S')
+		endif
+	endif
+	if IsBracesDelimitedLang()
+		normal! [{
+		let l:tmp = CursorPositionStore()
+		call SearchAndGo('/', '\S')
+		call setpos("'<", [0, line('.'), col('.'), 0])
+		call CursorPositionRestore(l:tmp)
+		call GotoTwinChar()
+		call SearchAndGo('?', '\S')
+		call setpos("'>", [0, line('.'), col('.'), 0])
+	else
+		if indent('.') == 0
+			return
+		endif
+		let l:start_pos = CursorPositionStore()
+		call MoveToLastOfIndent('-')
+		call setpos("'<", [0, line('.'), col('.'), 0])
+		call CursorPositionRestore(l:start_pos)
+		call MoveToLastOfIndent('+')
+		call setpos("'>", [0, line('.'), col('.'), 0])
+	endif
+	normal! '<V'>
+endfunction
+function! ResetVMarks()
+	call setpos("'<", [0, line('.'), col('.'), 0])
+	call setpos("'>", [0, line('.'), col('.'), 0])
+endfunction
+nnoremap <silent> <Space>m :call ResetVMarks()<CR>:call MarkCurrentBlock(0)<CR>
+vnoremap <silent> <Space>m :<c-u>call MarkCurrentBlock(1)<CR>
+
+function! ToggleBooleanValue()
+	let l:m = {
+				\'0': '1', '1': '0',
+				\'TRUE': 'FALSE', 'FALSE': 'TRUE',
+				\'true': 'false', 'false': 'true',
+				\'True': 'False', 'False': 'True',
+				\}
+	let l:w = expand('<cword>')
+	if !has_key(l:m, l:w)
+		return
+	endif
+	" mark the current word and change it
+	call feedkeys("viwc".l:m[l:w]."\<ESC>", 'nx')
+	normal! `<
+endfunction
+nnoremap <silent> <Space>f :call ToggleBooleanValue()<CR>
+
+function Eatchar(pat)
+	let c = nr2char(getchar(0))
+	return (c =~ a:pat) ? '' : c
+endfunc
+function! GrepFiles(path, ignore_case, fpat, ...)
+	if a:0 < 1
+		call PrintError('Need at least one search parameter')
+		return
+	endif
+	let l:curr_winid = win_getid()
+	let l:ignore_case = (a:ignore_case) ? '-i' : ''
+	let l:pat = join(a:000, ' ')
+
+	" remove previous quickfix buffer
+	let l:qf_buf_list = filter(range(1, bufnr('$')), 'buflisted(v:val) && getbufvar(v:val, "&buftype") ==# "quickfix" && bufwinnr(v:val) != -1')
+	if !empty(l:qf_buf_list)
+		execute 'bwipeout! ' . l:qf_buf_list[0]
+	endif
+
+	silent execute "grep -srnI  ".$DT_GREP_PARAMS." --exclude-dir=.git --include=".a:fpat." --exclude=tags ".l:ignore_case." ".l:pat." ".a:path
+	cw
+
+	" check that a quickfix windows was opened (there are results) and only then make the markings
+	if getbufvar('%', '&buftype') ==# 'quickfix'
+		let l:search_pat = (a:ignore_case ? '\c' : '')
+		let l:search_pat .= substitute(l:pat, '^''\(.*\)''$', '\1', '')
+		" This is to avoid marking the pattern in filenames.
+		" We end the match (\ze), then require not to match (\@!)
+		" of anything|NUM| as a group.
+		let l:search_pat .= '\ze\(.\{-}|[0-9]\+|\)\@!'
+		call matchadd('FileSearchMark', l:search_pat, -1)
+	endif
+
+	redraw!
+	call win_gotoid(l:curr_winid)
+endfunction
+command! -nargs=+ Grep call GrepFiles(<f-args>)
+
+cabbrev <expr> fc (getcmdtype() == ':' && getcmdline() =~ '^fc$')
+			\? "find " . substitute(expand('%:p:h') . '/', '^' . getcwd() . '[/]*', './', '') . "<C-R>" . Eatchar("\s")
+			\: 'fc'
+cabbrev <expr> f (getcmdtype() == ':' && getcmdline() =~ '^f$')
+			\? 'Find'
+			\: 'f'
+cabbrev <expr> g (getcmdtype() == ':' && getcmdline() =~ '^g$')
+			\? "Grep ./ 1 * ''".Eatchar('\s')."<LEFT>"
+			\: 'g'
+cabbrev <expr> ld (getcmdtype() == ':' && getcmdline() =~ '^ld$')
+			\? 'LookupDefinition'
+			\: 'ld'
+cabbrev <expr> m (getcmdtype() == ':' && getcmdline() =~ '^m$')
+			\? 'Manpage 0'
+			\: 'm'
+
+cnoreabbrev xuniq awk '\!x[$0]++'
+
+function! SetCursorLineSpecial()
+	highlight CursorLine cterm=NONE gui=NONE ctermbg=lightgrey ctermfg=black guibg=lightgrey guifg=black
+endfunction
+function! SetCursorLine()
+	if index(['_FileSearch', '_LookupDefinition'], bufname('%')) >= 0
+		call SetCursorLineSpecial()
+	elseif &buftype == 'quickfix'
+		match none
+	else
+		highlight CursorLine cterm=NONE term=NONE ctermbg=NONE guibg=NONE ctermfg=NONE guifg=NONE
+	endif
+endfunction
+
+highlight Column81Color ctermbg=DarkGreen guibg=DarkGreen ctermfg=white guifg=white
+"set colorcolumn=81
+function! OnBufEnter()
+	" for quickfix there's QuickFixLine and CursorLine is interfering
+	if &buftype != 'quickfix'
+		setlocal cursorline
+	endif
+	syntax sync fromstart
+	if !&diff && &buftype != 'quickfix'
+		match Column81Color /\%81v./
+	endif
+	call SetCursorLine()
+endfunction
+function! OnBufLeave()
+	setlocal nocursorline
+endfunction
+autocmd VimEnter,WinEnter,BufWinEnter * call OnBufEnter()
+autocmd WinLeave,BufWinLeave * call OnBufLeave()
+
+highlight Search ctermfg=black ctermbg=lightyellow guifg=black guibg=lightyellow
+highlight QuickFixLine ctermbg=lightyellow guibg=lightyellow
+
+highlight Pmenu ctermfg=black ctermbg=lightgrey guifg=black guibg=lightgrey
+highlight PmenuSel ctermfg=black ctermbg=lightyellow guifg=black guibg=lightyellow
+
+autocmd FileType python setlocal tabstop=4 shiftwidth=4 softtabstop=4 noexpandtab
+autocmd FileType json setlocal foldmethod=syntax
+autocmd FileType gitcommit setlocal textwidth=0 spell | startinsert | call feedkeys("\<C-O>1G", 'n')
+" Not sure why this is needed but without it the cursor
+" ends up in the middle of the first word
+autocmd FileType gitrebase call feedkeys("0", 'nx')
+
+" code folding
+"set foldmethod=syntax
+set foldmethod=indent
+set foldnestmax=99
+" don't unfold while searching
+set foldopen-=search
+" this unfolds everything on buffer read
+autocmd BufRead * normal! zR
+highlight Folded ctermbg=lightgrey
+
+" Create the `tags` file (may need to install ctags first)
+command! MakeTags !ctags -R --c++-kinds=+p --fields=+iaS --extras=+q
+			\ .
+			\ /usr/include/*.h
+			\ /usr/lib/gcc/x86_64-pc-linux-gnu/*/include
+			\ /usr/include/openssl
+
+function! IndentExternal()
+	if index(['c', 'cpp'], &filetype) >= 0
+		silent execute ":'<,'>!clang-format -style=\"{
+					\ ColumnLimit: 80,
+					\ UseTab: Always,
+					\ TabWidth: 4,
+					\ IndentWidth: 4,
+					\ BreakBeforeBraces: Allman,
+					\ IncludeBlocks: Preserve,
+					\ SortIncludes: false,
+					\ AlignTrailingComments: false,
+					\ AlignAfterOpenBracket: DontAlign,
+					\ AlignEscapedNewlines: DontAlign,
+					\ BinPackArguments: true,
+					\ BinPackParameters: true,
+					\ AllowAllParametersOfDeclarationOnNextLine: true,
+					\ AllowShortFunctionsOnASingleLine: Empty,
+					\ KeepEmptyLinesAtTheStartOfBlocks: false,
+					\ MaxEmptyLinesToKeep: 1,
+					\ }\""
+	else
+		echoerr 'Only c/cpp formats are supported'
+	endif
+endfunction
+vnoremap <silent> =e :<c-u>call IndentExternal()<CR>
+
+let g:filesearch_highlight = ""
+highlight FileSearchMark ctermfg=black ctermbg=lightcyan guifg=black guibg=lightcyan
+function! GotoFileAndCloseBuffer()
+	let l:curr_line = getline('.')
+	try
+		execute "e " . l:curr_line
+	catch
+	endtry
+endfunction
+function! ClearAllMatchesInBuffer()
+	call clearmatches()
+	match none
+endfunction
+function! FindFiles(query)
+	let l:query = trim(a:query)
+	try
+		execute 'b _FileSearch'
+		normal! ggVG"_x
+	catch
+		enew
+		setlocal buftype=nofile
+		call SetCursorLineSpecial()
+		file _FileSearch
+	endtry
+	augroup FileSearchBufGroup
+		autocmd!
+		autocmd BufEnter <buffer> call ClearAllMatchesInBuffer() | call matchadd('FileSearchMark', g:filesearch_highlight, -1)
+		autocmd BufHidden <buffer> call ClearAllMatchesInBuffer()
+	augroup end
+	nnoremap <buffer> <C-m> :call GotoFileAndCloseBuffer()<CR>
+	let l:query = substitute(l:query, '^\~', expand('~'), '')
+	if l:query =~ '^/'
+		let l:base_search_path = split(l:query, '*')[0]
+		let l:grep_pat = l:query
+		let l:grep_pat = substitute(l:grep_pat, '\*\*', '@ANYPATH@', 'g')
+		let l:grep_pat = substitute(l:grep_pat, '\.', '\\.', 'g')
+		let l:grep_pat = substitute(l:grep_pat, '\*', '[^/]*', 'g')
+		let l:grep_pat = substitute(l:grep_pat, '@ANYPATH@/', '.*', 'g')
+		let l:grep_pat = l:grep_pat.'$'
+		execute "%!find ".l:base_search_path." -not -path './.git/*' -type f 2>/dev/null | grep -i '".l:grep_pat."'"
+	else
+		execute "%!find ./ -not -path './.git/*' -type f -iname '" . l:query . "' 2>/dev/null || :"
+	endif
+	if getline('$') == ""
+		call append(line('$'), 'No results for search query '''. l:query . '''')
+		normal! gg"_dd
+		echoerr "No results"
+		b#
+		return
+	endif
+	let l:query = substitute(l:query, '^.*/', '', '')
+	let l:query = substitute(l:query, '^\**', '', '')
+	let l:query = substitute(l:query, '\**$', '', '')
+	let l:query = substitute(l:query, '\.', '\\.', 'g')
+	let l:query = substitute(l:query, '\*', '.*', 'g')
+	let g:filesearch_highlight = '\c^.*/.*\zs'.l:query
+	call ClearAllMatchesInBuffer()
+	call matchadd('FileSearchMark', g:filesearch_highlight, -1)
+	if line('$') == 1
+		call GotoFileAndCloseBuffer()
+	endif
+endfunction
+command! -nargs=1 Find call FindFiles(<f-args>)
+
+let g:ctag_data = []
+highlight DefinitionPageSignatureMark ctermfg=darkmagenta guifg=darkmagenta
+highlight DefinitionPageReturnMark ctermfg=darkcyan guifg=darkcyan
+highlight DefinitionPageFileMark ctermfg=darkgreen guifg=darkgreen
+function! GotoDefinitionFileAndCloseBuffer()
+	let l:t = g:ctag_data[line('.')-1]
+	execute "e " . l:t.filename
+	set nomagic
+	call cursor(1, 1)
+	execute l:t.cmd
+	normal! zt
+	call histdel('/', -1)
+	set magic
+endfunction
+function! SetDefinitionBufferMarks()
+	call matchadd('DefinitionPageSignatureMark', '^[^ ]*', -1)
+	call matchadd('DefinitionPageReturnMark', '(.*)', -1)
+	call matchadd('DefinitionPageFileMark', '\[.*\]', -1)
+endfunction
+function! CompareTagEntries (t1, t2)
+	let l:t1 = tolower(a:t1.name)
+	let l:t2 = tolower(a:t2.name)
+	return l:t1 == l:t2 ? 0 : l:t1 > l:t2 ? 1 : -1
+endfunction
+function! OpenCtagLookupBuffer(query)
+	let g:ctag_data = []
+	try
+		execute 'b _LookupDefinition'
+		normal! ggVG"_x
+	catch
+		enew
+		setlocal buftype=nofile
+		call SetCursorLineSpecial()
+		file _LookupDefinition
+	endtry
+	augroup CtagLookupBufGroup
+		autocmd!
+		autocmd BufEnter <buffer> call ClearAllMatchesInBuffer() | call SetDefinitionBufferMarks()
+		autocmd BufHidden <buffer> call ClearAllMatchesInBuffer()
+	augroup end
+	nnoremap <buffer> <C-m> :call GotoDefinitionFileAndCloseBuffer()<CR>
+	let l:query = trim(a:query)
+	let l:query = substitute(l:query, '\*', '.*', 'g')
+	for t in sort(taglist('\c^' . l:query . '$'), "CompareTagEntries")
+		let g:ctag_data += [t]
+		let l:typeref = has_key(t, 'typeref') ? t.typeref : ''
+		let l:typeref = substitute(l:typeref, 'typename:', '', '')
+		call append(line('$'), [t.name
+					\. ' (' . l:typeref . ')'
+					\. ' [' . t.filename . ']'])
+	endfor
+	normal! gg"_dd
+	if getline('$') == ""
+		call append(line('$'), 'No results for search query '''. a:query . '''')
+		normal! gg"_dd
+		echoerr "No results"
+		b#
+		return
+	endif
+	call ClearAllMatchesInBuffer()
+	call SetDefinitionBufferMarks()
+	if line('$') == 1
+		call GotoDefinitionFileAndCloseBuffer()
+	endif
+endfunction
+command! -nargs=1 LookupDefinition call OpenCtagLookupBuffer(<f-args>)
+
+let g:dt_manpage_params = {'section': 0, 'query': "echo"}
+function! s:ManpageBufferLoad(reset_cursor)
+	let l:w = winwidth('%') -5
+	let l:cmd = "%!bash -c 'export MANWIDTH=".l:w."; set -o pipefail; "
+	if g:dt_manpage_params.section == 0
+		let l:first = 1
+		for l:s in [2, 3, 1]
+			if !l:first
+				let l:cmd .= ' || '
+			endif
+			let l:cmd .= "(man ".l:s." ".g:dt_manpage_params.query." 2>/dev/null | col -bx)"
+			let l:first = 0
+		endfor
+	else
+		let l:cmd .= "(man ".g:dt_manpage_params.section." ".g:dt_manpage_params.query." 2>/dev/null | col -bx)"
+	endif
+	let l:cmd .= "'"
+	if !a:reset_cursor
+		let l:pos = CursorPositionStore()
+		let l:pos.c = 1
+	endif
+	silent! execute l:cmd
+	normal! zR
+	if !a:reset_cursor
+		call CursorPositionRestore(l:pos)
+	endif
+	call ClearAllMatchesInBuffer()
+endfunction
+function! s:OpenManpageBuffer(section, query)
+	" store current position at mark P
+	if bufname('%') != '_Manpage'
+		call setpos("'P", getcurpos())
+	endif
+	try
+		execute 'b _Manpage'
+		normal! ggVG"_x
+	catch
+		enew
+		setlocal buftype=nofile
+		file _Manpage
+	endtry
+	augroup ManpageBufGroup
+		autocmd!
+		autocmd WinEnter <buffer> call s:ManpageBufferLoad(0)
+		autocmd BufWinEnter <buffer> call ClearAllMatchesInBuffer()
+	augroup end
+	let g:dt_manpage_params = {'section': a:section, 'query': a:query}
+	call s:ManpageBufferLoad(1)
+endfunction
+command! -nargs=+ Manpage call s:OpenManpageBuffer(<f-args>)
+nnoremap <expr> ,m ":Manpage 0 "
+			\. "<C-R>=expand('<cword>')<CR><C-LEFT><LEFT>"
+
+
+" FINDING FILES:
+
+" Search down into subfolders
+" Provides tab-completion for all file-related tasks
+set path+=**
+
+" Display all matching files when we tab complete
+set wildmenu
+set wildignorecase
+set wildignore+=*.class,*.jar,*.pyc
+
+" NOW WE CAN:
+" - Use ^] to jump to tag under cursor
+" - Use g^] for ambiguous tags
+" - Use ^t to jump back up the tag stack
+
+" HIGHLIGHTS:
+" - ^x^n for JUST this file
+" - ^x^f for filenames (works with our path trick!)
+" - ^x^] for tags only
+" - ^n for anything specified by the 'complete' option
+
+" Tweaks for browsing
+let g:netrw_banner=0        " disable annoying banner
+let g:netrw_browse_split=4  " open in prior window
+let g:netrw_altv=1          " open splits to the right
+let g:netrw_liststyle=3     " tree view
+let g:netrw_list_hide=netrw_gitignore#Hide()
+let g:netrw_list_hide.=',\(^\|\s\s\)\zs\.\S\+'
+let g:netrw_winsize = 20
+nnoremap <silent> ,e :Vex<cr>
+" map x key to collapse parent folder
+"autocmd filetype netrw nmap <buffer> x :call NetrwCollapse()<CR><CR>
+"function! NetrwCollapse()
+"	redir => cnt
+"		silent .s/|//gn
+"	redir END
+"	let lvl = substitute(cnt, '\n', '', '')[0:0] - 1
+"	exec '?^\(| \)\{' . lvl . '\}\w'
+"endfunction
+
+" NOW WE CAN:
+" - :edit a folder to open a file browser
+" - <CR>/v/t to open in an h-split/v-split/tab
+"   40<C-w>| to set browse panel width
+" - check |netrw-browse-maps| for more mappings
+
+function! s:QuickfixWindowAction(action)
+	try
+		execute a:action
+		normal! zt^
+	catch
+		call PrintError(v:exception)
+	endtry
+endfunction
+nnoremap <silent> <Up> :call <SID>QuickfixWindowAction('cprevious')<CR>
+nnoremap <silent> <Down> :call <SID>QuickfixWindowAction('cnext')<CR>
+nnoremap <silent> <Left> :call <SID>QuickfixWindowAction('cpfile')<CR>
+nnoremap <silent> <Right> :call <SID>QuickfixWindowAction('cnfile')<CR>
+
+"function! CleanNoNameEmptyBuffers()
+"    let buffers = filter(range(1, bufnr('$')), 'buflisted(v:val) && empty(bufname(v:val)) && bufwinnr(v:val) < 0 && (getbufline(v:val, 1, "$") == [""])')
+"	if !empty(buffers)
+"		exe 'bd '.join(buffers, ' ')
+"	else
+"		echo 'No buffer deleted'
+"	endif
+"endfunction
+
+" Note: returns a list of tabnos where the buf is found or 0 for none.
+"               tabnos start at 1, so 0 is always invalid
+function! WhichTabNo(bufNo)
+	let tabNos = []
+	for tabNo in range(1, tabpagenr("$"))
+		for bufInTab in tabpagebuflist(tabNo)
+			if (bufInTab == a:bufNo)
+				call add(tabNos, tabNo)
+			endif
+		endfor
+	endfor
+	return tabNos
+endfunction
+
+function! CloseAllBuffersButCurrent()
+    let buffers = filter(range(1, bufnr('$')), 'buflisted(v:val) && bufnr("%") != v:val && getbufvar(v:val, "&buftype") !=# "quickfix" && bufwinnr(v:val) == -1 && empty(WhichTabNo(v:val))')
+	if !empty(buffers)
+		try
+			for b in buffers
+				silent execute 'bd'.b
+			endfor
+		catch
+			call PrintError(v:exception)
+			return
+		endtry
+		echo 'Removed ' . len(buffers) . ' buffers'
+	else
+		echo 'No buffer deleted'
+	endif
+endfunction
+
+function! BufferSkipQuickFix(command)
+	let start_buffer = bufnr('%')
+	execute a:command
+	while &buftype ==# 'quickfix' && bufnr('%') != start_buffer
+		execute a:command
+	endwhile
+endfunction
+
+function! ToggleDiffWithSaved()
+	if &diff
+		let l:own_window = win_getid()
+		wincmd h
+		q
+		call win_gotoid(l:own_window)
+		diffoff
+		syntax on
+		call OnBufEnter()
+		execute "vertical resize " . g:dt_width_before_diff_with_saved
+	else
+		let g:dt_width_before_diff_with_saved = winwidth('%')
+		syntax off
+		match none
+		set nosplitright
+		let filetype=&ft
+		diffthis
+		vnew | r # | normal! 1G"_dd
+		diffthis
+		exe "setlocal bt=nofile bh=wipe nobl noswf ro ft=" . filetype
+		match none
+		wincmd l
+		set splitright
+	endif
+endfunction
+nnoremap <silent> ,ds :call ToggleDiffWithSaved()<cr>
+
+function! PrintError(msg) abort
+	execute 'normal! \<Esc>'
+	echohl ErrorMsg
+	echomsg a:msg
+	echohl None
+endfunction
+
+function! SearchAndGo(dir, pat)
+	setlocal nowrapscan
+	silent! execute "keepjumps normal! ".a:dir.a:pat."\<CR>"
+	call histdel("/", -1)
+	setlocal wrapscan
+endfunction
+
+function! CursorPositionStore()
+	return {'l': line('.'), 'c': col('.')}
+endfunction
+function! CursorPositionRestore(pos)
+	call cursor(a:pos['l'], a:pos['c'])
+endfunction
+function! CursorPositionCompare(pos1, pos2)
+	if a:pos1['l'] == a:pos2['l'] && a:pos1['c'] == a:pos2['c']
+		return 0
+	elseif a:pos2['l'] > a:pos1['l']
+		return 1
+	elseif a:pos1['l'] == a:pos2['l']
+		if a:pos2['c'] > a:pos1['c']
+			return 1
+		else
+			return -1
+		endif
+	else
+		return -1
+	endif
+endfunction
+
+let g:decl_win_info = {}
+function! DeclarationResize()
+	let l:size = winheight(0)
+	let l:curr_winid = win_getid()
+	if has_key(g:decl_win_info, l:curr_winid)
+		let g:decl_win_info[l:curr_winid].winheight = l:size
+		" when resizing, the cursor moves for some reason
+		normal! zt
+	endif
+endfunction
+function! DeclarationStick()
+	setlocal scrolloff=0
+	setlocal winfixheight
+	let l:tag_line_number = line('.')
+	let l:tag_line = getline('.')
+	if getline('.') =~ ';'
+		let l:height = 1
+		if getline('.') =~ '}'
+			normal! 0f}
+			normal! %
+			if getline('.') =~ '^\s*{\s*$'
+				normal! k
+			endif
+			let l:height = l:tag_line_number - line('.') + 1
+		endif
+	else
+		normal! ^
+		let l:line_type = GetCurrentCharType()
+		if l:line_type =~ '\cstructure'
+			if l:tag_line =~ 'struct' || l:tag_line =~ 'union'
+				call SearchAndGo('/', '}')
+			endif
+			call SearchAndGo('/', ';')
+		elseif l:line_type =~ '\cstorageclass'
+			let l:start_pos = CursorPositionStore()
+			call SearchAndGo('/', ';')
+			let l:pos_apos = CursorPositionStore()
+			call CursorPositionRestore(l:start_pos)
+			call SearchAndGo('/', '{')
+			if getline('.') =~ '^\s*{\s*$'
+				normal! k
+			endif
+			if CursorPositionCompare(l:pos_apos, CursorPositionStore()) >= 0
+				call CursorPositionRestore(l:pos_apos)
+			endif
+		elseif l:line_type =~ '\cblock'
+			call SearchAndGo('/', ';')
+		else
+			call SearchAndGo('/', '{')
+			if getline('.') =~ '^\s*{\s*$'
+				normal! k
+			endif
+		endif
+		let l:ldiff = line('.') - l:tag_line_number + 1
+		let l:height = (l:ldiff <= 0) ? 1 : l:ldiff
+		call cursor(l:tag_line_number, 1)
+	endif
+	if l:height > 10
+		let l:height = 10
+	endif
+	execute "resize " . l:height
+	normal! zt
+	execute "let g:decl_win_info.".win_getid()." = {'file': '".expand('%:p')."', 'line': ".line('.').", 'winheight': ".l:height."}"
+endfunction
+function! OpenFuncDeclarationHint(funcname)
+	let l:curr_winid = win_getid()
+	try
+		set nosplitbelow
+		execute "stjump " . a:funcname
+		call DeclarationStick()
+		normal! zR
+		call win_gotoid(l:curr_winid)
+	catch
+		" stjump failed. don't keep the split
+		if win_getid() != l:curr_winid
+			q
+			call win_gotoid(l:curr_winid)
+		endif
+		call PrintError(v:exception)
+	finally
+		set splitbelow
+	endtry
+endfunction
+function! OnMoveDeclarationWindow()
+	let l:curr_winid = win_getid()
+	if has_key(g:decl_win_info, l:curr_winid)
+		setlocal nowinfixheight
+		setlocal scrolloff=20
+		call remove(g:decl_win_info, l:curr_winid)
+	endif
+endfunction
+function! ResetDeclWindows(resize_current)
+	let l:curr_window = win_getid()
+	let l:windows_to_remove = []
+	for [key, value] in items(g:decl_win_info)
+		if key == l:curr_window && !a:resize_current
+			continue
+		endif
+		if win_gotoid(key)
+			execute "b " . value['file']
+			call cursor(value['line'], 1)
+			execute "resize " . value['winheight']
+			normal! zt
+		else
+			let l:windows_to_remove += [key]
+		endif
+	endfor
+	for l:win_id in l:windows_to_remove
+		call remove(g:decl_win_info, l:win_id)
+	endfor
+	call win_gotoid(l:curr_window)
+endfunction
+function! CloseAllHintWindows()
+	let l:windows_to_remove = []
+	for [key, value] in items(g:decl_win_info)
+		let l:winnr = win_id2win(key)
+		if l:winnr > 0
+			execute l:winnr.'wincmd c'
+			let l:windows_to_remove += [key]
+		endif
+	endfor
+	for l:win_id in l:windows_to_remove
+		call remove(g:decl_win_info, l:win_id)
+	endfor
+endfunction
+
+nnoremap <silent> <C-w>H :call OnMoveDeclarationWindow()<BAR> wincmd H<CR>
+nnoremap <silent> <C-w>J :call OnMoveDeclarationWindow()<BAR> wincmd J<CR>
+nnoremap <silent> <C-w>K :call OnMoveDeclarationWindow()<BAR> wincmd K<CR>
+nnoremap <silent> <C-w>L :call OnMoveDeclarationWindow()<BAR> wincmd L<CR>
+nnoremap <silent> <C-w>T :call OnMoveDeclarationWindow()<BAR> wincmd T<CR>
+
+nnoremap <silent> ,hi :call OpenFuncDeclarationHint(expand("<cword>"))<cr>
+nnoremap <silent> ,hs :call DeclarationStick()<CR>
+nnoremap <silent> ,hd :call CloseAllHintWindows()<CR>
+
+nnoremap <silent> <C-w>h :wincmd h<CR>:call ResetDeclWindows(1)<CR>
+nnoremap <silent> <C-w>j :wincmd j<CR>:call ResetDeclWindows(1)<CR>
+nnoremap <silent> <C-w>k :wincmd k<CR>:call ResetDeclWindows(1)<CR>
+nnoremap <silent> <C-w>l :wincmd l<CR>:call ResetDeclWindows(1)<CR>
+nnoremap <silent> <C-w>_ :wincmd _<CR>:normal! zt<CR>:call ResetDeclWindows(0)<CR>
+nnoremap <silent> <C-w><C-w> :wincmd w<CR>:call ResetDeclWindows(1)<CR>
+nnoremap <silent> gt :normal! gt<CR>:call ResetDeclWindows(1)<CR>
+nnoremap <silent> gT :normal! gT<CR>:call ResetDeclWindows(1)<CR>
+
+nmap <S-Left> <C-w>h
+nmap <S-Down> <C-w>j
+nmap <S-Up> <C-w>k
+nmap <S-Right> <C-w>l
+
+nnoremap <silent> <C-Up> :resize -1<CR>:call DeclarationResize()<CR>
+nnoremap <silent> <C-Down> :resize +1<CR>:call DeclarationResize()<CR>
+nnoremap <silent> <C-Left> :vertical resize -1<CR>
+nnoremap <silent> <C-Right> :vertical resize +1<CR>
+
+nnoremap <silent> Q :q<CR>
+nmap _ <C-w>_
+nnoremap <BAR> <C-w><BAR>
+nnoremap =w <C-w>=
+
+let g:EclimCSearchSingleResult = 'edit'
+let g:EclimJavaSearchSingleResult = 'edit'
+let g:EclimPythonSearchSingleResult = 'edit'
+let g:EclimQuickFixOpen = 'let l:eclim_prev_window = win_getid() | call setpos("''P", getcurpos()) | cwindow | call win_gotoid(l:eclim_prev_window) | cfirst | silent echo'
+
+function! s:EclimExists()
+	return exists("*eclim#PingEclim")
+				\ && eclim#PingEclim(0)
+				\ && eclim#project#util#GetCurrentProjectName() != ''
+endfunction
+function! s:EclimGetFiletype()
+	if index(['c', 'cpp', 'h'], &filetype) >= 0
+		return 'C'
+	elseif &filetype == 'java'
+		return 'Java'
+	elseif &filetype == 'python'
+		return 'Python'
+	else
+		return ''
+	endif
+endfunction
+function! GotoDefinitionCustom()
+	let l:ft = s:EclimGetFiletype()
+	if s:EclimExists() && l:ft != ''
+		cclose
+		execute l:ft . 'SearchContext'
+		normal! zt^
+	else
+		normal! gd
+	endif
+endfunction
+nnoremap <silent> gd :call GotoDefinitionCustom()<CR>
+function! GotoReferences()
+	let l:ft = s:EclimGetFiletype()
+	if s:EclimExists() && l:ft != ''
+		cclose
+		execute l:ft . 'Search -x references'
+		normal! zt^
+	else
+		echo 'Eclim is not supported here'
+	endif
+endfunction
+nnoremap <silent> gr :call GotoReferences()<CR>
+
+function! s:CloseOmniParenthesis() abort
+	augroup CloseOmniParenthesis
+		autocmd!
+		autocmd CompleteDone <buffer>
+					\  if has_key(v:completed_item, 'word')
+					\|     if v:completed_item.word =~# '($'
+					\|         call OpenFuncDeclarationHint(substitute(v:completed_item.word, '($', '', ''))
+					\|         call feedkeys(")\<Left>", 'in')
+					\|     else
+					\|         call OpenFuncDeclarationHint(v:completed_item.word)
+					\|     endif
+					\| endif
+					\| autocmd! CloseOmniParenthesis
+					\| augroup! CloseOmniParenthesis
+	augroup END
+	return ''
+endfunction
+inoremap <C-x><C-o> <C-r>=<SID>CloseOmniParenthesis()<CR><C-x><C-o>
+imap <C-c> <C-x><C-o>
+inoremap <C-p> <C-x><C-f>
+inoremap <C-n> <C-x><C-p>
+
+function! ChangeInnerChar(chr, twin)
+	let l:curr_char = GetCurrentChar()
+	if index([a:chr, a:twin], l:curr_char) < 0
+		execute 'normal! F' . a:chr
+		let l:curr_char = GetCurrentChar()
+		if index([a:chr, a:twin], l:curr_char) < 0
+			execute 'normal! f' . a:chr
+		endif
+	endif
+	execute 'normal! "_ci' . a:chr
+	execute 'normal! l'
+	startinsert
+	if a:chr == '{'
+		call feedkeys("\<C-F>", 'n')
+	endif
+endfunction
+nnoremap ci< :call ChangeInnerChar('<', '>')<CR>
+nnoremap ci> :call ChangeInnerChar('<', '>')<CR>
+nnoremap ci{ :call ChangeInnerChar('{', '}')<CR>
+nnoremap ci} :call ChangeInnerChar('{', '}')<CR>
+nnoremap ci( :call ChangeInnerChar('(', ')')<CR>
+nnoremap ci) :call ChangeInnerChar('(', ')')<CR>
+nnoremap ci[ :call ChangeInnerChar('[', ']')<CR>
+nnoremap ci] :call ChangeInnerChar('[', ']')<CR>
+
+function! ChangeValue()
+	let l:sc = 0
+	if getline('.') =~ '[,;]\s*$'
+		let l:sc = 1
+	endif
+	let l:sep = '='
+	if getline('.') =~ '^\s*[a-zA-Z_0-9-]*:'
+		let l:sep = ':'
+	endif
+	execute 's/\('.l:sep.'\)\s\+/\1 /e'
+	call histdel("/", -1)
+	execute 's/\(.\{-\}'.l:sep.'\s*\).\{-}\([,;]*\)\s*$/\1\2/e'
+	call histdel("/", -1)
+	if l:sc
+		normal! $
+		startinsert
+	else
+		startinsert
+		call feedkeys("\<C-O>$", 'n')
+	endif
+endfunction
+nnoremap <silent> cv :call ChangeValue()<CR>
+function! ChangeField()
+	let l:sep = '='
+	if getline('.') =~ '^\s*[a-zA-Z_0-9-]*:'
+		let l:sep = ':'
+	endif
+	execute 's/\(\s*\).\{-}\(\s*'.l:sep.'.*\)$/\1@\2/e'
+	call histdel("/", -1)
+	normal! 0f@
+	normal! "_x
+	startinsert
+endfunction
+nnoremap <silent> cn :call ChangeField()<CR>
+
+function! FindFirstParenthesis()
+	let l:curr_chr = GetCurrentChar()
+	if index(["(", "[", "{", "<", "\"", "'"], l:curr_chr) >= 0
+				\ || (index(['"', ''''], l:curr_chr) && GetPreviousChar() == '\')
+		return
+	endif
+	while 1
+		call SearchAndGo('?', '[][(){}<>''"]\{1\}')
+		if index(['"', ''''], GetCurrentChar())
+					\ && GetPreviousChar() == '\'
+			continue
+		endif
+		let l:matched_chr = GetCurrentChar()
+		if CheckIfAccessOper()
+			continue
+		endif
+		if index([')', ']', '}', '>'], l:matched_chr) >= 0
+			call GotoTwinChar()
+			continue
+		endif
+		if index(['"', ''''], l:matched_chr) >= 0
+			let l:tmp_pos = CursorPositionStore()
+			call GotoTwinChar()
+			if CursorPositionCompare(l:tmp_pos, CursorPositionStore()) >= 0
+				call CursorPositionRestore(l:tmp_pos)
+				break
+			endif
+			continue
+		endif
+		if GetCurrentCharType() =~ '\cstring'
+			continue
+		endif
+		break
+	endwhile
+endfunction
+function! InnerAnythingChange()
+	call FindFirstParenthesis()
+	let l:curr_chr = GetCurrentChar()
+	let l:curr_type = GetCurrentCharType()
+	execute 'normal! "_ci' . l:curr_chr
+	normal! l
+	startinsert
+	if l:curr_chr == '{'
+		call feedkeys("\<C-F>", 'n')
+	elseif l:curr_chr == '[' && &filetype == 'sh'
+				\ && l:curr_type !~ '\cquote\|\ccomment'
+		call feedkeys("  \<LEFT>", 'n')
+	endif
+endfunction
+function! InnerAnythingIndent(type)
+	let l:start_pos = CursorPositionStore()
+	call FindFirstParenthesis()
+	call setpos("'<", [0, line('.'), col('.'), 0])
+	call GotoTwinChar()
+	call setpos("'>", [0, line('.'), col('.'), 0])
+	if a:type == 'simple'
+		call feedkeys("`<v`>=", 'nx')
+	elseif a:type == 'custom'
+		'<,'>call LightFormat(0)
+	endif
+	call CursorPositionRestore(l:start_pos)
+	normal! ^
+endfunction
+nnoremap <silent> cc :call InnerAnythingChange()<CR>
+nnoremap <silent> =ii :call InnerAnythingIndent('simple')<CR>
+nnoremap <silent> ,== :call InnerAnythingIndent('custom')<CR>
+
+nnoremap j +
+nnoremap k -
+
+nnoremap <C-j> 5j^
+nnoremap <C-k> 5k^
+nnoremap <C-l> 5l
+nnoremap <C-h> 5h
+
+nnoremap <C-e> 5<C-e>
+nnoremap <C-y> 5<C-y>
+
+vnoremap <C-j> 5j
+vnoremap <C-k> 5k
+vnoremap <C-l> 5l
+vnoremap <C-h> 5h
+nnoremap Y yg_
+
+function! DuplicateLine()
+	normal! "zyy"zp
+	let l:curr_line = getline('.')
+	if l:curr_line =~ '^#include\s*<'
+		call ChangeInnerChar('<', '>')
+		normal! l
+		startinsert
+	endif
+endfunction
+function! DuplicateLines()
+	normal! gv"zy
+	normal! '>"zp
+endfunction
+nnoremap <silent> yyy :call DuplicateLine()<CR>
+vnoremap <silent> yyy :<c-u>call DuplicateLines()<CR>
+nnoremap <silent> yyi :execute "normal! yi" . GetCurrentChar()<CR>
+
+" for these - mark Y as copy source location
+nnoremap <silent> yy :normal! yy<CR>:normal! mY<CR>
+vnoremap <silent> y y:normal! mY<CR>
+
+function! GotoTwinChar()
+	let l:curr_chr = GetCurrentChar()
+	if index(['(', ')', '[', ']', '{', '}'], l:curr_chr) >= 0
+		normal! %
+	elseif index(['<', '>', '"', '''', '`'], l:curr_chr) >= 0
+		let l:start_pos = CursorPositionStore()
+		let l:last_undo = undotree()['seq_last']
+		" if nothing is yanked to it, it will not be set to ''
+		call setreg('z', '')
+		execute 'normal! "zdi' . l:curr_chr
+		if getreg('z') == ''
+			if CursorPositionCompare(l:start_pos, CursorPositionStore()) == 0
+				normal! h
+			endif
+		else
+			normal! "zP
+			normal! `[h
+			if CursorPositionCompare(l:start_pos, CursorPositionStore()) == 0
+				normal! `]l
+			endif
+		endif
+		if undotree()['seq_last'] > l:last_undo
+			let l:tmp_pos = CursorPositionStore()
+			silent! normal! u
+			call CursorPositionRestore(l:tmp_pos)
+		endif
+	else
+		call SearchAndGo('/', '{')
+		normal! %
+	endif
+endfunction
+nnoremap <silent> % :call GotoTwinChar()<CR>
+
+function! MarkVisualModeTwinChar(mode)
+	call GotoTwinChar()
+	execute 'normal! `<' . a:mode . '``'
+endfunction
+xnoremap <expr> % ':<c-u>call MarkVisualModeTwinChar(''' . mode() . ''')<CR>'
+
+function! HandleWordEndKey()
+	if IsCharMatching(GetCurrentChar(), ']})>')
+		return
+	elseif IsCharMatching(GetCurrentChar(), '[{(<''"')
+		let l:pos = CursorPositionStore()
+		call GotoTwinChar()
+		if CursorPositionCompare(CursorPositionStore(), l:pos) > 0
+			call CursorPositionRestore(l:pos)
+		endif
+	else
+		normal! e
+	endif
+endfunction
+nnoremap <silent> e :call HandleWordEndKey()<CR>
+
+" delete a block by character, inclusive
+function! DeleteBlockByCharacter(do_change)
+	if col('.') == col('$')-1
+		let l:act = 'a'
+	else
+		let l:act = 'i'
+	endif
+	call GotoTwinChar()
+	normal! v``"_x
+	if a:do_change
+		call feedkeys(l:act, 'n')
+	endif
+endfunction
+nnoremap <silent> db :call DeleteBlockByCharacter(0)<CR>
+nnoremap <silent> cb :call DeleteBlockByCharacter(1)<CR>
+
+function! FindParen(dir)
+	if index(['"', '''', '`'], GetCurrentChar()) >= 0 && a:dir == '/'
+		let l:tmp_pos = CursorPositionStore()
+		call GotoTwinChar()
+		if CursorPositionCompare(CursorPositionStore(), l:tmp_pos) >= 0
+			call CursorPositionRestore(l:tmp_pos)
+		endif
+	endif
+	call SearchAndGo(a:dir, '[{[(<"''`]\{1\}')
+	if index(['"', '''', '`'], GetCurrentChar()) >= 0 && a:dir == '?'
+		let l:tmp_pos = CursorPositionStore()
+		call GotoTwinChar()
+		if CursorPositionCompare(l:tmp_pos, CursorPositionStore()) >= 0
+			call CursorPositionRestore(l:tmp_pos)
+		endif
+	endif
+endfunction
+nnoremap <silent> ) :call FindParen('/')<CR>
+nnoremap <silent> ( :call FindParen('?')<CR>
+
+nnoremap <silent> <C-]> :execute "tjump " . expand("<cword>")<CR>
+
+vnoremap s ge
+vnoremap S gE
+vnoremap $ g_
+
+nnoremap ,q :cq<CR>
+nnoremap <silent> <Space>w :w<CR>
+nnoremap <silent> ,sp :setlocal spell!<cr>
+nnoremap <silent> ,yf :let @+=expand("%:t")<bar>echo "Copied '" . expand("%:t") . "'"<CR>
+nnoremap <silent> ,yF :let @+=expand("%:p")<bar>echo "Copied '" . expand("%:p") . "'"<CR>
+nnoremap <silent> ,bl :execute "silent !bash -ic 'tig blame ".expand("%:p")." +".line('.')."'" <BAR> :redraw!<CR>
+
+if !&diff
+	nnoremap <silent> ,bd :call CloseAllBuffersButCurrent()<cr>
+	nnoremap <silent> ,n :call BufferSkipQuickFix("bn")<cr>
+	nnoremap <silent> ,p :call BufferSkipQuickFix("bp")<cr>
+	nnoremap ,l :ls<cr>:b<space>
+	nnoremap <silent> ,o :only<cr>
+endif
+
+highlight DiffAdd ctermfg=black ctermbg=lightgreen guifg=black guibg=lightgreen
+highlight DiffChange ctermfg=NONE ctermbg=NONE guifg=NONE guibg=NONE
+highlight DiffDelete ctermfg=lightgrey ctermbg=lightred guifg=lightgrey guibg=lightred
+highlight DiffText ctermfg=black ctermbg=lightblue guifg=black guibg=lightblue
+
+function DiffIgnoreWhiteSpaceToggle()
+	if &diffopt =~ 'iwhite'
+		set diffopt-=iwhite
+		echo "NOT ignoring whitespace in diffs"
+	else
+		set diffopt+=iwhite
+		echo "Ignoring whitespace in diffs"
+	endif
+endfunction
+nnoremap <silent> <Space>i :call DiffIgnoreWhiteSpaceToggle()<CR>
+
+if &diff
+	autocmd VimEnter * '":normal! gg]c[cz.'
+	set noreadonly
+	syntax off
+	function! DiffToggle()
+		if &diff
+			diffoff
+		else
+			diffthis
+		endif
+	endfunction
+	nnoremap <silent> ,t :call DiffToggle()<CR>
+	nnoremap <silent> ,r :diffget REMOTE<CR>
+	nnoremap <silent> ,l :diffget LOCAL<CR>
+	nnoremap <silent> ,n /^<<<<<<<<CR>
+endif
+
+nnoremap <C-n> ]cz.
+nnoremap <C-p> [cz.
+nnoremap do :diffget<BAR>normal! ]cz.<CR>
+
+nnoremap <expr> K ":call setreg(has('unnamedplus') ? '+' : 'z', '<C-R>=expand('<cword>')<CR>')<CR>"
+			\.":Grep ./ 0 "
+			\."*".(len(expand('%:e')) > 0 ? '.'.expand('%:e') : '')
+			\. " '\\\<<C-R>=expand('<cword>')<CR>\\\>'<C-LEFT><LEFT>"
+
+" search for selection by copying to clipboard, escaping, then looking for it
+vnoremap <silent> * "zy:let @/='<C-R>=escape(@z,'/\')<CR>'<CR>:set hls<CR>
+nnoremap <silent> * :let @/='\<<C-R>=expand("<cword>")<CR>\>'<CR>:set hls<CR>
+
+execute "set <A-d>=\ed"
+execute "set <A-h>=\eh"
+execute "set <A-j>=\ej"
+execute "set <A-k>=\ek"
+execute "set <A-l>=\el"
+execute "set <A-o>=\eo"
+inoremap <silent> <A-d> <C-o>"_dw
+inoremap <silent> <A-j> <C-O>o
+inoremap <silent> <A-k> <C-O>O
+inoremap <silent> <A-o> <CR><C-O>O
+
+function! BreakToNewline()
+	call feedkeys("i\<CR>", 'nx')
+	execute (line('.')-1).'s/\s*$//e'
+	normal! +
+endfunction
+nnoremap <silent> <Space><CR> :call BreakToNewline()<CR>
+
+let g:move_action_undo_join = 0
+function! GetMoveActionLinesCommand(selection_escape, reselect, movement, post)
+	return (g:move_action_undo_join ? ":".a:selection_escape."silent! undojoin\<CR>".a:reselect : "")
+				\. ":move ".a:movement."\<CR>"
+				\. ":let g:move_action_undo_join=1\<CR>"
+				\. a:post
+endfunction
+nnoremap <silent> <expr> <A-j> GetMoveActionLinesCommand('', '', '.+1', '==')
+nnoremap <silent> <expr> <A-k> GetMoveActionLinesCommand('', '', '.-2', '==')
+vnoremap <silent> <expr> <A-j> GetMoveActionLinesCommand('\<c-u>', 'gv', "'>+1", 'gv=gv')
+vnoremap <silent> <expr> <A-k> GetMoveActionLinesCommand('\<c-u>', 'gv', "'<-2", 'gv=gv')
+
+inoremap <C-j> <C-o>j<C-o>^
+inoremap <C-k> <C-o>k<C-o>^
+inoremap <C-h> <LEFT>
+inoremap <C-l> <RIGHT>
+
+noremap c "_c
+nnoremap x "_x
+noremap <Del> "_x
+nnoremap C "_C
+nnoremap D "_D
+" don't pollute the clipboard with every delete word, but do yank a whole line
+nnoremap d "_d
+nnoremap dd dd
+
+" paste and auto-indent
+function! PasteCustom(type)
+	execute 'normal! "' . v:register . a:type . '`[v`]='
+	execute 'normal! `' . (getregtype('') == 'V' ? '[' : ']')
+	if col('.') == 1
+		normal! ^
+	endif
+endfunction
+nnoremap <silent> p :call PasteCustom('p')<CR>
+nnoremap <silent> P :call PasteCustom('P')<CR>
+
+nnoremap - "_dd
+nnoremap + m`o<Esc>``
+
+"command! Qbuffers call setqflist(map(filter(range(1, bufnr('$')), 'buflisted(v:val) && getbufvar(v:val, "&buftype", "ERROR") != "quickfix"'), '{"bufnr":v:val}'))
+"autocmd BufAdd * Qbuffers
+"autocmd BufDelete * Qbuffers
+
+let commentTextMap = {
+			\'c': '\/\/',
+			\'h': '\/\/',
+			\'cpp': '\/\/',
+			\'java': '\/\/',
+			\'php': '\/\/',
+			\'javascript': '\/\/',
+			\'groovy': '\/\/',
+			\'python': '#',
+			\'sh': '#',
+			\'vim': '"',
+			\'make': '#',
+			\'conf': '#',
+\}
+noremap <silent> <expr> <C-m> ((GetCurrentCharType() =~ 'comment\c') ?
+			\ ':<S-Right>:s/^\([ \t]*\)' . get(commentTextMap, &filetype, '#') . '/\1/<CR>' :
+			\ ':<S-Right>:s/^/' . get(commentTextMap, &filetype, '#') . '/<CR>:nohl<CR>'
+			\ ) . ':nohl<CR>:call histdel("/", -1)<CR>'
+
+function PySetTabParams(v)
+	if a:v > 0
+		execute "setlocal tabstop=".a:v
+		execute "setlocal shiftwidth=".a:v
+		execute "setlocal softtabstop=".a:v
+		setlocal expandtab
+	else
+		setlocal tabstop=4
+		setlocal shiftwidth=4
+		setlocal softtabstop=4
+		setlocal noexpandtab
+	endif
+endfunction
+
+" Python auto detect
+function PyIndentAutoCfg()
+	let lnum = 1
+	let got_col = 0  " 1 if previous line ended with colon
+	let space_pattern = '^\([ ]*\)'
+	while lnum <= 100
+		let line = getline(lnum)
+		let l:current_line_type = GetCharType(lnum, 1)
+		let lnum = lnum + 1
+
+		if l:current_line_type =~ 'comment\c'
+					\ || l:current_line_type =~ 'string\c'
+					\ || l:current_line_type =~ 'triplequotes\c'
+			continue
+		endif
+
+		if got_col == 1
+			if line =~ "^\t"
+				" do nothing because default is
+				" setlocal noexpandtab tabstop=4 shiftwidth=4
+				call PySetTabParams(0)
+				return
+			endif
+			let preceding_spaces = len(matchlist(line, space_pattern)[1])
+			if preceding_spaces > 0
+				call PySetTabParams(preceding_spaces)
+				return
+			endif
+		endif
+		if line =~ ":\s*$"
+			let got_col = 1
+		else
+			let got_col = 0
+		endif
+	endwhile
+endfunction
+autocmd FileType python call PyIndentAutoCfg()
+" End Python auto detect
+
+" It just so happens that yaml can use the same python function
+autocmd FileType yaml call PyIndentAutoCfg()
+
+function! PrettyFormat()
+	if &filetype == 'xml'
+		%!XMLLINT_INDENT=$'\t' xmllint --encode UTF-8 --format -
+	elseif &filetype == 'json'
+		%!jq --tab '.'
+	else
+		normal! gg=G''
+	endif
+	normal! zR
+endfunction
+nnoremap <silent> =f :call PrettyFormat()<CR>
+
+" SNIPPETS:
+
+" Read a template and move cursor to EOL
+"nnoremap ,tmp :-1read $HOME/my.template<CR>:+1,+1d<CR>k$a
