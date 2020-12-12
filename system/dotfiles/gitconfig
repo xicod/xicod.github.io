@@ -1,0 +1,14 @@
+[pull]
+	rebase = true
+[rebase]
+	autoStash = true
+[credential]
+	helper = store
+[core]
+	excludesfile = /etc/gitignore_global
+[merge]
+	tool = vimdiff
+[mergetool]
+	keepBackup = false
+[mergetool "vimdiff"]
+	trustExitCode = false

@@ -1,0 +1,52 @@
+set refresh-mode = auto
+set diff-options = -m
+set wrap-search = no
+
+color main-tracked red default bold
+color main-head blue default bold
+
+bind main M <bash -c 'echo "" > ~/.tig_param'
+bind main ! >bash -c 'git revert $(git rev-parse %(commit)^2 &>/dev/null && echo "-m 1") --no-edit %(commit)'
+bind main p >git pull --rebase
+bind main P !git push %(remote) %(commit):%(branch)
+bind main ) >bash -c 'git reset --soft %(commit)~1 && git commit --edit -m"$(git log --format=%B --reverse HEAD..HEAD@{1})"'
+bind main u >git reset --soft HEAD~1
+bind main , >git rebase -i %(commit)~1
+bind main Y +bash -c 'echo -n %(commit) | xsel -ib ; echo "Copied \'%(commit)\' to clipboard"'
+bind main C <bash -c 'echo "--first-parent" > ~/.tig_param'
+bind main Z <bash -c 'echo "%(commit) --first-parent" > ~/.tig_param'
+
+bind status A >bash -c 'git reset --hard HEAD && git clean -fd'
+bind status a >git checkout -- .
+bind status U >git add --patch %(file)
+bind status F :/^M
+bind status C >git commit
+bind status Y +bash -c 'echo -n %(file) | xsel -ib ; echo "Copied \'%(file)\' to clipboard"'
+bind status S !bash -c 'read -p "Enter stash name: " sname; git stash save --keep-index $sname'
+
+bind refs C >bash -c 'git checkout %(branch) && git pull --rebase'
+bind refs - >bash -c 'git checkout - && git pull --rebase'
+bind refs ! >git branch -d %(branch)
+bind refs M >bash -c 'git pull --rebase && git merge --no-ff --no-edit %(remote)/%(branch)'
+bind refs N !bash -c 'git pull --rebase && echo -n "Enter branch name to fork of current ($(git symbolic-ref --short HEAD)): " && read nbname && test -n "$nbname" && git checkout -b $nbname && git push -u %(remote) $nbname'
+
+bind diff F :/^diff --git
+bind diff G :/^[+-]{1}[^+-]{1}
+bind diff D >git difftool --tool=vimdiff --no-prompt %(commit)^! -- %(file)
+bind diff M >git difftool --tool=meld --no-prompt %(commit)^! -- %(file)
+bind diff Y +bash -c 'echo -n %(file) | xsel -ib ; echo "Copied \'%(file)\' to clipboard"'
+bind diff H <bash -c 'echo "--follow %(file)" > ~/.tig_param'
+
+bind stage F :/^diff --git
+bind stage G :/^[+-]{1}[^+-]{1}
+bind stage D >bash -c 'git difftool --tool=vimdiff --no-prompt $([[ "%(status)" =~ ^Staged\\ changes\\ to ]] && echo "--cached") -- "%(file)"'
+bind stage M >bash -c 'git difftool --tool=meld --no-prompt $([[ "%(status)" =~ ^Staged\\ changes\\ to ]] && echo "--cached") -- "%(file)"'
+bind stage Y +bash -c 'echo -n %(file) | xsel -ib ; echo "Copied \'%(file)\' to clipboard"'
+bind stage H <bash -c 'echo "--follow %(file)" > ~/.tig_param'
+
+bind log F :/^commit
+
+bind blob Y +bash -c 'echo -n %(file) | xsel -ib ; echo "Copied \'%(file)\' to clipboard"'
+bind blob H <bash -c 'echo "--follow %(file)" > ~/.tig_param'
+
+bind blame H <bash -c 'echo "--follow %(file)" > ~/.tig_param'
