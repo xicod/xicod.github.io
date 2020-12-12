@@ -21,7 +21,6 @@ alias ls='ls --color=auto'
 alias ping="ping -c 10"
 alias top="top -c"
 alias lfp="pgrep -aif"
-alias hdl="source /tools/handle_download_last.sh"
 alias systemctl="systemctl -l"
 alias vimc="vim -u <(curl -sS https://xicod.github.io/v)"
 
@@ -47,6 +46,23 @@ function whoswap {
 	| sort -k3 -n \
 	| awk '{if($3>0){print $2"|"$1"|"$3" kB"}}' \
 	| column -s '|' -t
+}
+
+function hdl {
+	which openssl >/dev/null || return 1
+	local f="${HOME}/Downloads/$(ls -1t ${HOME}/Downloads/ | head -n1)"
+	local d=${HOME}/tmp/$(openssl rand 8 | xxd -ps -c 256)
+	echo -e "\nHandling '$f'\n"
+	local cmd=""
+	case "$f" in
+		*.zip) cmd="unzip";;
+		*.tar|*.tar.gz|*.tar.bz2|tar.xz|*.tbz|*.tgz) cmd="tar xpf";;
+		*.rar) cmd="unrar x";;
+		*) echo -e "\nDon't know how to handle '$f'\n"; return 1;;
+	esac
+	mkdir -p "$d"; cd "$d"
+	$cmd "$f" >/dev/null \
+		&& echo -e "\nRemoving '$f'\n" && rm "$f" && ls -l
 }
 
 ## Colours
