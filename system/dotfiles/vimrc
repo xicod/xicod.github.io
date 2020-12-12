@@ -310,8 +310,14 @@ function! LightFormat(advanced)
 
 	" remove multiple whitespace
 	call ReplaceInCode('\s\+', ' ')
-	" remove space before [semi]colon at end of line
-	s/\s*\([:;]\{1\}\)\s*$/\1/e
+	" remove space before semicolon at end of line
+	s/\s*\([;]\{1\}\)\s*$/\1/e
+
+	" remove space before colon at end of line for specific languages
+	if index(['python', 'yaml'], &filetype) >= 0
+		s/\s*\([:]\{1\}\)\s*$/\1/e
+	endif
+
 	" remove trailing whitespace
 	s/\s*$//e
 	" restore original indentation
