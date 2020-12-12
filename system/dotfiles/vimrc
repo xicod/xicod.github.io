@@ -624,7 +624,8 @@ function! MoveToLastOfIndent(dir)
 	endif
 endfunction
 function! IsBracesDelimitedLang()
-	return index(['c', 'cpp', 'java', 'php', 'javascript', 'groovy'], &filetype) >= 0
+	return index(['c', 'h', 'cpp',
+				\'java', 'php', 'javascript', 'groovy'], &filetype) >= 0
 endfunction
 function! MarkCurrentBlock(go_up)
 	if a:go_up
