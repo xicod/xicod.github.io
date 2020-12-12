@@ -35,6 +35,11 @@ function tig {
 	done
 }
 
+function xuniq {
+	awk '!x[$0]++'
+}
+export -f xuniq
+
 function xopen {
 	gio open -- "$1" >/dev/null 2>&1
 }
