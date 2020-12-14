@@ -183,7 +183,25 @@ function _prompt_pre {
 [ -n "$PROMPT_COMMAND" ] && PROMPT_COMMAND+=";"
 PROMPT_COMMAND+="_prompt_pre"
 
+_dt_temp_prev_compl_cmd=""
+function _dt_fzf_compl {
+	local c=${READLINE_LINE%% *}
+	if [ "$1" = "set" ]; then
+		_dt_temp_prev_compl_cmd=$(complete -p "$c" 2>/dev/null)
+		local cmd="complete -F _fzf_path_completion -o default -o bashdefault $c"
+	elif [ "$1" = "unset" ]; then
+		local cmd="$_dt_temp_prev_compl_cmd"
+	else
+		return
+	fi
+	if ! [[ "$_dt_temp_prev_compl_cmd" =~ _fzf_ ]]; then
+		complete -r "$c" &>/dev/null
+		$cmd
+	fi
+}
 if [ -f /usr/share/bash-completion/completions/fzf ]; then
 	source /usr/share/bash-completion/completions/fzf
-	_fzf_setup_completion path mpv
+	bind -x '"\210":"_dt_fzf_compl set"'
+	bind -x '"\211":"_dt_fzf_compl unset"'
+	bind '"\ef":"\210**\t\211"'
 fi
