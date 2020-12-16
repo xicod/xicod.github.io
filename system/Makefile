@@ -9,7 +9,7 @@ all:
 	cp -a ./dotfiles/vimrc /etc/vim/vimrc.local
 	@echo "-------------------------------------------"
 	@echo "Setting tigrc"
-	echo -e 'source /etc/tigrc\nsource /etc/tigrc-dt' > /etc/tigrc-custom
+	bash -c "echo -e 'source /etc/tigrc\nsource /etc/tigrc-dt' > /etc/tigrc-custom"
 	cp -a ./dotfiles/tigrc-dt /etc/
 	@echo "-------------------------------------------"
 	@echo "Setting dt-env-common.sh"
