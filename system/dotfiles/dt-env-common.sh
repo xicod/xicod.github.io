@@ -201,7 +201,7 @@ function _dt_fzf_compl {
 }
 if [ -f /usr/share/bash-completion/completions/fzf ]; then
 	source /usr/share/bash-completion/completions/fzf
-	bind -x '"\210":"_dt_fzf_compl set"'
-	bind -x '"\211":"_dt_fzf_compl unset"'
-	bind '"\ef":"\210**\t\211"'
+	bind -x '"\220":"_dt_fzf_compl set"'
+	bind -x '"\221":"_dt_fzf_compl unset"'
+	bind '"\ef":"\220**\t\221"'
 fi
