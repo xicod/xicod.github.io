@@ -108,6 +108,10 @@ bind '"\ek":"\207ls -l "'
 # Bind Alt+b to go back in directory history
 bind -x '"\208":"popd &>/dev/null; popd &>/dev/null"'
 bind '"\eb":"\200\C-a\C-k\208\C-m\201"'
+# Bind Alt+c to toggle comment on current command and hit enter
+# if the line was commented
+bind -x '"\209": if [[ "$READLINE_LINE" =~ ^# ]]; then READLINE_LINE="${READLINE_LINE:1}"; let READLINE_POINT--; bind "\"\210\":\"\""; else READLINE_LINE="#${READLINE_LINE}"; bind "\"\210\":\"\n\""; fi'
+bind '"\ec":"\209\210"'
 
 : >> ~/.bash_init_lock #create a file if it doesn't exist
 {
