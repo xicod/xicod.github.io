@@ -102,9 +102,12 @@ bind '"\eu":"\200\C-a\C-k\205\C-m\201"'
 # Bind Alt+l to directory listing
 bind -x '"\206": ls -lh'
 bind '"\el":"\200\C-a\C-k\C-m\206\201"'
+# Bind Alt+k to directory listing command start
+bind -x '"\207":READLINE_LINE=""'
+bind '"\ek":"\207ls -l "'
 # Bind Alt+b to go back in directory history
-bind -x '"\207":"popd &>/dev/null; popd &>/dev/null"'
-bind '"\eb":"\200\C-a\C-k\207\C-m\201"'
+bind -x '"\208":"popd &>/dev/null; popd &>/dev/null"'
+bind '"\eb":"\200\C-a\C-k\208\C-m\201"'
 
 : >> ~/.bash_init_lock #create a file if it doesn't exist
 {
