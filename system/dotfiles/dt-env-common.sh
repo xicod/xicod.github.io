@@ -100,7 +100,7 @@ bind -x '"\201": READLINE_LINE=$TEMP_READLINE_LINE; READLINE_POINT=$TEMP_READLIN
 bind -x '"\205": "cd .."'
 bind '"\eu":"\200\C-a\C-k\205\C-m\201"'
 # Bind Alt+l to directory listing
-bind -x '"\206": "ls -l"'
+bind -x '"\206": ls -lh'
 bind '"\el":"\200\C-a\C-k\C-m\206\201"'
 # Bind Alt+b to go back in directory history
 bind -x '"\207":"popd &>/dev/null; popd &>/dev/null"'
