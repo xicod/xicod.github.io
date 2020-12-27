@@ -1677,7 +1677,7 @@ vnoremap S gE
 vnoremap $ g_
 
 nnoremap ,q :cq<CR>
-nnoremap <silent> <Space>w :w<CR>
+nnoremap <silent> <Space><Space> :w<CR>
 nnoremap <silent> ,sp :setlocal spell!<cr>
 nnoremap <silent> ,yf :let @+=expand("%:t")<bar>echo "Copied '" . expand("%:t") . "'"<CR>
 nnoremap <silent> ,yF :let @+=expand("%:p")<bar>echo "Copied '" . expand("%:p") . "'"<CR>
