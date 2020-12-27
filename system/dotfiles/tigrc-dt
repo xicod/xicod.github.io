@@ -35,18 +35,18 @@ bind diff G :/^[+-]{1}[^+-]{1}
 bind diff D >git difftool --tool=vimdiff --no-prompt %(commit)^! -- %(file)
 bind diff M >git difftool --tool=meld --no-prompt %(commit)^! -- %(file)
 bind diff Y +bash -c 'echo -n %(file) | xsel -ib ; echo "Copied \'%(file)\' to clipboard"'
-bind diff H <bash -c 'echo "--follow %(file)" > ~/.tig_param'
+bind diff H <bash -c 'echo "--follow %(repo:cdup)/%(file)" > ~/.tig_param'
 
 bind stage F :/^diff --git
 bind stage G :/^[+-]{1}[^+-]{1}
 bind stage D >bash -c 'git difftool --tool=vimdiff --no-prompt $([[ "%(status)" =~ ^Staged\\ changes\\ to ]] && echo "--cached") -- "%(file)"'
 bind stage M >bash -c 'git difftool --tool=meld --no-prompt $([[ "%(status)" =~ ^Staged\\ changes\\ to ]] && echo "--cached") -- "%(file)"'
 bind stage Y +bash -c 'echo -n %(file) | xsel -ib ; echo "Copied \'%(file)\' to clipboard"'
-bind stage H <bash -c 'echo "--follow %(file)" > ~/.tig_param'
+bind stage H <bash -c 'echo "--follow %(repo:cdup)/%(file)" > ~/.tig_param'
 
 bind log F :/^commit
 
 bind blob Y +bash -c 'echo -n %(file) | xsel -ib ; echo "Copied \'%(file)\' to clipboard"'
-bind blob H <bash -c 'echo "--follow %(file)" > ~/.tig_param'
+bind blob H <bash -c 'echo "--follow %(repo:cdup)/%(file)" > ~/.tig_param'
 
-bind blame H <bash -c 'echo "--follow %(file)" > ~/.tig_param'
+bind blame H <bash -c 'echo "--follow %(repo:cdup)/%(file)" > ~/.tig_param'
