@@ -1780,9 +1780,9 @@ let commentTextMap = {
 			\'conf': '#',
 \}
 noremap <silent> <expr> <C-m> ((GetCurrentCharType() =~ 'comment\c') ?
-			\ ':<S-Right>:s/^\([ \t]*\)' . get(commentTextMap, &filetype, '#') . '/\1/<CR>' :
-			\ ':<S-Right>:s/^/' . get(commentTextMap, &filetype, '#') . '/<CR>:nohl<CR>'
-			\ ) . ':nohl<CR>:call histdel("/", -1)<CR>'
+			\ ':<S-Right>:s/^\(\s*\)' . get(commentTextMap, &filetype, '#') . '/\1/' :
+			\ ':<S-Right>:s/^/' . get(commentTextMap, &filetype, '#') . '/'
+			\ ) . '<CR>:nohl<CR>:call histdel("/", -1)<CR>'
 
 function PySetTabParams(v)
 	if a:v > 0
