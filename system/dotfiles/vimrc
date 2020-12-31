@@ -1018,8 +1018,6 @@ nnoremap <expr> ,m ":Manpage 0 "
 			\. "<C-R>=expand('<cword>')<CR><C-LEFT><LEFT>"
 
 
-" FINDING FILES:
-
 " Search down into subfolders
 " Provides tab-completion for all file-related tasks
 set path+=**
@@ -1028,17 +1026,6 @@ set path+=**
 set wildmenu
 set wildignorecase
 set wildignore+=*.class,*.jar,*.pyc
-
-" NOW WE CAN:
-" - Use ^] to jump to tag under cursor
-" - Use g^] for ambiguous tags
-" - Use ^t to jump back up the tag stack
-
-" HIGHLIGHTS:
-" - ^x^n for JUST this file
-" - ^x^f for filenames (works with our path trick!)
-" - ^x^] for tags only
-" - ^n for anything specified by the 'complete' option
 
 " Tweaks for browsing
 let g:netrw_banner=0        " disable annoying banner
@@ -1059,12 +1046,6 @@ nnoremap <silent> ,e :Vex<cr>
 "	exec '?^\(| \)\{' . lvl . '\}\w'
 "endfunction
 
-" NOW WE CAN:
-" - :edit a folder to open a file browser
-" - <CR>/v/t to open in an h-split/v-split/tab
-"   40<C-w>| to set browse panel width
-" - check |netrw-browse-maps| for more mappings
-
 function! s:QuickfixWindowAction(action)
 	try
 		execute a:action
@@ -1078,17 +1059,6 @@ nnoremap <silent> <Down> :call <SID>QuickfixWindowAction('cnext')<CR>
 nnoremap <silent> <Left> :call <SID>QuickfixWindowAction('cpfile')<CR>
 nnoremap <silent> <Right> :call <SID>QuickfixWindowAction('cnfile')<CR>
 
-"function! CleanNoNameEmptyBuffers()
-"    let buffers = filter(range(1, bufnr('$')), 'buflisted(v:val) && empty(bufname(v:val)) && bufwinnr(v:val) < 0 && (getbufline(v:val, 1, "$") == [""])')
-"	if !empty(buffers)
-"		exe 'bd '.join(buffers, ' ')
-"	else
-"		echo 'No buffer deleted'
-"	endif
-"endfunction
-
-" Note: returns a list of tabnos where the buf is found or 0 for none.
-"               tabnos start at 1, so 0 is always invalid
 function! WhichTabNo(bufNo)
 	let tabNos = []
 	for tabNo in range(1, tabpagenr("$"))
@@ -1794,10 +1764,6 @@ nnoremap <silent> P :call PasteCustom('P')<CR>
 
 nnoremap - "_dd
 nnoremap + m`o<Esc>``
-
-"command! Qbuffers call setqflist(map(filter(range(1, bufnr('$')), 'buflisted(v:val) && getbufvar(v:val, "&buftype", "ERROR") != "quickfix"'), '{"bufnr":v:val}'))
-"autocmd BufAdd * Qbuffers
-"autocmd BufDelete * Qbuffers
 
 let commentTextMap = {
 			\'c': '\/\/',
