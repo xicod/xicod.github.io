@@ -1704,8 +1704,8 @@ nnoremap <expr> K ":call setreg(has('unnamedplus') ? '+' : 'z', '<C-R>=expand('<
 			\. " '\\\<<C-R>=expand('<cword>')<CR>\\\>'<C-LEFT><LEFT>"
 
 " search for selection by copying to clipboard, escaping, then looking for it
-vnoremap <silent> * "zy:let @/='<C-R>=escape(@z,'/\')<CR>'<CR>:set hls<CR>
-nnoremap <silent> * :let @/='\<<C-R>=expand("<cword>")<CR>\>'<CR>:set hls<CR>
+vnoremap <silent> * "zy:let @/='<C-R>=escape(@z,'/\')<CR>'<CR>:set hls<CR>:call histadd('/', @/)<CR>
+nnoremap <silent> * :let @/='\<<C-R>=expand("<cword>")<CR>\>'<CR>:set hls<CR>:call histadd('/', @/)<CR>
 
 execute "set <A-d>=\ed"
 execute "set <A-h>=\eh"
