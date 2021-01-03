@@ -1518,7 +1518,7 @@ nnoremap Y yg_
 function! DuplicateLine()
 	normal! "zyy"zp
 	let l:curr_line = getline('.')
-	if l:curr_line =~ '^#include\s*<'
+	if l:curr_line =~ '^\s*#\s*include\s*<'
 		call ChangeFirstParen()
 	endif
 endfunction
