@@ -1385,30 +1385,16 @@ imap <C-c> <C-x><C-o>
 inoremap <C-p> <C-x><C-f>
 inoremap <C-n> <C-x><C-p>
 
-function! ChangeInnerChar(chr, twin)
-	let l:curr_char = GetCurrentChar()
-	if index([a:chr, a:twin], l:curr_char) < 0
-		execute 'normal! F' . a:chr
-		let l:curr_char = GetCurrentChar()
-		if index([a:chr, a:twin], l:curr_char) < 0
-			execute 'normal! f' . a:chr
-		endif
+function! ChangeFirstParen()
+	let l:p_arr = ['(', '[', '{', '<', '''', '"']
+	if index(l:p_arr, GetCurrentChar()) < 0
+		call FindParen('/')
 	endif
-	execute 'normal! "_ci' . a:chr
-	execute 'normal! l'
-	startinsert
-	if a:chr == '{'
-		call feedkeys("\<C-F>", 'n')
+	if index(l:p_arr, GetCurrentChar()) >= 0
+		call InnerAnythingChange()
 	endif
 endfunction
-nnoremap ci< :call ChangeInnerChar('<', '>')<CR>
-nnoremap ci> :call ChangeInnerChar('<', '>')<CR>
-nnoremap ci{ :call ChangeInnerChar('{', '}')<CR>
-nnoremap ci} :call ChangeInnerChar('{', '}')<CR>
-nnoremap ci( :call ChangeInnerChar('(', ')')<CR>
-nnoremap ci) :call ChangeInnerChar('(', ')')<CR>
-nnoremap ci[ :call ChangeInnerChar('[', ']')<CR>
-nnoremap ci] :call ChangeInnerChar('[', ']')<CR>
+nnoremap cp :call ChangeFirstParen()<CR>
 
 function! ChangeValue()
 	let l:sc = 0
@@ -1533,9 +1519,7 @@ function! DuplicateLine()
 	normal! "zyy"zp
 	let l:curr_line = getline('.')
 	if l:curr_line =~ '^#include\s*<'
-		call ChangeInnerChar('<', '>')
-		normal! l
-		startinsert
+		call ChangeFirstParen()
 	endif
 endfunction
 function! DuplicateLines()
