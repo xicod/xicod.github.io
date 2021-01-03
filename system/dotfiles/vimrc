@@ -1394,7 +1394,7 @@ function! ChangeFirstParen()
 		call InnerAnythingChange()
 	endif
 endfunction
-nnoremap cp :call ChangeFirstParen()<CR>
+nnoremap <silent> cp :call ChangeFirstParen()<CR>
 
 function! ChangeValue()
 	let l:sc = 0
