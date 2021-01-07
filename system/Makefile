@@ -10,7 +10,7 @@ all:
 	@echo "-------------------------------------------"
 	@echo "Setting tigrc"
 	bash -c "echo -e 'source /etc/tigrc\nsource /etc/tigrc-dt' > /etc/tigrc-custom"
-	cp -a ./dotfiles/tigrc-dt /etc/
+	cp -a ./dotfiles/tigrc /etc/tigrc-dt
 	@echo "-------------------------------------------"
 	@echo "Setting dt-env-common.sh"
 	cp -a ./dotfiles/dt-env-common.sh $(BASH_ENV_DEST)/
