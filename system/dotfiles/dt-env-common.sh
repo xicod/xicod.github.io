@@ -22,7 +22,6 @@ alias ping="ping -c 10"
 alias top="top -c"
 alias lfp="pgrep -aif"
 alias systemctl="systemctl -l"
-alias vimc="vim -u <(curl -sS https://xicod.github.io/v)"
 
 alias psmem='ps -eo pid,rss,args | sort -b -k2,2n | cut -c -`tput cols`'
 
