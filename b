@@ -1,1 +1,1 @@
-system/dotfiles/dt-env-common.sh
+system/load_bash_env.sh
