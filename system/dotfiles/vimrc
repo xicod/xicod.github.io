@@ -152,7 +152,7 @@ function! GetCharType(l, c)
 	let l:type = synIDattr(synID(a:l, a:c, 0), "name")
 	return l:type
 endfunction
-function GetCurrentCharType()
+function! GetCurrentCharType()
 	return GetCharType(line('.'), col('.'))
 endfunction
 function! IsCharMatching(chr, pat)
@@ -689,7 +689,7 @@ function! ToggleBooleanValue()
 endfunction
 nnoremap <silent> <Space>f :call ToggleBooleanValue()<CR>
 
-function Eatchar(pat)
+function! Eatchar(pat)
 	let c = nr2char(getchar(0))
 	return (c =~ a:pat) ? '' : c
 endfunc
@@ -1650,7 +1650,7 @@ highlight DiffChange ctermfg=NONE ctermbg=NONE guifg=NONE guibg=NONE
 highlight DiffDelete ctermfg=lightgrey ctermbg=lightred guifg=lightgrey guibg=lightred
 highlight DiffText ctermfg=black ctermbg=lightblue guifg=black guibg=lightblue
 
-function DiffIgnoreWhiteSpaceToggle()
+function! DiffIgnoreWhiteSpaceToggle()
 	if &diffopt =~ 'iwhite'
 		set diffopt-=iwhite
 		echo "NOT ignoring whitespace in diffs"
@@ -1768,7 +1768,7 @@ noremap <silent> <expr> <C-m> ((GetCurrentCharType() =~ 'comment\c') ?
 			\ ':<S-Right>:s/^/' . get(commentTextMap, &filetype, '#') . '/'
 			\ ) . '<CR>:nohl<CR>:call histdel("/", -1)<CR>'
 
-function PySetTabParams(v)
+function! PySetTabParams(v)
 	if a:v > 0
 		execute "setlocal tabstop=".a:v
 		execute "setlocal shiftwidth=".a:v
@@ -1783,7 +1783,7 @@ function PySetTabParams(v)
 endfunction
 
 " Python auto detect
-function PyIndentAutoCfg()
+function! PyIndentAutoCfg()
 	let lnum = 1
 	let got_col = 0  " 1 if previous line ended with colon
 	let space_pattern = '^\([ ]*\)'
