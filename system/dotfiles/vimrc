@@ -742,6 +742,9 @@ cabbrev <expr> ld (getcmdtype() == ':' && getcmdline() =~ '^ld$')
 cabbrev <expr> m (getcmdtype() == ':' && getcmdline() =~ '^m$')
 			\? 'Manpage 0'
 			\: 'm'
+cabbrev <expr> t (getcmdtype() == ':' && getcmdline() =~ '^t$')
+			\? 'TabParams'
+			\: 't'
 
 cnoreabbrev xuniq awk '\!x[$0]++'
 
@@ -1781,6 +1784,7 @@ function! PySetTabParams(v)
 		setlocal noexpandtab
 	endif
 endfunction
+command! -nargs=1 TabParams call PySetTabParams(<f-args>)
 
 " Python auto detect
 function! PyIndentAutoCfg()
