@@ -15,7 +15,7 @@ fi
 
 function trap_tempConfFilesDelete {
 	for f in "${tmp_files[@]}"; do
-		rm $f
+		command rm $f
 	done
 }
 trap "trap_tempConfFilesDelete" EXIT
