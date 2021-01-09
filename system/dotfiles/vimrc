@@ -82,10 +82,16 @@ set cindent
 set cinoptions=(1s,m1,:0,g0,t0
 
 " disable automatic comment insertion
-autocmd FileType * setlocal formatoptions-=c formatoptions-=r formatoptions-=o
+augroup GrpNoAutoComments
+	autocmd!
+	autocmd FileType * setlocal formatoptions-=c formatoptions-=r formatoptions-=o
+augroup end
 
 set autoread
-autocmd CursorHold * checktime | call feedkeys("f\e", 'n') | let g:move_action_undo_join=0
+augroup GrpAutoReloadFiles
+	autocmd!
+	autocmd CursorHold * checktime | call feedkeys("f\e", 'n') | let g:move_action_undo_join=0
+augroup end
 
 " each time entering insert mode, turn on autochdir for filename
 " completion relative to current file's path
@@ -104,8 +110,11 @@ function! OnInsertLeave()
 	" create mark I for last global edit position
 	normal! mI
 endfunction
-autocmd InsertEnter * call OnInsertEnter()
-autocmd InsertLeave * call OnInsertLeave()
+augroup GrpOnInsert
+	autocmd!
+	autocmd InsertEnter * call OnInsertEnter()
+	autocmd InsertLeave * call OnInsertLeave()
+augroup end
 function! s:OnResizeReloadManpageWindow()
 	let l:curr_window = win_getid()
 	for l:w in range(1, winnr('$'))
@@ -121,11 +130,17 @@ function! s:OnVimResized()
 	wincmd =
 	call s:OnResizeReloadManpageWindow()
 endfunction
-autocmd VimResized * call s:OnVimResized()
+augroup GrpOnVimResized
+	autocmd!
+	autocmd VimResized * call s:OnVimResized()
+augroup end
 
 " want to figure out if was called as pipe to something else
 let g:started_with_stdin = 0
-autocmd StdinReadPost * let g:started_with_stdin = 1
+augroup GrpOnStdinRead
+	autocmd!
+	autocmd StdinReadPost * let g:started_with_stdin = 1
+augroup end
 
 function! GetCurrentChar()
 	return strcharpart(getline('.')[col('.') - 1:], 0, 1)
@@ -764,8 +779,11 @@ endfunction
 function! OnBufLeave()
 	setlocal nocursorline
 endfunction
-autocmd WinEnter,BufWinEnter * call OnBufEnter()
-autocmd WinLeave,BufWinLeave * call OnBufLeave()
+augroup GrpOnWinEnter
+	autocmd!
+	autocmd WinEnter,BufWinEnter * call OnBufEnter()
+	autocmd WinLeave,BufWinLeave * call OnBufLeave()
+augroup end
 
 function! OnVimEnter()
 	if &columns > 150 && empty(argv()) && !g:started_with_stdin
@@ -778,7 +796,10 @@ function! OnVimEnter()
 		normal! gg]c[cz.
 	endif
 endfunction
-autocmd VimEnter * call OnVimEnter()
+augroup GrpOnVimEnter
+	autocmd!
+	autocmd VimEnter * call OnVimEnter()
+augroup end
 
 highlight Search ctermfg=black ctermbg=lightyellow guifg=black guibg=lightyellow
 highlight QuickFixLine ctermbg=lightyellow guibg=lightyellow
@@ -792,8 +813,11 @@ set foldmethod=indent
 set foldnestmax=99
 " don't unfold while searching
 set foldopen-=search
-" this unfolds everything on buffer read
-autocmd BufRead * normal! zR
+augroup GrpOnBufRead
+	autocmd!
+	" this unfolds everything on buffer read
+	autocmd BufRead * normal! zR
+augroup end
 highlight Folded ctermbg=lightgrey
 
 " Create the `tags` file (may need to install ctags first)
@@ -1812,16 +1836,19 @@ function! PyIndentAutoCfg()
 	endwhile
 endfunction
 
-" default format settings are tabs
-autocmd FileType * call PySetTabParams(0)
-autocmd FileType yaml call PySetTabParams(2)
-" auto figure out the current indentation format
-autocmd FileType python,yaml call PyIndentAutoCfg()
-autocmd FileType json setlocal foldmethod=syntax
-autocmd FileType gitcommit setlocal textwidth=0 spell | startinsert | call feedkeys("\<C-O>1G", 'n')
-" Not sure why this is needed but without it the cursor
-" ends up in the middle of the first word
-autocmd FileType gitrebase call feedkeys("0", 'nx')
+augroup GrpFileTypes
+	autocmd!
+	" default format settings are tabs
+	autocmd FileType * call PySetTabParams(0)
+	autocmd FileType yaml call PySetTabParams(2)
+	" auto figure out the current indentation format
+	autocmd FileType python,yaml call PyIndentAutoCfg()
+	autocmd FileType json setlocal foldmethod=syntax
+	autocmd FileType gitcommit setlocal textwidth=0 spell | startinsert | call feedkeys("\<C-O>1G", 'n')
+	" Not sure why this is needed but without it the cursor
+	" ends up in the middle of the first word
+	autocmd FileType gitrebase call feedkeys("0", 'nx')
+augroup end
 
 function! PrettyFormat()
 	if &filetype == 'xml'
