@@ -69,13 +69,9 @@ endif
 set hlsearch
 set incsearch
 set list listchars=tab:»·,trail:·
-set tabstop=4
-set shiftwidth=4
-set softtabstop=4
 set autoindent
 set smartindent
 set smarttab
-set noexpandtab
 set splitbelow
 set splitright
 set noequalalways
@@ -1816,8 +1812,9 @@ function! PyIndentAutoCfg()
 	endwhile
 endfunction
 
-" default python format settings are spaces, which I don't agree with
-autocmd FileType python call PySetTabParams(0)
+" default format settings are tabs
+autocmd FileType * call PySetTabParams(0)
+" auto figure out the current indentation format
 autocmd FileType python,yaml call PyIndentAutoCfg()
 autocmd FileType json setlocal foldmethod=syntax
 autocmd FileType gitcommit setlocal textwidth=0 spell | startinsert | call feedkeys("\<C-O>1G", 'n')
