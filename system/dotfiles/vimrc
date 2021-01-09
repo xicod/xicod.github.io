@@ -131,15 +131,6 @@ autocmd VimResized * call s:OnVimResized()
 let g:started_with_stdin = 0
 autocmd StdinReadPost * let g:started_with_stdin = 1
 
-function! OnVimEnter()
-	if &columns > 150 && empty(argv()) && !g:started_with_stdin
-		vsplit
-		wincmd h
-	endif
-	call SetStatusLine(0)
-endfunction
-autocmd VimEnter * call OnVimEnter()
-
 function! GetCurrentChar()
 	return strcharpart(getline('.')[col('.') - 1:], 0, 1)
 endfunction
@@ -777,8 +768,21 @@ endfunction
 function! OnBufLeave()
 	setlocal nocursorline
 endfunction
-autocmd VimEnter,WinEnter,BufWinEnter * call OnBufEnter()
+autocmd WinEnter,BufWinEnter * call OnBufEnter()
 autocmd WinLeave,BufWinLeave * call OnBufLeave()
+
+function! OnVimEnter()
+	if &columns > 150 && empty(argv()) && !g:started_with_stdin
+		vsplit
+		wincmd h
+	endif
+	call SetStatusLine(0)
+	call OnBufEnter()
+	if &diff
+		normal! gg]c[cz.
+	endif
+endfunction
+autocmd VimEnter * call OnVimEnter()
 
 highlight Search ctermfg=black ctermbg=lightyellow guifg=black guibg=lightyellow
 highlight QuickFixLine ctermbg=lightyellow guibg=lightyellow
@@ -1665,7 +1669,6 @@ endfunction
 nnoremap <silent> <Space>i :call DiffIgnoreWhiteSpaceToggle()<CR>
 
 if &diff
-	autocmd VimEnter * '":normal! gg]c[cz.'
 	set noreadonly
 	syntax off
 	function! DiffToggle()
