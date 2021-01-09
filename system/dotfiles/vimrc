@@ -790,13 +790,6 @@ highlight QuickFixLine ctermbg=lightyellow guibg=lightyellow
 highlight Pmenu ctermfg=black ctermbg=lightgrey guifg=black guibg=lightgrey
 highlight PmenuSel ctermfg=black ctermbg=lightyellow guifg=black guibg=lightyellow
 
-autocmd FileType python setlocal tabstop=4 shiftwidth=4 softtabstop=4 noexpandtab
-autocmd FileType json setlocal foldmethod=syntax
-autocmd FileType gitcommit setlocal textwidth=0 spell | startinsert | call feedkeys("\<C-O>1G", 'n')
-" Not sure why this is needed but without it the cursor
-" ends up in the middle of the first word
-autocmd FileType gitrebase call feedkeys("0", 'nx')
-
 " code folding
 "set foldmethod=syntax
 set foldmethod=indent
@@ -1789,7 +1782,6 @@ function! PySetTabParams(v)
 endfunction
 command! -nargs=1 TabParams call PySetTabParams(<f-args>)
 
-" Python auto detect
 function! PyIndentAutoCfg()
 	let lnum = 1
 	let got_col = 0  " 1 if previous line ended with colon
@@ -1807,8 +1799,6 @@ function! PyIndentAutoCfg()
 
 		if got_col == 1
 			if line =~ "^\t"
-				" do nothing because default is
-				" setlocal noexpandtab tabstop=4 shiftwidth=4
 				call PySetTabParams(0)
 				return
 			endif
@@ -1825,11 +1815,15 @@ function! PyIndentAutoCfg()
 		endif
 	endwhile
 endfunction
-autocmd FileType python call PyIndentAutoCfg()
-" End Python auto detect
 
-" It just so happens that yaml can use the same python function
-autocmd FileType yaml call PyIndentAutoCfg()
+" default python format settings are spaces, which I don't agree with
+autocmd FileType python call PySetTabParams(0)
+autocmd FileType python,yaml call PyIndentAutoCfg()
+autocmd FileType json setlocal foldmethod=syntax
+autocmd FileType gitcommit setlocal textwidth=0 spell | startinsert | call feedkeys("\<C-O>1G", 'n')
+" Not sure why this is needed but without it the cursor
+" ends up in the middle of the first word
+autocmd FileType gitrebase call feedkeys("0", 'nx')
 
 function! PrettyFormat()
 	if &filetype == 'xml'
