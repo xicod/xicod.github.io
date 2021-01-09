@@ -1814,6 +1814,7 @@ endfunction
 
 " default format settings are tabs
 autocmd FileType * call PySetTabParams(0)
+autocmd FileType yaml call PySetTabParams(2)
 " auto figure out the current indentation format
 autocmd FileType python,yaml call PyIndentAutoCfg()
 autocmd FileType json setlocal foldmethod=syntax
