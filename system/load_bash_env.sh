@@ -3,7 +3,7 @@
 dt_repo_dl_prefix="https://raw.githubusercontent.com/xicod/xicod.github.io/master/system/dotfiles"
 
 function createTempFileFromUrl {
-	local t=$(mktemp -p $(eval echo ~) bash.tmp.XXXXXXXXXX) \
+	local t=$(mktemp bash.tmp.XXXXXXXXXX) \
 		&& tmp_files+=($t) \
 		&& curl -sSf "$1" >$t
 }
