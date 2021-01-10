@@ -552,7 +552,7 @@ nnoremap <Tab> <Esc>
 vnoremap <Tab> <Esc>gV
 onoremap <Tab> <Esc>
 "cnoremap <Tab> <C-C><Esc>
-inoremap <Tab> <Esc>`^:redraw!<CR>
+inoremap <Tab> <C-o>mz<Esc><Esc>`z:redraw!<CR>
 inoremap \<Tab> <Tab>
 
 inoremap {{ {<CR>}<ESC>ko
