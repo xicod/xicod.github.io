@@ -93,6 +93,11 @@ augroup GrpAutoReloadFiles
 	autocmd CursorHold * checktime | call feedkeys("f\e", 'n') | let g:move_action_undo_join=0
 augroup end
 
+" implement own trim function
+function! Trim(s)
+	return substitute(a:s, '^\s*\(.\{-}\)\s*$', '\1', '')
+endfunction
+
 " each time entering insert mode, turn on autochdir for filename
 " completion relative to current file's path
 function! OnInsertEnter()
@@ -598,7 +603,7 @@ function! IdentifyCodePath()
 		let l:curr = substitute(l:curr, '^\(.\{-}\)(.*$', '\1', '')
 		let l:curr = substitute(l:curr, '\s*[{:]*\s*$', '', '')
 		let l:curr = substitute(l:curr, '^\s*[}]*', '', '')
-		let l:path += [trim(l:curr)]
+		let l:path += [Trim(l:curr)]
 	endwhile
 	echo "\r -> " . join(reverse(l:path), "\n -> ")
 	call CursorPositionRestore(l:start_pos)
@@ -859,7 +864,7 @@ function! ClearAllMatchesInBuffer()
 	match none
 endfunction
 function! FindFiles(query)
-	let l:query = trim(a:query)
+	let l:query = Trim(a:query)
 	try
 		execute 'b _FileSearch'
 		normal! ggVG"_x
@@ -950,7 +955,7 @@ function! OpenCtagLookupBuffer(query)
 		autocmd BufHidden <buffer> call ClearAllMatchesInBuffer()
 	augroup end
 	nnoremap <buffer> <C-m> :call GotoDefinitionFileAndCloseBuffer()<CR>
-	let l:query = trim(a:query)
+	let l:query = Trim(a:query)
 	let l:query = substitute(l:query, '\*', '.*', 'g')
 	for t in sort(taglist('\c^' . l:query . '$'), "CompareTagEntries")
 		let g:ctag_data += [t]
