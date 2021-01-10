@@ -639,21 +639,13 @@ function! MarkCurrentBlock(go_up)
 		if IsBracesDelimitedLang()
 			normal! [{
 			call SearchAndGo('?', '\S')
-			normal! ^
 		else
 			normal! ^
 			call SearchAndGo('?', '\S')
 		endif
 	endif
 	if IsBracesDelimitedLang()
-		normal! [{
-		let l:tmp = CursorPositionStore()
-		call SearchAndGo('/', '\S')
-		call setpos("'<", [0, line('.'), col('.'), 0])
-		call CursorPositionRestore(l:tmp)
-		call GotoTwinChar()
-		call SearchAndGo('?', '\S')
-		call setpos("'>", [0, line('.'), col('.'), 0])
+		normal! vi{
 	else
 		if indent('.') == 0
 			return
@@ -664,8 +656,8 @@ function! MarkCurrentBlock(go_up)
 		call CursorPositionRestore(l:start_pos)
 		call MoveToLastOfIndent('+')
 		call setpos("'>", [0, line('.'), col('.'), 0])
+		normal! '<V'>
 	endif
-	normal! '<V'>
 endfunction
 function! ResetVMarks()
 	call setpos("'<", [0, line('.'), col('.'), 0])
