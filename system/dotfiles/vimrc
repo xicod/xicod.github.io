@@ -650,7 +650,7 @@ function! MarkCurrentBlock(go_up)
 		endif
 	endif
 	if IsBracesDelimitedLang()
-		normal! vi{
+		normal! vi{V
 	else
 		if indent('.') == 0
 			return
