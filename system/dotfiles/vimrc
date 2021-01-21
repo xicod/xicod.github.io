@@ -1308,6 +1308,13 @@ nnoremap <silent> <C-w>K :call OnMoveDeclarationWindow()<BAR> wincmd K<CR>
 nnoremap <silent> <C-w>L :call OnMoveDeclarationWindow()<BAR> wincmd L<CR>
 nnoremap <silent> <C-w>T :call OnMoveDeclarationWindow()<BAR> wincmd T<CR>
 
+function! s:RollWindow()
+	let l:w = win_getid()
+	wincmd x
+	call win_gotoid(l:w)
+endfunction
+nnoremap <silent> <C-w>x :call <SID>RollWindow()<CR>
+
 nnoremap <silent> ,hi :call OpenFuncDeclarationHint(expand("<cword>"))<cr>
 nnoremap <silent> ,hs :call DeclarationStick()<CR>
 nnoremap <silent> ,hd :call CloseAllHintWindows()<CR>
