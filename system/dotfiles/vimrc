@@ -1123,6 +1123,7 @@ function! ToggleDiffWithSaved()
 		syntax on
 		call OnBufEnter()
 		execute "vertical resize " . g:dt_width_before_diff_with_saved
+		normal! zR
 	else
 		let g:dt_width_before_diff_with_saved = winwidth('%')
 		syntax off
@@ -1134,7 +1135,10 @@ function! ToggleDiffWithSaved()
 		diffthis
 		exe "setlocal bt=nofile bh=wipe nobl noswf ro ft=" . filetype
 		match none
+		normal! zR
 		wincmd l
+		normal! zR
+		normal! gg]cz.
 		set splitright
 	endif
 endfunction
