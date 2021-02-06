@@ -211,3 +211,28 @@ if [ -f /usr/share/bash-completion/completions/fzf ]; then
 	bind -x '"\221":"_dt_fzf_compl unset"'
 	bind '"\ef":"\220**\t\221"'
 fi
+
+_dt_term_socket_ssh() {
+	ssh -oControlPath=$1 -O exit DUMMY_HOST
+}
+function sshx {
+	local t=$(mktemp -u --tmpdir=$HOME ssh.sock.XXXXXXXXXX)
+	local f="~/clip"
+	ssh -f -oControlMaster=yes -oControlPath=$t $@ tail\ -f\ /dev/null || return 1
+	ssh -S $t DUMMY_HOST "bash -c 'if ! [ -p $f ]; then mkfifo $f; fi'"\
+		|| { _dt_term_socket_ssh $t; return 1; }
+	(
+	set -e
+	set -o pipefail
+	while [ 1 ]; do
+		ssh -S $t DUMMY_HOST "cat $f" | xsel -ib
+		if [ $? -ne 0 ]; then
+			break
+		fi
+	done &
+	)
+	ssh -S$t -t DUMMY_HOST "tmux attach -t remote || tmux new -s remote" \
+		|| { _dt_term_socket_ssh $t; return 1; }
+	ssh -S $t DUMMY_HOST "rm $f"
+	_dt_term_socket_ssh $t
+}
