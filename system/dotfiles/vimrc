@@ -1724,6 +1724,18 @@ vnoremap <expr> K ":<c-u>exec 'normal! gv\"".(has('unnamedplus') ? '+' : 'z')."y
 vnoremap <silent> * "zy:let @/='<C-R>=escape(@z,'/\')<CR>'<CR>:set hls<CR>:call histadd('/', @/)<CR>
 nnoremap <silent> * :let @/='\<<C-R>=expand("<cword>")<CR>\>'<CR>:set hls<CR>:call histadd('/', @/)<CR>
 
+function! s:DumpContToFile(reg_cont, fname)
+	if !filereadable(a:fname)
+		echoerr a:fname . " does not exist"
+		return
+	endif
+	execute "redir! > " . a:fname
+	silent echon a:reg_cont
+	redir END
+	echo "Dumped to clipboard"
+endfunction
+nnoremap <silent> <Space>c :call <SID>DumpContToFile(@", expand("~")."/clip")<CR>
+
 execute "set <A-d>=\ed"
 execute "set <A-h>=\eh"
 execute "set <A-j>=\ej"
