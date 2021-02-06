@@ -18,19 +18,36 @@ if [ $? -eq 0 ]; then
 	current_child=$(ps -p $p -o comm=)
 fi
 
-if [ "$current_child" = "ssh" ]; then
-	echo -n "ssh "
+handle_ssh_command(){
 	proc_args=$(ps -p $p -o args=)
 	read -ra args_arr <<< "$proc_args"
 	for a in "${args_arr[@]}"; do
 		if [ "$a" = "ssh" ]; then
 			continue
+		elif [[ "$a" =~ ^-S ]]; then
+			socket=${a/-S/}
 		elif [[ "$a" =~ ^[a-zA-Z]+ ]] \
 			|| [[ "$a" =~ ^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$ ]]; then
-			echo -n "$a"
-			break
+					if [ "$a" = "DUMMY_HOST" ]; then
+						echo -n "$socket"
+						return 1
+					else
+						echo -n "ssh $a"
+						break
+					fi
 		fi
 	done
+}
+if [ "$current_child" = "ssh" ]; then
+	ret=$(handle_ssh_command)
+	if [ $? -eq 1 ]; then
+		# we got a socket file as response
+		p=$(pgrep -f -- -oControlPath=$ret)
+		ret=$(handle_ssh_command)
+		echo -n "$ret"
+	else
+		echo -n "$ret"
+	fi
 else
 	echo -n $curr_dir | sed -E \
 		-e "s|^${home_dir}|~|" \
