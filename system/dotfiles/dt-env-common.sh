@@ -25,6 +25,9 @@ alias systemctl="systemctl -l"
 
 alias psmem='ps -eo pid,rss,args | sort -b -k2,2n | cut -c -`tput cols`'
 
+# Capture the current pane into a vim buffer
+alias tmux-cap='tmux capture-pane -p -S- -E- | vim -c "normal! G" -'
+
 function tig {
 	/usr/bin/tig $@
 	while [ -f ~/.tig_param ]; do
