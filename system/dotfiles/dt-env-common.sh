@@ -226,9 +226,6 @@ function sshx {
 	set -o pipefail
 	while [ 1 ]; do
 		ssh -S$t DUMMY_HOST "cat $f" | xsel -ib
-		if [ $? -ne 0 ]; then
-			break
-		fi
 	done &
 	)
 	ssh -S$t -t DUMMY_HOST "tmux attach -t remote || tmux new -s remote" \
