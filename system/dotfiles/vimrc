@@ -783,9 +783,12 @@ augroup GrpOnWinEnter
 augroup end
 
 function! OnVimEnter()
-	if &columns > 150 && empty(argv()) && !g:started_with_stdin
-		vsplit
-		wincmd h
+	if empty(argv())
+		call PySetTabParams(0)
+		if !g:started_with_stdin && &columns > 150
+			vsplit
+			wincmd h
+		endif
 	endif
 	call SetStatusLine(0)
 	call OnBufEnter()
