@@ -228,7 +228,7 @@ function sshx {
 	set -e
 	set -o pipefail
 	while [ 1 ]; do
-		ssh -S$t DUMMY_HOST "cat $f" | xsel -ib
+		ssh -S$t -oServerAliveInterval=60 DUMMY_HOST "cat $f" | xsel -ib
 	done &
 	)
 	ssh -S$t -t DUMMY_HOST "tmux attach -t remote || tmux new -s remote" \
