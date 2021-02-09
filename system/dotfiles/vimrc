@@ -787,7 +787,6 @@ function! OnVimEnter()
 		call PySetTabParams(0)
 		if !g:started_with_stdin && &columns > 150
 			vsplit
-			wincmd h
 		endif
 	endif
 	call SetStatusLine(0)
