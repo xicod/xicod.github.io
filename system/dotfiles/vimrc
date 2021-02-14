@@ -1463,13 +1463,20 @@ nnoremap <silent> cn :call ChangeField()<CR>
 
 function! FindFirstParenthesis()
 	let l:curr_chr = GetCurrentChar()
-	if index(["(", "[", "{", "<", "\"", "'"], l:curr_chr) >= 0
-				\ || (index(['"', ''''], l:curr_chr) && GetPreviousChar() == '\')
+	if index(["(", "[", "{", "<"], l:curr_chr) >= 0
 		return
 	endif
+	if index(['"', '''', '`'], l:curr_chr) >= 0 && GetPreviousChar() != '\'
+		let l:tmp_pos = CursorPositionStore()
+		call GotoTwinChar()
+		if CursorPositionCompare(l:tmp_pos, CursorPositionStore()) < 0
+			call CursorPositionRestore(l:tmp_pos)
+			return
+		endif
+	endif
 	while 1
-		call SearchAndGo('?', '[][(){}<>''"]\{1\}')
-		if index(['"', ''''], GetCurrentChar())
+		call SearchAndGo('?', '[][(){}<>''"`]\{1\}')
+		if index(['"', ''''], GetCurrentChar()) >= 0
 					\ && GetPreviousChar() == '\'
 			continue
 		endif
@@ -1481,7 +1488,7 @@ function! FindFirstParenthesis()
 			call GotoTwinChar()
 			continue
 		endif
-		if index(['"', ''''], l:matched_chr) >= 0
+		if index(['"', '''', '`'], l:matched_chr) >= 0
 			let l:tmp_pos = CursorPositionStore()
 			call GotoTwinChar()
 			if CursorPositionCompare(l:tmp_pos, CursorPositionStore()) >= 0
