@@ -549,8 +549,14 @@ nnoremap <silent> ds :call DeleteSubcall()<CR>
 " select the last pasted text
 nnoremap gp `[v`]
 
-" always indent on insert
-nnoremap i i<C-f>
+" Indent on insert in empty line
+function! s:StartInsert()
+	startinsert
+	if getline('.') =~ '^$'
+		call feedkeys("\<C-f>", "n")
+	endif
+endfunction
+nnoremap <silent> i :call <SID>StartInsert()<CR>
 
 " Escape everything
 nnoremap <Tab> <Esc>
