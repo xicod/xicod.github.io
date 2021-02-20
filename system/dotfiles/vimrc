@@ -1683,7 +1683,7 @@ vnoremap $ g_
 
 nnoremap ,q :cq<CR>
 nnoremap <silent> <Space><Space> :w<CR>
-nnoremap <silent> ,sp :setlocal spell!<cr>
+nnoremap <silent> ,sp :setlocal spell!<CR>:echo "Spelling is ".(&spell ? "on" : "off")<CR>
 nnoremap <silent> ,yf :let @+=expand("%:t")<bar>echo "Copied '" . expand("%:t") . "'"<CR>
 nnoremap <silent> ,yF :let @+=expand("%:p")<bar>echo "Copied '" . expand("%:p") . "'"<CR>
 nnoremap <silent> ,bl :execute "silent !bash -ic 'tig blame ".expand("%:p")." +".line('.')."'" <BAR> :redraw!<CR>
