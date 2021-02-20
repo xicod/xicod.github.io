@@ -798,6 +798,9 @@ function! OnVimEnter()
 	call OnBufEnter()
 	if &diff
 		normal! gg]c[cz.
+		" this is needed for some reason when starting in diff mode
+		" and there is a 'setlocal spell' via an autocmd for a filetype
+		set nospell
 	endif
 endfunction
 augroup GrpOnVimEnter
@@ -1131,14 +1134,19 @@ function! ToggleDiffWithSaved()
 		call OnBufEnter()
 		execute "vertical resize " . g:dt_width_before_diff_with_saved
 		normal! zR
+		if g:dt_spell_was_enabled_before_diff_with_saved
+			setlocal spell
+		endif
 	else
 		let g:dt_width_before_diff_with_saved = winwidth('%')
+		let g:dt_spell_was_enabled_before_diff_with_saved = &spell
 		syntax off
 		match none
 		set nosplitright
 		let filetype=&ft
 		diffthis
 		vnew | r # | normal! 1G"_dd
+		setlocal nospell
 		diffthis
 		exe "setlocal bt=nofile bh=wipe nobl noswf ro ft=" . filetype
 		match none
@@ -1147,6 +1155,7 @@ function! ToggleDiffWithSaved()
 		normal! zR
 		normal! gg]cz.
 		set splitright
+		setlocal nospell
 	endif
 endfunction
 nnoremap <silent> ,ds :call ToggleDiffWithSaved()<cr>
@@ -1887,7 +1896,7 @@ augroup GrpFileTypes
 	autocmd FileType python,yaml call PyIndentAutoCfg()
 	autocmd FileType json setlocal foldmethod=syntax
 	autocmd FileType gitcommit setlocal textwidth=0 spell | startinsert | call feedkeys("\<C-O>1G", 'n')
-	autocmd FileType markdown setlocal spell
+	autocmd FileType markdown if !&diff | setlocal spell | endif
 	" Not sure why this is needed but without it the cursor
 	" ends up in the middle of the first word
 	autocmd FileType gitrebase call feedkeys("0", 'nx')
