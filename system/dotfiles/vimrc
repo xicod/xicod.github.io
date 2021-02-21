@@ -1570,10 +1570,6 @@ vnoremap <C-h> 5h
 
 function! DuplicateLine()
 	normal! "zyy"zp
-	let l:curr_line = getline('.')
-	if l:curr_line =~ '^\s*#\s*include\s*<'
-		call ChangeFirstParen()
-	endif
 endfunction
 function! DuplicateLines()
 	normal! gv"zy
