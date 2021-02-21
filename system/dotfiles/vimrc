@@ -1567,7 +1567,6 @@ vnoremap <C-j> 5j
 vnoremap <C-k> 5k
 vnoremap <C-l> 5l
 vnoremap <C-h> 5h
-nnoremap Y yg_
 
 function! DuplicateLine()
 	normal! "zyy"zp
@@ -1802,6 +1801,7 @@ nnoremap x "_x
 noremap <Del> "_x
 nnoremap C "_C
 nnoremap D "_D
+nnoremap Y yg_
 " don't pollute the clipboard with every delete word, but do yank a whole line
 nnoremap d "_d
 nnoremap dd dd
