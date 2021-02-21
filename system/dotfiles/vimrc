@@ -1622,21 +1622,6 @@ function! MarkVisualModeTwinChar(mode)
 endfunction
 xnoremap <expr> % ':<c-u>call MarkVisualModeTwinChar(''' . mode() . ''')<CR>'
 
-function! HandleWordEndKey()
-	if IsCharMatching(GetCurrentChar(), ']})>')
-		return
-	elseif IsCharMatching(GetCurrentChar(), '[{(<''"')
-		let l:pos = CursorPositionStore()
-		call GotoTwinChar()
-		if CursorPositionCompare(CursorPositionStore(), l:pos) > 0
-			call CursorPositionRestore(l:pos)
-		endif
-	else
-		normal! e
-	endif
-endfunction
-nnoremap <silent> e :call HandleWordEndKey()<CR>
-
 " delete a block by character, inclusive
 function! DeleteBlockByCharacter(do_change)
 	if col('.') == col('$')-1
