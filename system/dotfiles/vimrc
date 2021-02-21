@@ -539,9 +539,13 @@ function! DeleteSubcall()
 		call CursorPositionRestore(l:tmp_pos)
 	endif
 	call setpos("'>", [0, line('.'), col('.'), 0])
-	call feedkeys('gvx', 'nx')
+	normal! gvx
 	if getline('.') =~ '^\s*$'
 		normal! "_dd
+	endif
+	" focus on next subcall
+	if GetCurrentChar() == '.'
+		call SkipNonAlnumForWord("w")
 	endif
 endfunction
 nnoremap <silent> ds :call DeleteSubcall()<CR>
