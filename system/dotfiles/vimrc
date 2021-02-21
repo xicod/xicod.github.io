@@ -1521,15 +1521,14 @@ function! InnerAnythingChange()
 	call FindFirstParenthesis()
 	let l:curr_chr = GetCurrentChar()
 	let l:curr_type = GetCurrentCharType()
-	execute 'normal! "_ci' . l:curr_chr
-	normal! l
-	startinsert
+	let l:additional_actions = ""
 	if l:curr_chr == '{'
-		call feedkeys("\<C-F>", 'n')
+		let l:additional_actions = "\<C-F>"
 	elseif l:curr_chr == '[' && &filetype == 'sh'
 				\ && l:curr_type !~ '\cquote\|\ccomment'
-		call feedkeys("  \<LEFT>", 'n')
+		let l:additional_actions = "  \<LEFT>"
 	endif
+	call feedkeys('"_ci'.l:curr_chr.l:additional_actions, 'ni')
 endfunction
 function! InnerAnythingIndent(type)
 	let l:start_pos = CursorPositionStore()
