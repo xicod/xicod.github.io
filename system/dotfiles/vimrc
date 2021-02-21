@@ -177,6 +177,7 @@ function! SkipNonAlnumForWord(cmd)
 endfunction
 nnoremap <silent> w :call SkipNonAlnumForWord("w")<CR>
 nnoremap <silent> b :call SkipNonAlnumForWord("b")<CR>
+nnoremap <silent> e :call SkipNonAlnumForWord("e")<CR>
 inoremap <silent> <C-Right> <C-O>:call SkipNonAlnumForWord("w")<CR>
 inoremap <silent> <C-Left> <C-O>:call SkipNonAlnumForWord("b")<CR>
 
