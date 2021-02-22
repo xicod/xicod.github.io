@@ -1459,11 +1459,9 @@ function! ChangeValue()
 	execute 's/\(.\{-\}'.l:sep.'\s*\).\{-}\([,;]*\)\s*$/\1\2/e'
 	call histdel("/", -1)
 	if l:sc
-		normal! $
-		startinsert
+		call feedkeys("$i", 'ni')
 	else
-		startinsert
-		call feedkeys("\<C-O>$", 'n')
+		call feedkeys("A", 'ni')
 	endif
 endfunction
 nnoremap <silent> cv :call ChangeValue()<CR>
