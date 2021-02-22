@@ -106,8 +106,10 @@ function! OnInsertEnter()
 	execute "set tags=".getcwd()."/tags"
 	let g:insert_mode_save_cwd = getcwd()
 	set autochdir
+	normal! qi
 endfunction
 function! OnInsertLeave()
+	normal! q
 	call SetStatusLine(0)
 	set noignorecase
 	set noautochdir
@@ -361,8 +363,8 @@ function! DeleteCurrentWrap(do_replace, to)
 		normal! "_x
 	endif
 endfunction
-nnoremap <silent> d[ :call DeleteCurrentWrap(0, '')<CR>
-nnoremap <silent> c[ :call DeleteCurrentWrap(1, nr2char(getchar()))<CR>
+nnoremap <silent> d[ :call DeleteCurrentWrap(0, '')<CR>:call RepeatSet("d[", 0)<CR>
+nnoremap <silent> c[ :let c=nr2char(getchar())<BAR>:call DeleteCurrentWrap(1, c)<BAR>:call RepeatSet('c['.c, 0)<CR>
 
 """"""" Start of Delete Param functions
 function! CheckIfAccessOper()
@@ -515,12 +517,12 @@ function! ParamGoPrevious()
 endfunction
 nnoremap <silent> \a :call AddParamAfter()<CR>
 nnoremap <silent> \A :call AddParamBefore()<CR>
-nnoremap <silent> \d :call DeleteParam(0, 1)<CR>
+nnoremap <silent> \d :call DeleteParam(0, 1)<CR>:call RepeatSet("\\d", 0)<CR>
 nnoremap <silent> \c :call DeleteParam(1, 1)<CR>
 nnoremap <silent> } :call ParamGoNext()<CR>
 nnoremap <silent> { :call ParamGoPrevious()<CR>
-nnoremap <silent> <A-h> :call MoveParam(0)<CR>
-nnoremap <silent> <A-l> :call MoveParam(1)<CR>
+nnoremap <silent> <A-h> :call MoveParam(0)<CR>:call RepeatSet("\<A-h>", 0)<CR>
+nnoremap <silent> <A-l> :call MoveParam(1)<CR>:call RepeatSet("\<A-l>", 0)<CR>
 """"""" End of Delete Param functions
 
 function! DeleteSubcall()
@@ -549,7 +551,7 @@ function! DeleteSubcall()
 		call SkipNonAlnumForWord("w")
 	endif
 endfunction
-nnoremap <silent> ds :call DeleteSubcall()<CR>
+nnoremap <silent> ds :call DeleteSubcall()<CR>:call RepeatSet("ds", 0)<CR>
 
 " select the last pasted text
 nnoremap gp `[v`]
@@ -697,7 +699,7 @@ function! ToggleBooleanValue()
 	call feedkeys("viwc".l:m[l:w]."\<ESC>", 'nx')
 	normal! `<
 endfunction
-nnoremap <silent> <Space>f :call ToggleBooleanValue()<CR>
+nnoremap <silent> <Space>f :call ToggleBooleanValue()<CR>:call RepeatSet("\<Space>f", 0)<CR>
 
 function! Eatchar(pat)
 	let c = nr2char(getchar(0))
@@ -1443,7 +1445,7 @@ function! ChangeFirstParen()
 		call InnerAnythingChange()
 	endif
 endfunction
-nnoremap <silent> cp :call ChangeFirstParen()<CR>
+nnoremap <silent> cp :call RepeatSet("cp", 1)<CR>:call ChangeFirstParen()<CR>
 
 function! ChangeValue()
 	let l:sc = 0
@@ -1464,7 +1466,7 @@ function! ChangeValue()
 		call feedkeys("A", 'ni')
 	endif
 endfunction
-nnoremap <silent> cv :call ChangeValue()<CR>
+nnoremap <silent> cv :call RepeatSet("cv", 1)<CR>:call ChangeValue()<CR>
 function! ChangeField()
 	let l:sep = '='
 	if getline('.') =~ '^\s*[a-zA-Z_0-9-]*:'
@@ -1476,7 +1478,7 @@ function! ChangeField()
 	normal! "_x
 	startinsert
 endfunction
-nnoremap <silent> cn :call ChangeField()<CR>
+nnoremap <silent> cn :call RepeatSet("cn", 1)<CR>:call ChangeField()<CR>
 
 function! FindFirstParenthesis()
 	let l:curr_chr = GetCurrentChar()
@@ -1547,7 +1549,7 @@ function! InnerAnythingIndent(type)
 	call CursorPositionRestore(l:start_pos)
 	normal! ^
 endfunction
-nnoremap <silent> cc :call InnerAnythingChange()<CR>
+nnoremap <silent> cc :call RepeatSet("cc", 1)<CR>:call InnerAnythingChange()<CR>
 nnoremap <silent> =ii :call InnerAnythingIndent('simple')<CR>
 nnoremap <silent> ,== :call InnerAnythingIndent('custom')<CR>
 
@@ -1574,8 +1576,8 @@ function! DuplicateLines()
 	normal! gv"zy
 	normal! '>"zp
 endfunction
-nnoremap <silent> yyy :call DuplicateLine()<CR>
-vnoremap <silent> yyy :<c-u>call DuplicateLines()<CR>
+nnoremap <silent> yyy :call DuplicateLine()<CR>:call RepeatSet("yyy", 0)<CR>
+vnoremap <silent> yyy :<c-u>call DuplicateLines()<CR>:call RepeatSet("gvyyy", 0)<CR>
 nnoremap <silent> yyi :execute "normal! yi" . GetCurrentChar()<CR>
 
 " for these - mark Y as copy source location
@@ -1631,11 +1633,11 @@ function! DeleteBlockByCharacter(do_change)
 	call GotoTwinChar()
 	normal! v``"_x
 	if a:do_change
-		call feedkeys(l:act, 'n')
+		call feedkeys(l:act, 'in')
 	endif
 endfunction
-nnoremap <silent> db :call DeleteBlockByCharacter(0)<CR>
-nnoremap <silent> cb :call DeleteBlockByCharacter(1)<CR>
+nnoremap <silent> db :call DeleteBlockByCharacter(0)<CR>:call RepeatSet("db", 0)<CR>
+nnoremap <silent> cb :call RepeatSet("cb", 1)<CR>:call DeleteBlockByCharacter(1)<CR>
 
 function! FindParen(dir)
 	if index(['"', '''', '`'], GetCurrentChar()) >= 0 && a:dir == '/'
@@ -1896,6 +1898,42 @@ function! PrettyFormat()
 	normal! zR
 endfunction
 nnoremap <silent> =f :call PrettyFormat()<CR>
+
+" Repeat functionality
+let g:dt_repeat_changed_tick = -1
+function! RepeatSet(action, repeat_was_insert)
+	let g:dt_repeat_changed_tick = b:changedtick
+	let g:dt_repeat_action = a:action
+	let g:dt_repeat_was_insert = a:repeat_was_insert
+	augroup GrpRepeatTick
+		autocmd!
+		if a:repeat_was_insert
+			autocmd InsertLeave <buffer> let g:dt_repeat_changed_tick = b:changedtick | autocmd! GrpRepeatTick
+		else
+			autocmd CursorMoved <buffer> let g:dt_repeat_changed_tick = b:changedtick | autocmd! GrpRepeatTick
+		endif
+	augroup END
+endfunction
+
+function! RepeatRun()
+	if g:dt_repeat_changed_tick == b:changedtick
+		if len(@i) > 0
+			let g:dt_repeat_insert_text = @i
+		endif
+		let l:k = g:dt_repeat_action .
+					\ (g:dt_repeat_was_insert ? g:dt_repeat_insert_text . "\<ESC>" : "")
+		call feedkeys(l:k, 'i')
+	else
+		normal! .
+	endif
+endfunction
+augroup GrpRepeat
+	autocmd!
+	autocmd BufLeave,BufWritePre,BufReadPre * let g:dt_repeat_changed_tick = (g:dt_repeat_changed_tick == b:changedtick || g:dt_repeat_changed_tick == 0) ? 0 : -1
+	autocmd BufEnter,BufWritePost * if g:dt_repeat_changed_tick == 0 | let g:dt_repeat_changed_tick = b:changedtick | endif
+augroup END
+nnoremap <silent> . :call RepeatRun()<CR>
+" END Repeat
 
 " SNIPPETS:
 
