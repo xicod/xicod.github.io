@@ -1119,7 +1119,13 @@ function! CloseAllBuffersButCurrent()
 	if !empty(buffers)
 		try
 			for b in buffers
-				silent execute 'bd'.b
+				if index(['_FileSearch', '_LookupDefinition'], bufname(b)) >= 0
+					" use wipeout because we'd like to erase status and
+					" properly re-create these special buffers
+					silent execute 'bw'.b
+				else
+					silent execute 'bd'.b
+				endif
 			endfor
 		catch
 			call PrintError(v:exception)
