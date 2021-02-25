@@ -106,10 +106,19 @@ function! OnInsertEnter()
 	execute "set tags=".getcwd()."/tags"
 	let g:insert_mode_save_cwd = getcwd()
 	set autochdir
-	normal! qi
+	" for older vim versions, prefer keeping the macro
+	" functionality unbroken at the expense of repeating with insert
+	if exists('*reg_recording') && reg_recording() == ''
+		let g:dt_repeat_insert_macro_recording = 1
+		normal! qi
+	else
+		let g:dt_repeat_insert_macro_recording = 0
+	endif
 endfunction
 function! OnInsertLeave()
-	normal! q
+	if g:dt_repeat_insert_macro_recording
+		normal! q
+	endif
 	call SetStatusLine(0)
 	set noignorecase
 	set noautochdir
