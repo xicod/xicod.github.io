@@ -1910,6 +1910,7 @@ nnoremap <silent> =f :call PrettyFormat()<CR>
 
 " Repeat functionality
 let g:dt_repeat_changed_tick = -1
+let g:dt_repeat_insert_text = ''
 function! RepeatSet(action, repeat_was_insert)
 	let g:dt_repeat_changed_tick = b:changedtick
 	let g:dt_repeat_action = a:action
