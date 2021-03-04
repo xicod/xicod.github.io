@@ -2008,7 +2008,7 @@ function! s:TabNew()
 	redrawtabline
 endfunction
 function! s:TabClose()
-	call remove(g:dt_tab_labels, tabpagenr()-1)
+	call remove(g:dt_tab_labels, tabpagenr() + (tabpagenr('$') > 1 ? -1 : 0))
 	redrawtabline
 endfunction
 nnoremap <silent> \tn :tabnew<CR>
