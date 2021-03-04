@@ -2008,7 +2008,7 @@ function! s:TabNew()
 	redrawtabline
 endfunction
 function! s:TabClose()
-	call remove(g:dt_tab_labels, tabpagenr() + (tabpagenr('$') > 1 ? -1 : 0))
+	call remove(g:dt_tab_labels, g:dt_tab_last-1)
 	redrawtabline
 endfunction
 nnoremap <silent> \tn :tabnew<CR>
@@ -2026,6 +2026,7 @@ augroup GrpTabs
 	autocmd!
 	autocmd TabNew * :call s:TabNew()
 	autocmd TabClosed * :call s:TabClose()
+	autocmd TabLeave * :let g:dt_tab_last = tabpagenr()
 augroup end
 " END Tab renaming
 
