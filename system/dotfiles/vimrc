@@ -766,6 +766,9 @@ cabbrev <expr> m (getcmdtype() == ':' && getcmdline() =~ '^m$')
 cabbrev <expr> t (getcmdtype() == ':' && getcmdline() =~ '^t$')
 			\? 'TabParams'
 			\: 't'
+cabbrev <expr> tn (getcmdtype() == ':' && getcmdline() =~ '^tn$')
+			\? 'TabSetName'
+			\: 'tn'
 
 cnoreabbrev xuniq awk '\!x[$0]++'
 
@@ -1953,6 +1956,78 @@ augroup GrpRepeat
 augroup END
 nnoremap <silent> . :call RepeatRun()<CR>
 " END Repeat
+
+" Tab renaming functionality
+" Copied from :h setting-tabline
+set tabline=%!MyTabLine()
+function MyTabLine()
+	let s = ''
+	for i in range(tabpagenr('$'))
+		" select the highlighting
+		if i + 1 == tabpagenr()
+			let s .= '%#TabLineSel#'
+		else
+			let s .= '%#TabLine#'
+		endif
+		" set the tab page number (for mouse clicks)
+		let s .= '%' . (i + 1) . 'T'
+		" the label is made by MyTabLabel()
+		let s .= ' %{MyTabLabel(' . (i + 1) . ')} '
+	endfor
+	" after the last tab fill with TabLineFill and reset tab page nr
+	let s .= '%#TabLineFill#%T'
+	" right-align the label to close the current tab page
+	if tabpagenr('$') > 1
+		let s .= '%=%#TabLine#%999Xclose'
+	endif
+	return s
+endfunction
+let g:dt_tab_labels = ['']
+function MyTabLabel(n)
+	let buflist = tabpagebuflist(a:n)
+	let winnr = tabpagewinnr(a:n)
+	if a:n > len(g:dt_tab_labels)
+		return ''
+	endif
+	if g:dt_tab_labels[a:n-1] != ''
+		return g:dt_tab_labels[a:n-1]
+	else
+		let l:t = bufname(buflist[winnr - 1])
+		if len(l:t) > 0
+			let l:s = split(l:t, '/')
+			return l:s[len(l:s)-1]
+		else
+			return "[No Name]"
+		endif
+	endif
+endfunction
+function! s:TabNew()
+	let g:dt_tab_labels = g:dt_tab_labels[:tabpagenr()-2]
+				\+ ['']
+				\+ g:dt_tab_labels[tabpagenr()-1:]
+	redrawtabline
+endfunction
+function! s:TabClose()
+	call remove(g:dt_tab_labels, tabpagenr()-1)
+	redrawtabline
+endfunction
+nnoremap <silent> \tn :tabnew<CR>
+nnoremap <silent> \tc :tabclose<CR>
+
+function! s:TabSetName(name)
+	" strip surrounding "'
+	let l:name = substitute(a:name, '^[''"]*\(.\{-\}\)[''"]*$', '\1', '')
+	let g:dt_tab_labels[tabpagenr()-1] = l:name
+	redrawtabline
+endfunction
+command! -nargs=1 TabSetName call s:TabSetName(<f-args>)
+
+augroup GrpTabs
+	autocmd!
+	autocmd TabNew * :call s:TabNew()
+	autocmd TabClosed * :call s:TabClose()
+augroup end
+" END Tab renaming
 
 " SNIPPETS:
 
