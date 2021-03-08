@@ -1958,9 +1958,10 @@ nnoremap <silent> . :call RepeatRun()<CR>
 " END Repeat
 
 " Tab renaming functionality
-" Copied from :h setting-tabline
 set tabline=%!MyTabLine()
-function MyTabLine()
+set guitablabel=%{MyTabGuiLabel()}
+" Copied from :h setting-tabline
+function! MyTabLine()
 	let s = ''
 	for i in range(tabpagenr('$'))
 		" select the highlighting
@@ -1982,15 +1983,12 @@ function MyTabLine()
 	endif
 	return s
 endfunction
-let g:dt_tab_labels = ['']
-function MyTabLabel(n)
+function! s:TabGetLabel(n)
 	let buflist = tabpagebuflist(a:n)
 	let winnr = tabpagewinnr(a:n)
-	if a:n > len(g:dt_tab_labels)
-		return ''
-	endif
-	if g:dt_tab_labels[a:n-1] != ''
-		return g:dt_tab_labels[a:n-1]
+	let l:tab_label = gettabvar(a:n, 'dt_tab_label')
+	if l:tab_label != ''
+		return l:tab_label
 	else
 		let l:t = bufname(buflist[winnr - 1])
 		if len(l:t) > 0
@@ -2001,33 +1999,19 @@ function MyTabLabel(n)
 		endif
 	endif
 endfunction
-function! s:TabNew()
-	let g:dt_tab_labels = g:dt_tab_labels[:tabpagenr()-2]
-				\+ ['']
-				\+ g:dt_tab_labels[tabpagenr()-1:]
-	redrawtabline
+function! MyTabGuiLabel()
+	return s:TabGetLabel(v:lnum)
 endfunction
-function! s:TabClose()
-	call remove(g:dt_tab_labels, g:dt_tab_last-1)
-	redrawtabline
+function! MyTabLabel(tabnum)
+	return s:TabGetLabel(a:tabnum)
 endfunction
-nnoremap <silent> \tn :tabnew<CR>
-nnoremap <silent> \tc :tabclose<CR>
-
 function! s:TabSetName(name)
 	" strip surrounding "'
 	let l:name = substitute(a:name, '^[''"]*\(.\{-\}\)[''"]*$', '\1', '')
-	let g:dt_tab_labels[tabpagenr()-1] = l:name
+	let t:dt_tab_label = l:name
 	redrawtabline
 endfunction
 command! -nargs=1 TabSetName call s:TabSetName(<f-args>)
-
-augroup GrpTabs
-	autocmd!
-	autocmd TabNew * :call s:TabNew()
-	autocmd TabClosed * :call s:TabClose()
-	autocmd TabLeave * :let g:dt_tab_last = tabpagenr()
-augroup end
 " END Tab renaming
 
 " SNIPPETS:
