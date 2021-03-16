@@ -9,6 +9,6 @@ fi
 
 cmd=$(zenity --list --width=1000 --height=300 --column "cmd" -- "${cmds[@]}" 2>/dev/null)
 if [ -n "$cmd" ]; then
-	echo -n "$cmd" | xsel -ib
+	echo -n "$cmd" | xclip -selection clipboard
 fi
 
