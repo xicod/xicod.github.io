@@ -220,7 +220,7 @@ _dt_term_socket_ssh() {
 }
 # need to export it because programs can call the _dt_write_to_clipboard
 # function that's using it
-export _dt_remote_clipboard_file="$(getent passwd $(whoami) | cut -d':' -f6)/clip"
+export _dt_remote_clipboard_file="~/clip"
 function sshx {
 	local t=$(mktemp -u --tmpdir=$HOME ssh.sock.XXXXXXXXXX)
 	local f=$_dt_remote_clipboard_file
