@@ -218,12 +218,9 @@ fi
 _dt_term_socket_ssh() {
 	ssh -oControlPath=$1 -O exit DUMMY_HOST
 }
-# need to export it because programs can call the _dt_write_to_clipboard
-# function that's using it
-export _dt_remote_clipboard_file="~/clip"
 function sshx {
 	local t=$(mktemp -u --tmpdir=$HOME ssh.sock.XXXXXXXXXX)
-	local f=$_dt_remote_clipboard_file
+	local f="~/clip"
 	ssh -f -oControlMaster=yes -oControlPath=$t $@ tail\ -f\ /dev/null || return 1
 	ssh -S$t DUMMY_HOST "bash -c 'if ! [ -p $f ]; then mkfifo $f; fi'" \
 		|| { _dt_term_socket_ssh $t; return 1; }
@@ -248,9 +245,10 @@ function _dt_write_to_clipboard {
 	else
 		local v_trunc="${v_nonewline}"
 	fi
-	if [ -p $_dt_remote_clipboard_file ] \
-		&& dd oflag=nonblock conv=notrunc,nocreat count=0 of=$_dt_remote_clipboard_file 2>/dev/null; then
-		echo -n "$v" > $_dt_remote_clipboard_file
+	local remote_clipboard_file="$(getent passwd $(whoami) | cut -d':' -f6)/clip"
+	if [ -p $remote_clipboard_file ] \
+		&& dd oflag=nonblock conv=notrunc,nocreat count=0 of=$remote_clipboard_file 2>/dev/null; then
+		echo -n "$v" > $remote_clipboard_file
 		echo "Wrote '$v_trunc' to remote clipboard"
 	else
 		(
