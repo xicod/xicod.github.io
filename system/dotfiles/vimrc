@@ -839,10 +839,18 @@ set foldmethod=indent
 set foldnestmax=99
 " don't unfold while searching
 set foldopen-=search
+function! s:OnBufRead()
+	" this unfolds everything on buffer read
+	normal! zR
+	if &filetype == "gitrebase"
+		" Not sure why this is needed but without it the cursor
+		" ends up in the middle of the first word
+		normal! gg0
+	endif
+endfunction
 augroup GrpOnBufRead
 	autocmd!
-	" this unfolds everything on buffer read
-	autocmd BufRead * normal! zR
+	autocmd BufRead * call s:OnBufRead()
 augroup end
 highlight Folded ctermbg=lightgrey
 
@@ -1903,9 +1911,6 @@ augroup GrpFileTypes
 	autocmd FileType json setlocal foldmethod=syntax
 	autocmd FileType gitcommit setlocal textwidth=0 spell | startinsert | call feedkeys("\<C-O>1G", 'n')
 	autocmd FileType markdown if !&diff | setlocal spell | endif
-	" Not sure why this is needed but without it the cursor
-	" ends up in the middle of the first word
-	autocmd FileType gitrebase call feedkeys("0", 'nx')
 augroup end
 
 function! PrettyFormat()
