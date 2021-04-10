@@ -1794,16 +1794,18 @@ endfunction
 nnoremap <silent> <Space><CR> :call BreakToNewline()<CR>
 
 let g:move_action_undo_join = 0
-function! GetMoveActionLinesCommand(selection_escape, reselect, movement, post)
-	return (g:move_action_undo_join ? ":".a:selection_escape."silent! undojoin\<CR>".a:reselect : "")
-				\. ":move ".a:movement."\<CR>"
-				\. ":let g:move_action_undo_join=1\<CR>"
-				\. a:post
+function! s:MoveLines(mode, movement)
+	if g:move_action_undo_join
+		silent! undojoin
+	endif
+	silent! execute ":" . (a:mode == "v" ? "'<,'>" : "") . "move " . a:movement
+	let g:move_action_undo_join = 1
+	execute "normal! " . (a:mode == "n" ? "==" : "gv=gv")
 endfunction
-nnoremap <silent> <expr> <A-j> GetMoveActionLinesCommand('', '', '.+1', '==')
-nnoremap <silent> <expr> <A-k> GetMoveActionLinesCommand('', '', '.-2', '==')
-vnoremap <silent> <expr> <A-j> GetMoveActionLinesCommand('\<c-u>', 'gv', "'>+1", 'gv=gv')
-vnoremap <silent> <expr> <A-k> GetMoveActionLinesCommand('\<c-u>', 'gv', "'<-2", 'gv=gv')
+nnoremap <silent> <A-j> :call <SID>MoveLines("n", ".+1")<CR>
+nnoremap <silent> <A-k> :call <SID>MoveLines("n", ".-2")<CR>
+vnoremap <silent> <A-j> :<c-u>call <SID>MoveLines("v", "'>+1")<CR>
+vnoremap <silent> <A-k> :<c-u>call <SID>MoveLines("v", "'<-2")<CR>
 
 inoremap <C-j> <C-o>j<C-o>^
 inoremap <C-k> <C-o>k<C-o>^
