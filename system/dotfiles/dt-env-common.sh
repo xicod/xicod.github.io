@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# set HOME just in case it wasn't set properly
+export HOME=$(getent passwd $(whoami) | cut -d':' -f6)
+
 # to avoid less on every output
 export SYSTEMD_PAGER=''
 
