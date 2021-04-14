@@ -1691,7 +1691,13 @@ endfunction
 nnoremap <silent> ) :call FindParen('/')<CR>
 nnoremap <silent> ( :call FindParen('?')<CR>
 
-nnoremap <silent> <C-]> :execute "tjump " . expand("<cword>")<CR>
+function! s:GotoTagCustom()
+	let l:cw = expand("<cword>")
+	execute "tjump " . l:cw
+	normal! 0
+	call SearchAndGo('/', '\<'.l:cw.'\>')
+endfunction
+nnoremap <silent> <C-]> :call <SID>GotoTagCustom()<CR>
 
 vnoremap s ge
 vnoremap S gE
