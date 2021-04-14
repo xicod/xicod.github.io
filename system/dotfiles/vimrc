@@ -736,6 +736,7 @@ function! GrepFiles(path, ignore_case, fpat, ...)
 	if getbufvar('%', '&buftype') ==# 'quickfix'
 		let l:search_pat = (a:ignore_case ? '\c' : '')
 		let l:search_pat .= substitute(l:pat, '^''\(.*\)''$', '\1', '')
+		let g:dt_search_focus = l:search_pat
 		" This is to avoid marking the pattern in filenames.
 		" We end the match (\ze), then require not to match (\@!)
 		" of anything|NUM| as a group.
@@ -745,6 +746,7 @@ function! GrepFiles(path, ignore_case, fpat, ...)
 
 	redraw!
 	call win_gotoid(l:curr_winid)
+	call s:GotoSearchFocus()
 endfunction
 command! -nargs=+ Grep call GrepFiles(<f-args>)
 
@@ -1103,10 +1105,15 @@ nnoremap <silent> ,e :Vex<cr>
 "	exec '?^\(| \)\{' . lvl . '\}\w'
 "endfunction
 
+function! s:GotoSearchFocus()
+	normal! 0
+	call SearchAndGo('/', g:dt_search_focus)
+endfunction
 function! s:QuickfixWindowAction(action)
 	try
 		execute a:action
 		normal! zt^
+		call s:GotoSearchFocus()
 	catch
 		call PrintError(v:exception)
 	endtry
@@ -1424,6 +1431,7 @@ function! s:EclimGetFiletype()
 	endif
 endfunction
 function! GotoDefinitionCustom()
+	let g:dt_search_focus = '\<'.expand("<cword>").'\>'
 	let l:ft = s:EclimGetFiletype()
 	if s:EclimExists() && l:ft != ''
 		cclose
@@ -1432,14 +1440,17 @@ function! GotoDefinitionCustom()
 	else
 		normal! gd
 	endif
+	call s:GotoSearchFocus()
 endfunction
 nnoremap <silent> gd :call GotoDefinitionCustom()<CR>
 function! GotoReferences()
+	let g:dt_search_focus = '\<'.expand("<cword>").'\>'
 	let l:ft = s:EclimGetFiletype()
 	if s:EclimExists() && l:ft != ''
 		cclose
 		execute l:ft . 'Search -x references'
 		normal! zt^
+		call s:GotoSearchFocus()
 	else
 		echo 'Eclim is not supported here'
 	endif
