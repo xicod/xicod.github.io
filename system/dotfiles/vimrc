@@ -737,10 +737,15 @@ function! GrepFiles(path, ignore_case, fpat, ...)
 		let l:search_pat = (a:ignore_case ? '\c' : '')
 		let l:search_pat .= substitute(l:pat, '^''\(.*\)''$', '\1', '')
 		let g:dt_search_focus = l:search_pat
-		" This is to avoid marking the pattern in filenames.
-		" We end the match (\ze), then require not to match (\@!)
-		" of anything|NUM| as a group.
-		let l:search_pat .= '\ze\(.\{-}|[0-9]\+|\)\@!'
+		" This is to avoid marking the pattern in filenames and line numbers.
+		" We basically look for either
+		" file|NUM| pat
+		" or just pat. The effect is that the first match of query is matched
+		" to the first option that skips filename and line number. If there
+		" is another match to find (multiple occurrences on the same line),
+		" then it's just matched to pat as the filename and line number are
+		" already skipped.
+		let l:search_pat = '^.\{-}|[0-9]\+| .\{-}\zs'.l:search_pat.'\|'.l:search_pat
 		call matchadd('FileSearchMark', l:search_pat, -1)
 	endif
 
