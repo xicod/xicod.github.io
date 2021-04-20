@@ -723,13 +723,7 @@ function! GrepFiles(path, ignore_case, fpat, ...)
 	let l:ignore_case = (a:ignore_case) ? '-i' : ''
 	let l:pat = join(a:000, ' ')
 
-	" remove previous quickfix windows by removing the quickfix buffer
-	let l:qf_buf_list = filter(range(1, bufnr('$')), 'buflisted(v:val) && getbufvar(v:val, "&buftype") ==# "quickfix"')
-	if !empty(l:qf_buf_list)
-		for l:buf in l:qf_buf_list
-			execute 'bwipeout! ' . l:buf
-		endfor
-	endif
+	call s:QuickfixRemoveAll()
 
 	silent execute "grep -srnI  ".$DT_GREP_PARAMS." --exclude-dir=.git --include=".a:fpat." --exclude=tags ".l:ignore_case." ".l:pat." ".a:path
 	cw
@@ -754,6 +748,7 @@ function! GrepFiles(path, ignore_case, fpat, ...)
 	redraw!
 	call win_gotoid(l:curr_winid)
 	call s:GotoSearchFocus()
+	call s:SetWindowSearchMatch(g:dt_search_focus)
 endfunction
 command! -nargs=+ Grep call GrepFiles(<f-args>)
 
@@ -796,6 +791,33 @@ endfunction
 
 highlight Column81Color ctermbg=DarkGreen guibg=DarkGreen ctermfg=white guifg=white
 "set colorcolumn=81
+let g:dt_search_res = {}
+function! s:SetWindowSearchMatch(pat)
+	let g:dt_search_res = {'match': matchadd('FileSearchMark', a:pat, -1), 'winid': win_getid()}
+endfunction
+function! s:QuickfixRemoveAll()
+	" remove previous quickfix windows by removing the quickfix buffer
+	let l:qf_buf_list = filter(range(1, bufnr('$')), 'buflisted(v:val) && getbufvar(v:val, "&buftype") ==# "quickfix"')
+	if !empty(l:qf_buf_list)
+		for l:buf in l:qf_buf_list
+			execute 'bwipeout! ' . l:buf
+		endfor
+	endif
+	call s:SearchResMarkClean()
+endfunction
+function! s:QuickfixWindowExists()
+	return !empty(filter(range(1, bufnr('$')), 'buflisted(v:val) && getbufvar(v:val, "&buftype") ==# "quickfix"'))
+endfunction
+function! s:SearchResMarkClean()
+	let l:search_res = g:dt_search_res
+	let g:dt_search_res = {}
+	if l:search_res != {}
+		let l:curr_winid = win_getid()
+		call win_gotoid(l:search_res['winid'])
+		call matchdelete(l:search_res['match'])
+		call win_gotoid(l:curr_winid)
+	endif
+endfunction
 function! OnBufEnter()
 	" for quickfix there's QuickFixLine and CursorLine is interfering
 	if &buftype != 'quickfix'
@@ -806,6 +828,9 @@ function! OnBufEnter()
 		match Column81Color /\%81v./
 	endif
 	call SetCursorLine()
+	if !s:QuickfixWindowExists()
+		call s:SearchResMarkClean()
+	endif
 endfunction
 function! OnBufLeave()
 	setlocal nocursorline
@@ -1119,8 +1144,11 @@ endfunction
 function! s:QuickfixWindowAction(action)
 	try
 		execute a:action
+		normal! zR
 		normal! zt^
 		call s:GotoSearchFocus()
+		call s:SearchResMarkClean()
+		call s:SetWindowSearchMatch(g:dt_search_focus)
 	catch
 		call PrintError(v:exception)
 	endtry
@@ -1438,25 +1466,33 @@ function! s:EclimGetFiletype()
 	endif
 endfunction
 function! GotoDefinitionCustom()
-	let g:dt_search_focus = '\<'.expand("<cword>").'\>'
 	let l:ft = s:EclimGetFiletype()
 	if s:EclimExists() && l:ft != ''
+		let g:dt_search_focus = '\<'.expand("<cword>").'\>'
+		call s:QuickfixRemoveAll()
 		cclose
 		execute l:ft . 'SearchContext'
 		normal! zt^
+		if s:QuickfixWindowExists()
+			call s:SetWindowSearchMatch(g:dt_search_focus)
+		endif
+		call s:GotoSearchFocus()
 	else
 		normal! gd
 	endif
-	call s:GotoSearchFocus()
 endfunction
 nnoremap <silent> gd :call GotoDefinitionCustom()<CR>
 function! GotoReferences()
-	let g:dt_search_focus = '\<'.expand("<cword>").'\>'
 	let l:ft = s:EclimGetFiletype()
 	if s:EclimExists() && l:ft != ''
+		let g:dt_search_focus = '\<'.expand("<cword>").'\>'
+		call s:QuickfixRemoveAll()
 		cclose
 		execute l:ft . 'Search -x references'
 		normal! zt^
+		if s:QuickfixWindowExists()
+			call s:SetWindowSearchMatch(g:dt_search_focus)
+		endif
 		call s:GotoSearchFocus()
 	else
 		echo 'Eclim is not supported here'
