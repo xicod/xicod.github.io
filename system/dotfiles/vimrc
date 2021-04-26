@@ -1139,7 +1139,9 @@ nnoremap <silent> ,e :Vex<cr>
 
 function! s:GotoSearchFocus()
 	normal! 0
-	call SearchAndGo('/', g:dt_search_focus)
+	if getline('.') !~ '^'.g:dt_search_focus
+		call SearchAndGo('/', g:dt_search_focus)
+	endif
 endfunction
 function! s:QuickfixWindowAction(action)
 	try
