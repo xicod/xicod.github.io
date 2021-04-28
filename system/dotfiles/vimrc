@@ -724,6 +724,8 @@ function! GrepFiles(path, ignore_case, fpat, ...)
 	let l:pat = join(a:000, ' ')
 
 	call s:QuickfixRemoveAll()
+	" clear previous search marks in any case
+	call s:SearchResMarkClean()
 
 	silent execute "grep -srnI  ".$DT_GREP_PARAMS." --exclude-dir=.git --include=".a:fpat." --exclude=tags ".l:ignore_case." ".l:pat." ".a:path
 	cw
@@ -743,12 +745,13 @@ function! GrepFiles(path, ignore_case, fpat, ...)
 		" already skipped.
 		let l:search_pat = '^.\{-}|[0-9]\+| .\{-}\zs'.l:search_pat.'\|'.l:search_pat
 		call matchadd('FileSearchMark', l:search_pat, -1)
+
+		call win_gotoid(l:curr_winid)
+		call s:GotoSearchFocus()
+		call s:SetWindowSearchMatch(g:dt_search_focus)
 	endif
 
 	redraw!
-	call win_gotoid(l:curr_winid)
-	call s:GotoSearchFocus()
-	call s:SetWindowSearchMatch(g:dt_search_focus)
 endfunction
 command! -nargs=+ Grep call GrepFiles(<f-args>)
 
