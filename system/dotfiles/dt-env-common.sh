@@ -3,6 +3,11 @@
 # set HOME just in case it wasn't set properly
 export HOME=$(getent passwd $(whoami) | cut -d':' -f6)
 
+# for uninitialized terminals
+if [ -z "$TERM" ]; then
+	export TERM=xterm
+fi
+
 # to avoid less on every output
 export SYSTEMD_PAGER=''
 
