@@ -268,3 +268,8 @@ function _dt_write_to_clipboard {
 	fi
 }
 export -f _dt_write_to_clipboard
+
+# cd HOME for environments that it's not done by default
+if [ "$PWD" = "/" ]; then
+	command cd
+fi
