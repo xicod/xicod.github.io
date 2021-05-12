@@ -719,6 +719,7 @@ function! GrepFiles(path, ignore_case, fpat, ...)
 		call PrintError('Need at least one search parameter')
 		return
 	endif
+
 	let l:curr_winid = win_getid()
 	let l:ignore_case = (a:ignore_case) ? '-i' : ''
 	let l:pat = join(a:000, ' ')
@@ -750,6 +751,9 @@ function! GrepFiles(path, ignore_case, fpat, ...)
 		call s:GotoSearchFocus()
 		call s:SetWindowSearchMatch(g:dt_search_focus)
 	endif
+
+	" for some reason the search term also gets highlighted
+	nohlsearch
 
 	redraw!
 endfunction
