@@ -816,9 +816,12 @@ function! s:SearchResMarkClean()
 	let g:dt_search_res = {}
 	if l:search_res != {}
 		let l:curr_winid = win_getid()
-		call win_gotoid(l:search_res['winid'])
-		call matchdelete(l:search_res['match'])
-		call win_gotoid(l:curr_winid)
+		try
+			call win_gotoid(l:search_res['winid'])
+			call matchdelete(l:search_res['match'])
+			call win_gotoid(l:curr_winid)
+		catch
+		endtry
 	endif
 endfunction
 function! OnBufEnter()
