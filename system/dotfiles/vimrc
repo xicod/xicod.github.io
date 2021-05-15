@@ -877,6 +877,8 @@ highlight QuickFixLine ctermbg=lightyellow guibg=lightyellow
 highlight Pmenu ctermfg=black ctermbg=lightgrey guifg=black guibg=lightgrey
 highlight PmenuSel ctermfg=black ctermbg=lightyellow guifg=black guibg=lightyellow
 
+highlight SpellBad ctermfg=white ctermbg=red guifg=white guibg=red
+
 " code folding
 "set foldmethod=syntax
 set foldmethod=indent
