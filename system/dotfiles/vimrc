@@ -1635,23 +1635,7 @@ function! InnerAnythingChange()
 	endif
 	call feedkeys('"_ci'.l:curr_chr.l:additional_actions, 'ni')
 endfunction
-function! InnerAnythingIndent(type)
-	let l:start_pos = CursorPositionStore()
-	call FindFirstParenthesis()
-	call setpos("'<", [0, line('.'), col('.'), 0])
-	call GotoTwinChar()
-	call setpos("'>", [0, line('.'), col('.'), 0])
-	if a:type == 'simple'
-		call feedkeys("`<v`>=", 'nx')
-	elseif a:type == 'custom'
-		'<,'>call LightFormat(0)
-	endif
-	call CursorPositionRestore(l:start_pos)
-	normal! ^
-endfunction
 nnoremap <silent> cc :call RepeatSet("cc", 1)<CR>:call InnerAnythingChange()<CR>
-nnoremap <silent> =ii :call InnerAnythingIndent('simple')<CR>
-nnoremap <silent> ,== :call InnerAnythingIndent('custom')<CR>
 
 nnoremap j +
 nnoremap k -
