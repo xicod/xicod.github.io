@@ -575,7 +575,8 @@ endfunction
 nnoremap <silent> i :call <SID>StartInsert()<CR>
 
 " Escape everything
-nnoremap <Tab> <Esc>
+" remapping Tab also remaps Ctrl-i, which breaks going forward in jump history
+"nnoremap <Tab> <Esc>
 vnoremap <Tab> <Esc>gV
 onoremap <Tab> <Esc>
 "cnoremap <Tab> <C-C><Esc>
