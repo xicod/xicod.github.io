@@ -103,7 +103,9 @@ endfunction
 function! OnInsertEnter()
 	call SetStatusLine(1)
 	set ignorecase
-	execute "set tags=".getcwd()."/tags"
+	if &buftype != 'nofile'
+		execute "set tags=".getcwd()."/tags"
+	endif
 	let g:insert_mode_save_cwd = getcwd()
 	set autochdir
 	" for older vim versions, prefer keeping the macro
