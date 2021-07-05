@@ -80,6 +80,19 @@ function hdl {
 		&& echo -e "\nRemoving '$f'\n" && rm "$f" && ls -l
 }
 
+function massrename {
+	if [ $# -ne 1 ]; then
+		echo "Need file pattern"
+		return 1
+	fi
+	(
+	echo $'# execute with \':%!bash\''
+	echo $'# replace only in the new filename block: \'%s/\\t\\t.*\zsSOMETEXT/NEWTEXT/\''
+	ls -b $1 | sed 's/^\(.*\)$/mv -n \1\t\1/' \
+		| column -t -s $'\t' -o $'\t\t'
+	) | vim - -c 'set filetype=bash | setlocal buftype=nofile'
+}
+
 ## Colours
 function printRed { echo -e "\e[1;31m${1}\e[0m"; }
 export -f printRed
