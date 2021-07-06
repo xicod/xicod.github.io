@@ -80,7 +80,7 @@ function hdl {
 		&& echo -e "\nRemoving '$f'\n" && rm "$f" && ls -l
 }
 
-function massrename {
+function mmv {
 	if [ $# -ne 1 ]; then
 		echo "Need file pattern"
 		return 1
