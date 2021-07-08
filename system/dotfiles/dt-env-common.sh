@@ -249,7 +249,7 @@ function sshx {
 	set -e
 	set -o pipefail
 	while [ 1 ]; do
-		ssh -S$t DUMMY_HOST "cat $f" | xclip -selection clipboard
+		ssh -S$t -tt DUMMY_HOST "cat $f" 2>/dev/null | xclip -selection clipboard
 	done &
 	)
 	ssh -S$t -t DUMMY_HOST "tmux attach -t remote || tmux new -s remote" \
