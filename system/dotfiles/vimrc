@@ -1556,7 +1556,7 @@ function! ChangeValue()
 		let l:sc = 1
 	endif
 	let l:sep = '='
-	if getline('.') =~ '^\s*[a-zA-Z_0-9-]*:'
+	if getline('.') =~ '^\s*[-]*\s*[a-zA-Z_0-9-]*:'
 		let l:sep = ':'
 	endif
 	execute 's/\('.l:sep.'\)\s\+/\1 /e'
@@ -1572,10 +1572,10 @@ endfunction
 nnoremap <silent> cv :call RepeatSet("cv", 1)<CR>:call ChangeValue()<CR>
 function! ChangeField()
 	let l:sep = '='
-	if getline('.') =~ '^\s*[a-zA-Z_0-9-]*:'
+	if getline('.') =~ '^\s*[-]*\s*[a-zA-Z_0-9-]*:'
 		let l:sep = ':'
 	endif
-	execute 's/\(\s*\).\{-}\(\s*'.l:sep.'.*\)$/\1@\2/e'
+	execute 's/\(\s*[-]*\s*\).\{-}\(\s*'.l:sep.'.*\)$/\1@\2/e'
 	call histdel("/", -1)
 	normal! 0f@
 	normal! "_x
