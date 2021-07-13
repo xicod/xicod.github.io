@@ -81,16 +81,16 @@ function hdl {
 }
 
 function mmv {
-	if [ $# -ne 1 ]; then
-		echo "Need file pattern"
+	if [ $# -eq 0 ]; then
+		echo "Need files to rename"
 		return 1
 	fi
 	(
 	echo $'# execute with \':%!bash\''
 	echo $'# replace only in the new filename block: \'%s/\\t\\t.*\zsSOMETEXT/NEWTEXT/\''
-	ls -b $1 | sed 's/^\(.*\)$/mv -n \1\t\1/' \
+	ls -1d --quoting-style=shell "$@" | sed 's/^\(.*\)$/mv -nT \1\t\1/' \
 		| column -t -s $'\t' -o $'\t\t'
-	) | vim - -c 'set filetype=bash | setlocal buftype=nofile'
+	) | vim - -c 'setlocal filetype=bash buftype=nofile nolist'
 }
 
 ## Colours
