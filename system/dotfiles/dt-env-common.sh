@@ -236,8 +236,15 @@ function _dt_fzf_compl {
 		$cmd
 	fi
 }
-if [ -f /usr/share/bash-completion/completions/fzf ]; then
-	source /usr/share/bash-completion/completions/fzf
+
+__dt_fzf_bash_comp=""
+if [ -f /usr/share/doc/fzf/examples/completion.bash ]; then
+	__dt_fzf_bash_comp=/usr/share/doc/fzf/examples/completion.bash
+elif [ -f /usr/share/bash-completion/completions/fzf ]; then
+	__dt_fzf_bash_comp=/usr/share/bash-completion/completions/fzf
+fi
+if [ -n "$__dt_fzf_bash_comp" ]; then
+	source $__dt_fzf_bash_comp
 	bind -x '"\220":"_dt_fzf_compl set"'
 	bind -x '"\221":"_dt_fzf_compl unset"'
 	bind '"\ef":"\220**\t\221"'
