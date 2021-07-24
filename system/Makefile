@@ -3,6 +3,7 @@ BASH_ENV_DEST := $(shell bash -c '[ -d /etc/bash/bashrc.d ] && echo "/etc/bash/b
 
 all:
 	@echo "Copying tools"
+	mkdir -p $(GLOBAL_BIN_DEST_DIR)
 	cp -a tools/* $(GLOBAL_BIN_DEST_DIR)/
 	@echo "-------------------------------------------"
 	@echo "Setting vimrc"
