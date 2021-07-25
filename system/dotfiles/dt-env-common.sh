@@ -222,7 +222,7 @@ PROMPT_COMMAND+="_prompt_pre"
 
 _dt_temp_prev_compl_cmd=""
 function _dt_fzf_compl {
-	local c=${READLINE_LINE%% *}
+	local c=$(IFS=' '; read -ra s <<< "$READLINE_LINE"; echo ${s[0]})
 	if [ "$1" = "set" ]; then
 		_dt_temp_prev_compl_cmd=$(complete -p "$c" 2>/dev/null)
 		local cmd="complete -F _fzf_path_completion -o default -o bashdefault $c"
