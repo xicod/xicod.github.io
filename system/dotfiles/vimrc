@@ -1559,7 +1559,7 @@ function! ChangeValue()
 	else
 		let l:sc = 0
 	endif
-	if getline('.') =~ '^\s*[-]*\s*[a-zA-Z_0-9-]*:'
+	if getline('.') =~ '^\s*[-]*\s*[a-zA-Z_0-9-./]*:'
 		let l:sep = ':'
 	elseif getline('.') =~ '^\s*-'
 		let l:sep = '-'
@@ -1578,7 +1578,7 @@ function! ChangeValue()
 endfunction
 nnoremap <silent> cv :call RepeatSet("cv", 1)<CR>:call ChangeValue()<CR>
 function! ChangeField()
-	if getline('.') =~ '^\s*[-]*\s*[a-zA-Z_0-9-]*:'
+	if getline('.') =~ '^\s*[-]*\s*[a-zA-Z_0-9-./]*:'
 		let l:sep = ':'
 	else
 		let l:sep = '='
