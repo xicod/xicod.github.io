@@ -54,7 +54,7 @@ set scrolloff=20
 " place current line on top of window although scrolloff is set
 nnoremap zT :execute "normal! " . (line(".") + &scrolloff) . "Gzt"<CR>
 
-set mouse-=a
+set mouse=
 set clipboard=unnamedplus
 
 set number relativenumber
