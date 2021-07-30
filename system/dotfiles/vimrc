@@ -702,6 +702,9 @@ function! ToggleBooleanValue()
 				\'TRUE': 'FALSE', 'FALSE': 'TRUE',
 				\'true': 'false', 'false': 'true',
 				\'True': 'False', 'False': 'True',
+				\'yes': 'no', 'no': 'yes',
+				\'Yes': 'No', 'No': 'Yes',
+				\'YES': 'NO', 'NO': 'YES',
 				\}
 	let l:w = expand('<cword>')
 	if !has_key(l:m, l:w)
