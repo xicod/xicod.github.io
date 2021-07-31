@@ -1,0 +1,48 @@
+#!/bin/bash
+
+temp_chpasswd_file=/root/temp_chpasswd
+
+OPTIND=1
+
+user=""
+password_file=""
+silent=0
+
+while getopts "u:f:s" opt; do
+	case "$opt" in
+		u) user=$OPTARG
+			;;
+		f) password_file=$OPTARG
+			;;
+		s) silent=1
+			;;
+	esac
+done
+shift $((OPTIND-1))
+[ "$1" = "--" ] && shift
+
+if [ -z "$user" ]; then
+	echo "Params: -u USER [-f PASSWORD_FILE] [-s (silent)]"
+	exit 1
+fi
+
+echo -n "${user}:" > $temp_chpasswd_file
+
+if [ -z "$password_file" ]; then
+	echo "Generating random password for $user"
+	cat /dev/urandom | tr -dc A-Za-z0-9 | head -c32 >> $temp_chpasswd_file
+elif ! [ -f "$password_file" ]; then
+	echo "File $password_file was not found"
+	exit 1
+else
+	echo "Using password file $password_file for user $user"
+	cat "$password_file" | tr -d '\n' >> $temp_chpasswd_file
+fi
+echo >> $temp_chpasswd_file
+
+chpasswd < $temp_chpasswd_file
+
+[ $silent = 0 ] && cat $temp_chpasswd_file
+
+rm $temp_chpasswd_file
+
