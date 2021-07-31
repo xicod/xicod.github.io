@@ -11,7 +11,6 @@ confSchema:
   - -/media
   - -/mnt
   - -/sys
-  - -/tmp
   - -/var/lib/docker
   - -/root/.cache
   - -/home/user/.cache
