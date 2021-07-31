@@ -1,10 +1,11 @@
-GLOBAL_BIN_DEST_DIR=/tools
 BASH_ENV_DEST := $(shell bash -c '[ -d /etc/bash/bashrc.d ] && echo "/etc/bash/bashrc.d" || echo /etc/profile.d')
 
 all:
+	@echo "Setting profile"
+	./place_profile.sh
+	@echo "-------------------------------------------"
 	@echo "Copying tools"
-	mkdir -p $(GLOBAL_BIN_DEST_DIR)
-	cp -a tools/* $(GLOBAL_BIN_DEST_DIR)/
+	./place_tools.sh
 	@echo "-------------------------------------------"
 	@echo "Setting vimrc"
 	cp -a ./dotfiles/vimrc /etc/vim/vimrc.local
@@ -24,3 +25,8 @@ ifeq ($(shell cat /root/main_host 2>/dev/null), 1)
 	@echo "Setting system tmux.conf"
 	cp -a ./dotfiles/tmux.conf /etc/
 endif
+	@echo "-------------------------------------------"
+	./place_default_dt_config.sh
+	@echo "-------------------------------------------"
+	@echo "Setting cronfile"
+	./place_cronjobs.sh
