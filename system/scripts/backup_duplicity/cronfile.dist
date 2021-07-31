@@ -1,0 +1,2 @@
+# weekly
+30 6 * * 5   root    CRON_FILE_DIR/backup.sh

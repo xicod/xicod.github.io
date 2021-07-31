@@ -1,0 +1,19 @@
+appName: backup_duplicity
+confSchema:
+  backup_dest: /media/path/backups
+  backup_owner: owner_username
+  backup_passphrase: mybackuppassword
+  full_backup_rotation: 10W
+  include_exclude_list:
+  - -/tmp
+  - -/proc
+  - -/run
+  - -/media
+  - -/mnt
+  - -/sys
+  - -/tmp
+  - -/var/lib/docker
+  - -/root/.cache
+  - -/home/user/.cache
+  - -/home/user/Downloads
+  pre_backup_bash_func: "echo pre_backup_function"
