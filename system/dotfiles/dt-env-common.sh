@@ -34,7 +34,7 @@ alias systemctl="systemctl -l"
 alias psmem='ps -eo pid,rss,args | sort -b -k2,2n | cut -c -`tput cols`'
 
 # Capture the current pane into a vim buffer
-alias tmux-cap='tmux capture-pane -p -S- -E- | vim -c "normal! G" -'
+alias tmux-cap='tmux capture-pane -p -S- -E- | vim -c "setlocal filetype=none buftype=nofile nolist | normal! zRG" -'
 
 
 # use a custom config loader that will load the system and then
