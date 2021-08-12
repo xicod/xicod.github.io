@@ -1,6 +1,6 @@
 settings.hintAlign = "left";
-Hints.style('font-size: 15px;');
-Hints.style('font-size: 15px;', 'text');
+Hints.style('font-size: 12pt;');
+Hints.style('font-size: 12pt;', 'text');
 
 mapkey('yb', '#7Yank text of blockquote', function() {
 	Hints.create("blockquote", function(element) {
