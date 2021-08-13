@@ -1938,8 +1938,12 @@ function! PySetTabParams(v)
 	endif
 endfunction
 command! -nargs=1 TabParams call PySetTabParams(<f-args>)
-" call the function to set defaults for the first loaded file
-call PySetTabParams(0)
+
+" set global defaults
+set tabstop=4
+set shiftwidth=4
+set softtabstop=4
+set noexpandtab
 
 function! PyIndentAutoCfg()
 	let lnum = 1
