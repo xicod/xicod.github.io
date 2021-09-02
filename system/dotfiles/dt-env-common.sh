@@ -18,7 +18,7 @@ if [ -z "$TERM" ] || [ "$TERM" = "dumb" ]; then
 	export TERM=xterm
 fi
 
-PS1='[$([ $? -eq 0 ] && (echo -e "\[\e[32m\]\xe2\x9c\x94") || (echo -e "\[\e[31m\]\xe2\x9c\x98"))\[\e[0m\]]\[\033]0;\u@\h:\w\007\][$([ \u = root ] && echo -e "\[\033[01;31m\]" || echo -e "\[\033[01;32m\]")\u@\h\[\033[00m\]]\[\033[01;34m\] \w \[\033[00m\]$(g="`git symbolic-ref --short HEAD 2>/dev/null`"; [ -n "$g" ] && echo "($g) ")\[\033[01;34m\]\$\[\033[00m\]\[\033[00m\] '
+PS1='[$([ $? -eq 0 ] && (echo -e "\[\e[32m\]\xe2\x9c\x94") || (echo -e "\[\e[31m\]\xe2\x9c\x98"))\[\e[0m\]]\[\033]0;\u@\h:\w\007\][$([ \u = root ] && echo -e "\[\033[01;31m\]" || echo -e "\[\033[01;32m\]")\u@\h\[\033[00m\]]\[\033[01;34m\] \w \[\033[00m\]$(k=$(kubectl config current-context 2>/dev/null | cut -d/ -f2); [ -n "$k" ] && echo "(\[\033[0;33m\]k:$k\[\033[00m\]) ")$(g="`git symbolic-ref --short HEAD 2>/dev/null`"; [ -n "$g" ] && echo "(g:$g) ")\[\033[01;34m\]\$\[\033[00m\]\[\033[00m\] '
 
 # some basic ones because debian doesn't have them
 alias egrep='egrep --colour=auto'
