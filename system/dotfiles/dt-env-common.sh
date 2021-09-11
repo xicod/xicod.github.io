@@ -256,7 +256,9 @@ _dt_term_socket_ssh() {
 function sshx {
 	local t=$(mktemp -u --tmpdir ssh.sock.XXXXXXXXXX)
 	local f="~/clip"
-	ssh -f -oControlMaster=yes -oControlPath=$t $@ tail\ -f\ /dev/null || return 1
+	ssh -f -oControlMaster=yes -oControlPath=$t $@ tail\ -f\ /dev/null \
+		&> >(grep -v '^mux_master_process_new_session: tcgetattr: Inappropriate ioctl for device') \
+		|| return 1
 	ssh -S$t DUMMY_HOST "bash -c 'if ! [ -p $f ]; then mkfifo $f; fi'" \
 		|| { _dt_term_socket_ssh $t; return 1; }
 	(
@@ -264,6 +266,13 @@ function sshx {
 	set -o pipefail
 	while [ 1 ]; do
 		ssh -S$t -tt DUMMY_HOST "cat $f" 2>/dev/null | xclip -selection clipboard
+		# ioctl error is thrown by this command in some versions of
+		# ssh client because we're forcing here a PTY in order to keep hold of
+		# the remote cat command. This prevents remote having cat processes
+		# sticking around long after the session is closed. The issue is
+		# that the ssh command of ControlMaster is running in the background
+		# and therefore has the tcgetattr() call failing,
+		# not getting terminal properties.
 	done &
 	)
 	ssh -S$t -t DUMMY_HOST "tmux attach -t remote || tmux new -s remote" \
