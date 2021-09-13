@@ -6,6 +6,8 @@
 	helper = store
 [core]
 	excludesfile = /etc/gitignore_global
+[color]
+	ui = never
 [merge]
 	tool = vimdiff
 [mergetool]
