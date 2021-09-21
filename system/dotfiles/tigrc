@@ -33,7 +33,7 @@ bind refs N !bash -c 'git pull --rebase && echo -n "Enter branch name to fork of
 bind diff F :/^diff --git
 bind diff G :/^[+-]{1}[^+-]{1}
 bind diff D >git difftool --tool=vimdiff --no-prompt %(commit)^- -- %(file)
-bind diff M >git difftool --tool=meld --no-prompt %(commit)^! -- %(file)
+bind diff M >git difftool --tool=meld --no-prompt %(commit)^- -- %(file)
 bind diff Y +bash -c 'echo -n %(file) | _dt_write_to_clipboard'
 bind diff H <bash -c 'echo "--follow %(repo:cdup)/%(file)" > ~/.tig_param'
 
