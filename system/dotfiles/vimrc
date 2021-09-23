@@ -268,7 +268,7 @@ execute 'xnoremap <expr> [{ ' . s:GetWrapBlockCommand('{', '}')
 execute 'xnoremap <expr> [[ ' . s:GetWrapBlockCommand('[', ']')
 execute 'xnoremap <expr> [( ' . s:GetWrapBlockCommand('(', ')')
 execute 'xnoremap <expr> [" ' . s:GetWrapBlockCommand('"', '"')
-execute 'xnoremap <expr> ['' ' . s:GetWrapBlockCommand('''', '''')
+execute 'xnoremap <expr> ['' ' . s:GetWrapBlockCommand("''", "''")
 execute 'xnoremap <expr> [` ' . s:GetWrapBlockCommand('`', '`')
 execute 'xnoremap <expr> [< ' . s:GetWrapBlockCommand('<', '>')
 
