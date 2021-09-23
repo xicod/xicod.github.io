@@ -1,5 +1,4 @@
 #!/bin/bash
-set -x
 
 dt_repo_dl_prefix="https://raw.githubusercontent.com/xicod/xicod.github.io/master/system/dotfiles"
 
