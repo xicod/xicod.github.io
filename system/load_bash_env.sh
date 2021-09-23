@@ -21,15 +21,8 @@ function trap_tempConfFilesDelete {
 trap "trap_tempConfFilesDelete" EXIT
 
 : \
-&& source <(curl -sSf ${dt_repo_dl_prefix}/dt-env-common.sh) \
 && createTempFileFromUrl ${dt_repo_dl_prefix}/vimrc \
 && export VIMINIT="source ${tmp_files[-1]}" \
 && createTempFileFromUrl ${dt_repo_dl_prefix}/tigrc \
 && export TIGRC_USER=${tmp_files[-1]} \
-&& createTempFileFromUrl ${dt_repo_dl_prefix}/gitconfig \
-&& export GIT_CONFIG_SYSTEM=${tmp_files[-1]} \
-&& export GIT_CONFIG_GLOBAL= \
-&& createTempFileFromUrl ${dt_repo_dl_prefix}/gitignore_global \
-&& __dt_set_git_env_conf core.excludesfile ${tmp_files[-1]}
-
-
+&& source <(curl -sSf ${dt_repo_dl_prefix}/dt-env-common.sh)
