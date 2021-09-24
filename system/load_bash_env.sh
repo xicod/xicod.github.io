@@ -1,6 +1,6 @@
 #!/bin/bash
 
-dt_repo_dl_prefix="https://raw.githubusercontent.com/xicod/xicod.github.io/master/system/dotfiles"
+dt_repo_dl_prefix="https://raw.githubusercontent.com/xicod/xicod.github.io/gitconfig/system/dotfiles"
 
 function createTempFileFromUrl {
 	local t=$(mktemp --tmpdir bash.tmp.XXXXXXXXXX) \
