@@ -317,6 +317,7 @@ function __dt_set_git_env_conf {
 	export GIT_CONFIG_VALUE_${GIT_CONFIG_COUNT}="$2"
 
 	let "GIT_CONFIG_COUNT++"
+	export GIT_CONFIG_COUNT
 }
 
 # cd HOME for environments that it's not done by default
