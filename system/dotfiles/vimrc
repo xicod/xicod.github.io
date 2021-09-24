@@ -1671,9 +1671,9 @@ function! DuplicateLines()
 	normal! gv"zy
 	normal! '>"zp
 endfunction
-nnoremap <silent> yyy :call DuplicateLine()<CR>:call RepeatSet("yyy", 0)<CR>
-vnoremap <silent> yyy :<c-u>call DuplicateLines()<CR>:call RepeatSet("gvyyy", 0)<CR>
-nnoremap <silent> yyi :execute "normal! yi" . GetCurrentChar()<CR>
+nnoremap <silent> ' :call DuplicateLine()<CR>:call RepeatSet("'", 0)<CR>
+vnoremap <silent> ' :<c-u>call DuplicateLines()<CR>:call RepeatSet("gv'", 0)<CR>
+nnoremap <silent> y' :execute "normal! yi" . GetCurrentChar()<CR>
 
 " for these - mark Y as copy source location
 nnoremap <silent> yy :normal! yy<CR>:normal! mY<CR>
