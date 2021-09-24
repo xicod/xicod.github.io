@@ -180,7 +180,7 @@ function! IsCharMatching(chr, pat)
 endfunction
 function! SkipNonAlnumForWord(cmd)
 	execute "normal! " . a:cmd
-	while !IsCharMatching(GetCurrentChar(), 'a-zA-Z0-9')
+	while !IsCharMatching(GetCurrentChar(), 'a-zA-Z0-9_')
 		let l:prev_pos = CursorPositionStore()
 		execute "normal! " . a:cmd
 		if CursorPositionCompare(CursorPositionStore(), l:prev_pos) == 0
