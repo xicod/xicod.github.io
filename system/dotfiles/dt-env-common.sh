@@ -305,6 +305,20 @@ function _dt_write_to_clipboard {
 }
 export -f _dt_write_to_clipboard
 
+# This function is used in the injected environment to set git settings via env
+# variables when the ~/.gitconfig is disabled with a:
+# export GIT_CONFIG_GLOBAL=
+function __dt_set_git_env_conf {
+	if [ -z "$GIT_CONFIG_COUNT" ]; then
+		export GIT_CONFIG_COUNT=0
+	fi
+
+	export GIT_CONFIG_KEY_${GIT_CONFIG_COUNT}="$1"
+	export GIT_CONFIG_VALUE_${GIT_CONFIG_COUNT}="$2"
+
+	let "GIT_CONFIG_COUNT++"
+}
+
 # cd HOME for environments that it's not done by default
 if [ "$PWD" = "/" ]; then
 	command cd
