@@ -262,7 +262,7 @@ nnoremap <silent> ; :call FindCharRepeating(g:find_char_last_dir, g:find_char_la
 function! s:GetWrapBlockCommand(chr, twin)
 	return '((mode() == ''v'') '
 				\.'? ''"zc'.a:chr.a:twin.'<ESC>"zP`<'' '
-				\.': ''<ESC>`<O'.a:chr.'<ESC>`>o'.a:twin.'<ESC>=i'.a:chr.''')'
+				\.': ''<ESC>`<O'.a:chr.'<ESC>`>o'.a:twin.'<ESC>=a'.a:chr.''')'
 endfunction
 execute 'xnoremap <expr> [{ ' . s:GetWrapBlockCommand('{', '}')
 execute 'xnoremap <expr> [[ ' . s:GetWrapBlockCommand('[', ']')
