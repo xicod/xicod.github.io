@@ -1675,7 +1675,7 @@ function! DuplicateLines()
 endfunction
 nnoremap <silent> ' :call DuplicateLine()<CR>:call RepeatSet("'", 0)<CR>
 vnoremap <silent> ' :<c-u>call DuplicateLines()<CR>:call RepeatSet("gv'", 0)<CR>
-nnoremap <silent> y' :execute "normal! yi" . GetCurrentChar()<CR>
+nnoremap <silent> y' :execute "normal! mzyi" . GetCurrentChar() . "`z"<CR>
 
 " for these - mark Y as copy source location
 nnoremap <silent> yy :normal! yy<CR>:normal! mY<CR>
