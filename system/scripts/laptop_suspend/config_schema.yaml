@@ -1,0 +1,3 @@
+appName: laptop_suspend
+confSchema:
+  suspend_threshold: 25
