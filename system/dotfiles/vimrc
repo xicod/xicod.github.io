@@ -1010,6 +1010,7 @@ function! FindFiles(query)
 	endif
 endfunction
 command! -nargs=1 Find call FindFiles(<f-args>)
+nnoremap <silent> `F :b _FileSearch<CR>
 
 let g:ctag_data = []
 highlight DefinitionPageSignatureMark ctermfg=darkmagenta guifg=darkmagenta
@@ -1077,6 +1078,7 @@ function! OpenCtagLookupBuffer(query)
 	endif
 endfunction
 command! -nargs=1 LookupDefinition call OpenCtagLookupBuffer(<f-args>)
+nnoremap <silent> `D :b _LookupDefinition<CR>
 
 let g:dt_manpage_params = {'section': 0, 'query': "echo"}
 function! s:ManpageBufferLoad(reset_cursor)
