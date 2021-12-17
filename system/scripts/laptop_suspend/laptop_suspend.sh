@@ -33,8 +33,8 @@ done <<<"$bat_paths"
 avg_perc=$((${s_perc}/${s_bats}))
 
 if awk "BEGIN {exit !( $avg_perc < $DTCONF_suspend_threshold )}" && [ "$charger_status" = "discharging" ]; then
-	echo "Current charge (${avg_perc}) is below the required threshold of ${DTCONF_suspend_threshold}. Suspending." \
-		| mail -s "Cron `hostname -s` laptop_suspend" $MAILTO
+#	echo "Current charge (${avg_perc}) is below the required threshold of ${DTCONF_suspend_threshold}. Suspending." \
+#		| mail -s "Cron `hostname -s` laptop_suspend" $MAILTO
 	loginctl lock-sessions
 	sleep 3
 	systemctl suspend
