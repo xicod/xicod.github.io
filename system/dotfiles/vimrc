@@ -7,6 +7,9 @@ let g:skip_defaults_vim = 1
 " enter the current millennium
 set nocompatible
 
+" more history items
+set history=1000
+
 " set term to avoid tmux issues
 set term=xterm-256color
 
