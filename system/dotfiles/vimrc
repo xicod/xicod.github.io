@@ -1677,8 +1677,10 @@ function! DuplicateLine()
 	normal! "zyy"zp
 endfunction
 function! DuplicateLines()
-	normal! gv"zy
-	normal! '>"zp
+	for i in range(v:count > 0 ? v:count : 1)
+		normal! gv"zy
+		normal! '>"zp
+	endfor
 endfunction
 nnoremap <silent> ' :call DuplicateLine()<CR>:call RepeatSet("'", 0)<CR>
 vnoremap <silent> ' :<c-u>call DuplicateLines()<CR>:call RepeatSet("gv'", 0)<CR>
