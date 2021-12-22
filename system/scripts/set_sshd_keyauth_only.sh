@@ -5,6 +5,11 @@ function setParam {
 }
 
 setParam PasswordAuthentication no
+
+# this is deprecated in favor of KbdInteractiveAuthentication
 setParam ChallengeResponseAuthentication no
+
+setParam KbdInteractiveAuthentication no
+
 setParam UsePAM no
 
