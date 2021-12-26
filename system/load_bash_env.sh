@@ -30,6 +30,5 @@ trap "trap_tempConfFilesDelete" EXIT
 && export GIT_CONFIG_SYSTEM=${tmp_files[-1]} \
 && export GIT_CONFIG_GLOBAL= \
 && createTempFileFromUrl ${dt_repo_dl_prefix}/gitignore_global \
-&& __dt_set_git_env_conf core.excludesfile ${tmp_files[-1]}
-
-
+&& __dt_set_git_env_conf core.excludesfile ${tmp_files[-1]} \
+&& :
