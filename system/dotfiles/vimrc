@@ -1200,23 +1200,25 @@ function! WhichTabNo(bufNo)
 endfunction
 
 function! CloseAllBuffersButCurrent()
-    let buffers = filter(range(1, bufnr('$')), 'buflisted(v:val) && bufnr("%") != v:val && getbufvar(v:val, "&buftype") !=# "quickfix" && bufwinnr(v:val) == -1 && empty(WhichTabNo(v:val))')
-	if !empty(buffers)
-		try
-			for b in buffers
-				if index(['_FileSearch', '_LookupDefinition'], bufname(b)) >= 0
-					" use wipeout because we'd like to erase status and
-					" properly re-create these special buffers
-					silent execute 'bw'.b
-				else
-					silent execute 'bd'.b
-				endif
-			endfor
-		catch
-			call PrintError(v:exception)
-			return
-		endtry
-		echo 'Removed ' . len(buffers) . ' buffers'
+	let buffers = filter(range(1, bufnr('$')), 'buflisted(v:val) && bufnr("%") != v:val && getbufvar(v:val, "&buftype") !=# "quickfix" && bufwinnr(v:val) == -1 && empty(WhichTabNo(v:val))')
+	let l:c = 0
+	try
+		for b in buffers
+			if index(['_FileSearch', '_LookupDefinition'], bufname(b)) >= 0
+				" use wipeout because we'd like to erase status and
+				" properly re-create these special buffers
+				"silent execute 'bw'.b
+			else
+				silent execute 'bd'.b
+				let l:c += 1
+			endif
+		endfor
+	catch
+		call PrintError(v:exception)
+		return
+	endtry
+	if l:c > 0
+		echo 'Removed ' . l:c . ' buffers'
 	else
 		echo 'No buffer deleted'
 	endif
