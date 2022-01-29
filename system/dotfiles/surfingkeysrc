@@ -8,8 +8,8 @@ mapkey('yb', '#7Yank text of blockquote', function() {
 	});
 });
 
-map('<Ctrl-j>', 'd')
-map('<Ctrl-k>', 'u')
+map('<Ctrl-j>', 'd');
+map('<Ctrl-k>', 'u');
 
 mapkey(';w', '#2Focus top window CUSTOM', function() {
 	Normal.refreshScrollableElements();
