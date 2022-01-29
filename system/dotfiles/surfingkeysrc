@@ -1,4 +1,6 @@
 settings.hintAlign = "left";
+settings.modeAfterYank = "Normal";
+
 Hints.style('font-size: 12pt;');
 Hints.style('font-size: 12pt;', 'text');
 
