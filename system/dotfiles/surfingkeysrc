@@ -19,3 +19,10 @@ api.map('<Ctrl-k>', 'u');
 api.map('<Esc>', 'cS');
 api.map('<Tab>', 'cS');
 api.map('\\', 'f');
+
+api.unmapAllExcept([
+	'\\',
+	'j', 'k', 'd', 'u', '<Ctrl-j>', '<Ctrl-k>',
+	'<Esc>', '<Tab>',
+	'i'
+], /youtube.com/);
