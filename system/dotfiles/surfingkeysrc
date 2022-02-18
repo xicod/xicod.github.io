@@ -12,7 +12,7 @@ api.mapkey('yb', '#7Yank text of blockquote', function() {
 
 api.mapkey('i', '#1Go to edit box CUSTOM', function() {
 	api.Hints.create('input:not([type=submit])', api.Hints.dispatchMouseClick);
-}
+});
 
 api.map('<Ctrl-j>', 'd');
 api.map('<Ctrl-k>', 'u');
