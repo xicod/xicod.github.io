@@ -13,6 +13,7 @@ api.mapkey('yb', '#7Yank text of blockquote', function() {
 api.mapkey('s', '#1Focus the search field CUSTOM', function() {
 	var v = "input[placeholder*=search i]"
 		+ ",input[title*=search i]"
+		+ ",input[id*=search i]"
 		+ ",input[class*=search i]";
 	api.Hints.create(v, api.Hints.dispatchMouseClick);
 });
