@@ -18,3 +18,4 @@ api.map('<Ctrl-j>', 'd');
 api.map('<Ctrl-k>', 'u');
 api.map('<Esc>', 'cS');
 api.map('<Tab>', 'cS');
+api.map('\\', 'f');
