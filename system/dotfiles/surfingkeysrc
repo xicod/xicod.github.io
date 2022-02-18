@@ -10,13 +10,9 @@ api.mapkey('yb', '#7Yank text of blockquote', function() {
 	});
 });
 
-api.mapkey('s', '#1Focus the search field CUSTOM', function() {
-	var v = "input[placeholder*=search i]"
-		+ ",input[title*=search i]"
-		+ ",input[id*=search i]"
-		+ ",input[class*=search i]";
-	api.Hints.create(v, api.Hints.dispatchMouseClick);
-});
+api.mapkey('i', '#1Go to edit box CUSTOM', function() {
+	api.Hints.create('input:not([type=submit])', api.Hints.dispatchMouseClick);
+}
 
 api.map('<Ctrl-j>', 'd');
 api.map('<Ctrl-k>', 'u');
