@@ -1,19 +1,16 @@
 settings.hintAlign = "left";
 settings.modeAfterYank = "Normal";
 
-Hints.style('font-size: 12pt;');
-Hints.style('font-size: 12pt;', 'text');
+api.Hints.style('font-size: 12pt;');
+api.Hints.style('font-size: 12pt;', 'text');
 
-mapkey('yb', '#7Yank text of blockquote', function() {
-	Hints.create("blockquote", function(element) {
-		Clipboard.write(element.innerText);
+api.mapkey('yb', '#7Yank text of blockquote', function() {
+	api.Hints.create("blockquote", function(element) {
+		api.Clipboard.write(element.innerText);
 	});
 });
 
-map('<Ctrl-j>', 'd');
-map('<Ctrl-k>', 'u');
-
-mapkey(';w', '#2Focus top window CUSTOM', function() {
-	Normal.refreshScrollableElements();
-	top.focus();
-});
+api.map('<Ctrl-j>', 'd');
+api.map('<Ctrl-k>', 'u');
+api.map('<Esc>', 'cS');
+api.map('<Tab>', 'cS');
