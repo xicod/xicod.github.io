@@ -875,6 +875,7 @@ function! OnVimEnter()
 		" this is needed for some reason when starting in diff mode
 		" and there is a 'setlocal spell' via an autocmd for a filetype
 		set nospell
+		wincmd =
 	endif
 endfunction
 augroup GrpOnVimEnter
