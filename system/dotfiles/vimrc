@@ -1959,6 +1959,9 @@ set shiftwidth=4
 set softtabstop=4
 set noexpandtab
 
+" fox python files, this prevents double indentation of dict values
+let g:pyindent_open_paren=shiftwidth()
+
 function! PyIndentAutoCfg()
 	let lnum = 1
 	let got_col = 0  " 1 if previous line ended with colon
