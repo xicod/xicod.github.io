@@ -84,6 +84,19 @@ set cindent
 " :help cinoptions-values
 set cinoptions=(1s,m1,:0,g0,t0
 
+" Ctrl-c to work as expected - cancel and don't add anything to history
+cnoremap <C-c> <END><C-u><BACKSPACE>
+" Ctrl-j/k to move between search results
+cnoremap <C-j> <C-g>
+cnoremap <C-k> <C-t>
+" Ctrl-\ to stay in the currently focused search result and don't
+" add the query to history
+cnoremap <silent> <C-\> <CR>:call histdel("/", -1)<CR>:let @/ = ""<CR>
+" just clear out the highlighting
+nnoremap <silent> <C-\> :let @/ = ""<CR>
+" Ctrl-o to enter a word wrapper into the field
+cnoremap <C-o> \<\><LEFT><LEFT>
+
 " disable automatic comment insertion
 augroup GrpNoAutoComments
 	autocmd!
