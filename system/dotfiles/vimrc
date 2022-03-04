@@ -1631,8 +1631,8 @@ function! FindFirstParenthesis()
 		call GotoTwinChar()
 		if CursorPositionCompare(l:tmp_pos, CursorPositionStore()) < 0
 			call CursorPositionRestore(l:tmp_pos)
-			return
 		endif
+		return
 	endif
 	while 1
 		call SearchAndGo('?', '[][(){}<>''"`]\{1\}')
