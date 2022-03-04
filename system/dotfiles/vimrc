@@ -1913,6 +1913,17 @@ inoremap <C-k> <C-o>k<C-o>^
 inoremap <C-h> <LEFT>
 inoremap <C-l> <RIGHT>
 
+" append to end of current word
+function! s:AppendAfterWord()
+	if IsCharMatching(GetCurrentChar(), 'a-zA-Z0-9')
+		let l:cmd = "viw\<ESC>a"
+	else
+		let l:cmd = "a"
+	endif
+	call feedkeys(l:cmd, 'ni')
+endfunction
+nnoremap <silent> a :call <SID>AppendAfterWord()<CR>
+
 noremap c "_c
 nnoremap x "_x
 noremap <Del> "_x
