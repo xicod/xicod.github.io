@@ -1336,7 +1336,10 @@ function! DeclarationStick()
 	setlocal winfixheight
 	let l:tag_line_number = line('.')
 	let l:tag_line = getline('.')
-	if getline('.') =~ ';'
+	if &filetype == 'python'
+		call SearchAndGo('/', ':\s*$')
+		let l:height = l:tag_line_number - line('.') + 1
+	elseif getline('.') =~ ';'
 		let l:height = 1
 		if getline('.') =~ '}'
 			normal! 0f}
