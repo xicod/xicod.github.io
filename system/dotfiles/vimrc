@@ -1664,6 +1664,20 @@ function! FindFirstParenthesis()
 	endwhile
 endfunction
 function! InnerAnythingChange()
+	" for indent-formatted files, if cursor is in beginning of text,
+	" use the block mark function and change contents
+	if index(['python', 'yaml', 'sh', 'vim'], &filetype) >= 0 && col('.') > 1
+		let l:t = CursorPositionStore()
+		normal! ^
+		if CursorPositionCompare(CursorPositionStore(), l:t) == 0
+			call MarkCurrentBlock(0)
+			call feedkeys("c", 'ni')
+			return
+		else
+			call CursorPositionRestore(l:t)
+		endif
+	endif
+
 	call FindFirstParenthesis()
 	let l:curr_chr = GetCurrentChar()
 	let l:curr_type = GetCurrentCharType()
