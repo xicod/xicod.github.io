@@ -78,8 +78,8 @@ cnoremap <C-k> <C-t>
 " stay in the currently focused search result and don't
 " add the query to history
 cnoremap <silent> <C-\> <CR>:call histdel("/", -1)<CR>:let @/ = ""<CR>
-" just clear out the highlighting
-nnoremap <silent> <C-\> :call <SID>QuickfixRemoveAll()<CR>
+" clear out the highlighting and close any quickfix windows
+nnoremap <silent> <C-\> :let @/ = ""<CR>:call <SID>QuickfixRemoveAll()<CR>
 
 set list listchars=tab:»·,trail:·
 set autoindent
