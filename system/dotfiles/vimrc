@@ -726,7 +726,7 @@ vnoremap <silent> u :<c-u>call <SID>RaiseMarkBeginning()<CR>
 
 function! ToggleBooleanValue()
 	let l:m = {
-				\'0': '1', '1': '0',
+				\'1': '0', '0': '1',
 				\'TRUE': 'FALSE', 'FALSE': 'TRUE',
 				\'true': 'false', 'false': 'true',
 				\'True': 'False', 'False': 'True',
