@@ -716,9 +716,7 @@ vnoremap <silent> <Space>m :<c-u>call MarkCurrentBlock(1)<CR>
 
 function! s:RaiseMarkBeginning()
 	let l:p = getpos("'<")
-	for i in range(v:count > 0 ? v:count : 1)
-		let l:p[1] -= 1
-	endfor
+	let l:p[1] -= (v:count > 0 ? v:count : 1)
 	call setpos("'<", l:p)
 	normal! gv
 endfunction
