@@ -664,8 +664,12 @@ nnoremap <silent> go :call UpOneCodeLevelMapping()<CR>
 
 function! MoveToLastOfIndent(dir)
 	let l:curr_indent = indent('.')
-	while line('.') > 1 && line('.') < line('$')
-		execute "normal! " . a:dir
+	while (a:dir == '-' && line('.') > 1) || (a:dir == '+' && line('.') < line('$'))
+		execute "normal! " . a:dir . "^"
+		" commented lines are ignored
+		if GetCurrentCharType() =~ '\ccomment'
+			continue
+		endif
 		if indent('.') == 0 && getline('.') =~ '^\s*$'
 			continue
 		endif
