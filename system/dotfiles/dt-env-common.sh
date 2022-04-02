@@ -100,24 +100,28 @@ function mmv {
 	) | vim - -c 'setlocal filetype=bash buftype=nofile nolist'
 }
 
-## Colours
-function printRed { echo -e "\e[1;31m${1}\e[0m"; }
+## Colors
+function printRed { echo -e "\e[0;31m${1}\e[0m"; }
 export -f printRed
 function printGreen { echo -e "\e[0;32m${1}\e[0m"; }
 export -f printGreen
 function printCyan { echo -e "\e[0;36m${1}\e[0m"; }
 export -f printCyan
-function printBoldCyan { echo -e "\e[1;36m${1}\e[0m"; }
-export -f printBoldCyan
 function printBlue { echo -e "\e[0;34m${1}\e[0m"; }
 export -f printBlue
-function printBoldBlue { echo -e "\e[1;34m${1}\e[0m"; }
-export -f printBoldBlue
 function printPurple { echo -e "\e[0;35m${1}\e[0m"; }
 export -f printPurple
+function printBoldRed { echo -e "\e[1;31m${1}\e[0m"; }
+export -f printBoldRed
+function printBoldGreen { echo -e "\e[1;32m${1}\e[0m"; }
+export -f printBoldGreen
+function printBoldCyan { echo -e "\e[1;36m${1}\e[0m"; }
+export -f printBoldCyan
+function printBoldBlue { echo -e "\e[1;34m${1}\e[0m"; }
+export -f printBoldBlue
 function printBoldPurple { echo -e "\e[1;35m${1}\e[0m"; }
 export -f printBoldPurple
-## Colours
+## Colors
 
 # Bind Up and Down arrows to history search
 bind '"\e[A": history-search-backward'
