@@ -1988,7 +1988,7 @@ let commentTextMap = {
 			\'make': '#',
 			\'conf': '#',
 \}
-noremap <silent> <expr> <C-m> ((GetCurrentCharType() =~ 'comment\c') ?
+noremap <silent> <expr> <C-m> ((GetCurrentCharType() =~? 'comment\\|crontabCmnt') ?
 			\ ':<S-Right>:s/^\(\s*\)' . get(commentTextMap, &filetype, '#') . '/\1/' :
 			\ ':<S-Right>:s/^/' . get(commentTextMap, &filetype, '#') . '/'
 			\ ) . '<CR>:nohl<CR>:call histdel("/", -1)<CR>'
