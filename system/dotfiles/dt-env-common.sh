@@ -10,6 +10,29 @@ if [ -f /usr/bin/vi ]; then
 	export EDITOR=vi
 fi
 
+## Colors
+function printRed { echo -e "\e[0;31m${1}\e[0m"; }
+export -f printRed
+function printGreen { echo -e "\e[0;32m${1}\e[0m"; }
+export -f printGreen
+function printCyan { echo -e "\e[0;36m${1}\e[0m"; }
+export -f printCyan
+function printBlue { echo -e "\e[0;34m${1}\e[0m"; }
+export -f printBlue
+function printPurple { echo -e "\e[0;35m${1}\e[0m"; }
+export -f printPurple
+function printBoldRed { echo -e "\e[1;31m${1}\e[0m"; }
+export -f printBoldRed
+function printBoldGreen { echo -e "\e[1;32m${1}\e[0m"; }
+export -f printBoldGreen
+function printBoldCyan { echo -e "\e[1;36m${1}\e[0m"; }
+export -f printBoldCyan
+function printBoldBlue { echo -e "\e[1;34m${1}\e[0m"; }
+export -f printBoldBlue
+function printBoldPurple { echo -e "\e[1;35m${1}\e[0m"; }
+export -f printBoldPurple
+## Colors
+
 # after this line only stuff for interactive shell should be defined
 ! [[ "$-" =~ i ]] && return
 
@@ -99,29 +122,6 @@ function mmv {
 		| column -t -s $'\t' -o $'\t\t'
 	) | vim - -c 'setlocal filetype=bash buftype=nofile nolist'
 }
-
-## Colors
-function printRed { echo -e "\e[0;31m${1}\e[0m"; }
-export -f printRed
-function printGreen { echo -e "\e[0;32m${1}\e[0m"; }
-export -f printGreen
-function printCyan { echo -e "\e[0;36m${1}\e[0m"; }
-export -f printCyan
-function printBlue { echo -e "\e[0;34m${1}\e[0m"; }
-export -f printBlue
-function printPurple { echo -e "\e[0;35m${1}\e[0m"; }
-export -f printPurple
-function printBoldRed { echo -e "\e[1;31m${1}\e[0m"; }
-export -f printBoldRed
-function printBoldGreen { echo -e "\e[1;32m${1}\e[0m"; }
-export -f printBoldGreen
-function printBoldCyan { echo -e "\e[1;36m${1}\e[0m"; }
-export -f printBoldCyan
-function printBoldBlue { echo -e "\e[1;34m${1}\e[0m"; }
-export -f printBoldBlue
-function printBoldPurple { echo -e "\e[1;35m${1}\e[0m"; }
-export -f printBoldPurple
-## Colors
 
 # Bind Up and Down arrows to history search
 bind '"\e[A": history-search-backward'
