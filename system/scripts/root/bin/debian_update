@@ -1,0 +1,6 @@
+#!/bin/bash
+
+apt-get update \
+&& apt-get -V dist-upgrade \
+&& apt-get -V autoremove --purge \
+&& apt-get clean

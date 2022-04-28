@@ -1,0 +1,17 @@
+#!/bin/bash
+
+distro=$(source /etc/os-release; echo $ID)
+
+case "$distro" in
+	gentoo)
+		echo -e "\nSeems this is gentoo\n"
+		gentoo_update $@
+		;;
+	debian)
+		echo -e "\nSeems this is debian\n"
+		debian_update $@
+		;;
+	*)
+		echo "Unknown distro"
+		;;
+esac
