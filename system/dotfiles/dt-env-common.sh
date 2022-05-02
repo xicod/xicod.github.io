@@ -1,4 +1,9 @@
-#!/bin/bash
+#!/usr/bin/env bash
+
+if [ -z "$BASH" ]; then
+	echo "dt-env-common.sh: This is not loading in bash. Skipping."
+	return
+fi
 
 # set HOME just in case it wasn't set properly
 export HOME=$(getent passwd $(whoami) | cut -d':' -f6)
