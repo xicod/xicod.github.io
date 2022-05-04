@@ -1,0 +1,3 @@
+Debian gui system upgrade (run as desktop user):
+
+echo '1 11 * * 1 DISPLAY=:0 gnome-terminal --maximize -- bash -c "echo Enter your password to start system upgrade; echo; sudo bash -c \"export NEEDRESTART_SUSPEND=1; apt-get update && apt-get -V dist-upgrade -y && apt-get -V autoremove --purge && apt-get clean && needrestart -m e -r a -k -l\"; echo Press Enter to close the window; read"' | crontab -
