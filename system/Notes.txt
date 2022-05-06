@@ -1,3 +1,6 @@
 Debian gui system upgrade (run as root):
 
-(crontab -u $(id -nu 1000) -l 2>/dev/null | grep -v DT_SYSTEM_UPGRADE; echo '1 11 * * 1 echo DT_SYSTEM_UPGRADE; DISPLAY=:0 gnome-terminal --maximize -- bash -c "echo Enter your password to start system upgrade; echo; sudo bash -c \"export NEEDRESTART_SUSPEND=1; apt-get update && apt-get -V dist-upgrade -y && apt-get -V autoremove --purge && apt-get clean && needrestart -m e -r a -k -l\"; echo Press Enter to close the window; read"') | crontab -u $(id -nu 1000) -
+echo $'#!/usr/bin/env bash\n\necho -e "\\nEnter your password to start system upgrade\\n"\n\nsudo bash -c "export NEEDRESTART_SUSPEND=1; \\\n\tapt-get update \\\n\t&& apt-get -V dist-upgrade -y \\\n\t&& apt-get -V autoremove --purge \\\n\t&& apt-get clean \\\n\t&& needrestart -m e -r a -k -l"' > /usr/local/bin/sysupdate
+chmod +x /usr/local/bin/sysupdate
+
+(crontab -u $(id -nu 1000) -l 2>/dev/null | grep -v DT_SYSTEM_UPGRADE; echo '1 11 * * 1 echo DT_SYSTEM_UPGRADE; DISPLAY=:0 gnome-terminal --maximize -- bash -c "/usr/local/bin/sysupdate; echo Press Enter to close the window; read"') | crontab -u $(id -nu 1000) -
