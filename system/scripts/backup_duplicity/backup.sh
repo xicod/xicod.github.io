@@ -38,7 +38,7 @@ bash -c "${DTCONF_pre_backup_bash_func}"
 
 if [ -z "${DTCONF_backup_passphrase}" ]; then
 	gpg_key_param="--encrypt-key=$DTCONF_backup_gpg_key_id"
-	echo "Using gpg key ${DTCONF_backup_gpg_key_id} to encrypt backup"
+	echo "Using pgp key ${DTCONF_backup_gpg_key_id} to encrypt backup"
 else
 	gpg_key_param=""
 fi
