@@ -36,15 +36,24 @@ fi
 
 bash -c "${DTCONF_pre_backup_bash_func}"
 
+if [ -z "${DTCONF_backup_passphrase}" ]; then
+	gpg_key_param="--encrypt-key=$DTCONF_backup_gpg_key_id"
+	echo "Using gpg key ${DTCONF_backup_gpg_key_id} to encrypt backup"
+else
+	gpg_key_param=""
+fi
+
 PASSPHRASE=${DTCONF_backup_passphrase} \
 duplicity incr --full-if-older-than ${DTCONF_full_backup_rotation} \
 --verbosity e --no-print-statistics \
+${gpg_key_param} \
 ${INCLUDE_EXCLUDE_STR} \
 / \
 file://${DTCONF_backup_dest}
 
 PASSPHRASE=${DTCONF_backup_passphrase} \
 duplicity remove-all-but-n-full 1 --force --verbosity e \
+${gpg_key_param} \
 file://${DTCONF_backup_dest}
 
 chown -R ${DTCONF_backup_owner} ${DTCONF_backup_dest}

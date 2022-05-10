@@ -3,6 +3,7 @@ confSchema:
   backup_dest: /media/path/backups
   backup_owner: owner_username
   backup_passphrase: mybackuppassword
+  backup_gpg_key_id: my_key_id
   full_backup_rotation: 10W
   include_exclude_list:
     - -/tmp
