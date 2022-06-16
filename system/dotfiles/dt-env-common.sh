@@ -193,6 +193,11 @@ function long_command_notify () {
 		return
 	fi
 	START=$(awk '{print $2}' <<<"$LAST_COMM")
+	# check that a timestamp exists (avoid ??command lines)
+	if ! [[ "$START" =~ ^[0-9]+$ ]] ; then
+		last_comm_num=-1
+		return
+	fi
 	START_TIME=$(date -d"@$START" '+%F %T')
 	COMM=$(awk '{print $3}' <<<"$LAST_COMM")
 
