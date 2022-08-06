@@ -291,7 +291,7 @@ function sshx {
 	)
 	ssh -S$t -t DUMMY_HOST "tmux attach -t remote || tmux new -s remote \; split-window -v -p 30 \; send-keys 'htop || top -c' C-m\; select-pane -t 0" \
 		|| { _dt_term_socket_ssh $t; return 1; }
-	ssh -S$t DUMMY_HOST "rm $f"
+	ssh -S$t DUMMY_HOST "command rm $f"
 	_dt_term_socket_ssh $t
 }
 
