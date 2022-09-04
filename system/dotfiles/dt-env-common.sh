@@ -128,6 +128,9 @@ function mmv {
 	) | vim - -c 'setlocal filetype=bash buftype=nofile nolist'
 }
 
+# Bind Ctrl-e to delete to end of current word
+bind '"\C-e": shell-kill-word'
+
 # Bind Up and Down arrows to history search
 bind '"\e[A": history-search-backward'
 bind '"\e[B": history-search-forward'
