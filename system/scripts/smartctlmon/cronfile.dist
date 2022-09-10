@@ -1,0 +1,1 @@
+1 * * * *   root    [ -f CRON_FILE_DIR/smartctlmon.sh ] && CRON_FILE_DIR/smartctlmon.sh || :

@@ -1,0 +1,5 @@
+appName: smartctlmon
+confSchema:
+  drives: []
+  acceptable_temperatures: []
+  acceptable_usage_percents: []
