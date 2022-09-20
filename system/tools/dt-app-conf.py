@@ -51,7 +51,7 @@ def parseConfig():
 			val = dt_config['apps'][appName][k]
 			
 			if type(val) is bool:
-				valStr = valStr.upper()
+				valStr = str(val).upper()
 			elif type(val) is list:
 				valStr = ','.join(str(x) for x in val)
 			else:
