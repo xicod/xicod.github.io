@@ -1,0 +1,1 @@
+1 4 * * *   root    [ -f CRON_FILE_DIR/btrfs_snapshots.sh ] && CRON_FILE_DIR/btrfs_snapshots.sh || :

@@ -1,0 +1,4 @@
+appName: btrfs_snapshots
+confSchema:
+  silent: false
+  targets: []
