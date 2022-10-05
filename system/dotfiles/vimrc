@@ -743,7 +743,7 @@ function! ToggleBooleanValue()
 		return
 	endif
 	" mark the current word and change it
-	call feedkeys("viw\"zc".l:m[l:w]."\<ESC>", 'nx')
+	call feedkeys("viw\"_c".l:m[l:w]."\<ESC>", 'nx')
 	normal! `<
 endfunction
 nnoremap <silent> <Space>f :call ToggleBooleanValue()<CR>:call RepeatSet("\<Space>f", 0)<CR>
