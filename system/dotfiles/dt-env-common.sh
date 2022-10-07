@@ -142,11 +142,11 @@ bind -x '"\201": READLINE_LINE=$TEMP_READLINE_LINE; READLINE_POINT=$TEMP_READLIN
 bind -x '"\205": "cd .."'
 bind '"\eu":"\200\C-a\C-k\205\C-m\201"'
 # Bind Alt+l to directory listing
-bind -x '"\206": ls -lh'
+bind -x '"\206": TEMP_MANIPULATED_READLINE_LINE=`echo "${TEMP_READLINE_LINE:0:${TEMP_READLINE_POINT}}" | sed "s/\s\+$/A/"`; read -a TEMP_PARAM_ARR <<< "${TEMP_MANIPULATED_READLINE_LINE}"; if [[ "${TEMP_PARAM_ARR[-1]}" =~ /$ ]]; then ls -lAhtr "${TEMP_PARAM_ARR[-1]}"; else ls -lAhtr; fi'
 bind '"\el":"\200\C-a\C-k\C-m\206\201"'
 # Bind Alt+k to directory listing command start
 bind -x '"\207":READLINE_LINE=""'
-bind '"\ek":"\207ls -l "'
+bind '"\ek":"\207ls -lAhtr "'
 # Bind Alt+b to go back in directory history
 bind -x '"\208":"popd &>/dev/null; popd &>/dev/null"'
 bind '"\eb":"\200\C-a\C-k\208\C-m\201"'
