@@ -128,6 +128,40 @@ function mmv {
 	) | vim - -c 'setlocal filetype=bash buftype=nofile nolist'
 }
 
+function _dt_expand_homedir_tilde {
+	(
+	set -e
+	set -u
+	p="$1"
+	if [[ "$p" =~ ^~ ]]; then
+		u=`echo "$p" | sed 's|^~\([a-z0-9_-]*\)/.*|\1|'`
+		if [ -z "$u" ]; then
+			u=`whoami`
+		fi
+
+		h=$(set -o pipefail; getent passwd "$u" | cut -d: -f6) || exit 1
+		p=`echo "$p" | sed "s|^~[a-z0-9_-]*/|${h}/|"`
+	fi
+	echo $p
+	) || echo $1
+}
+
+function _dt_smart_readline_ls {
+	local ls_param=lAhtr
+
+	local partial_line=`echo "${TEMP_READLINE_LINE:0:${TEMP_READLINE_POINT}}" | sed "s/\s\+$/A/"`
+
+	local param_arr
+	read -a param_arr <<< "${partial_line}"
+
+	if [[ ${#param_arr[@]} -gt 0 ]] && [[ "${param_arr[-1]}" =~ /$ ]]; then
+		local parsed_path=`_dt_expand_homedir_tilde "${param_arr[-1]}"`
+		ls -${ls_param} "$parsed_path"
+	else
+		ls -${ls_param}
+	fi
+}
+
 # Bind Ctrl-e to delete to end of current word
 bind '"\C-e": shell-kill-word'
 
@@ -142,7 +176,7 @@ bind -x '"\201": READLINE_LINE=$TEMP_READLINE_LINE; READLINE_POINT=$TEMP_READLIN
 bind -x '"\205": "cd .."'
 bind '"\eu":"\200\C-a\C-k\205\C-m\201"'
 # Bind Alt+l to directory listing
-bind -x '"\206": TEMP_MANIPULATED_READLINE_LINE=`echo "${TEMP_READLINE_LINE:0:${TEMP_READLINE_POINT}}" | sed "s/\s\+$/A/"`; read -a TEMP_PARAM_ARR <<< "${TEMP_MANIPULATED_READLINE_LINE}"; if [[ "${TEMP_PARAM_ARR[-1]}" =~ /$ ]]; then ls -lAhtr "${TEMP_PARAM_ARR[-1]}"; else ls -lAhtr; fi'
+bind -x '"\206": _dt_smart_readline_ls'
 bind '"\el":"\200\C-a\C-k\C-m\206\201"'
 # Bind Alt+k to directory listing command start
 bind -x '"\207":READLINE_LINE=""'
