@@ -147,7 +147,7 @@ function _dt_expand_homedir_tilde {
 }
 
 function _dt_smart_readline_ls {
-	local ls_param=lAhtr
+	local ls_param=$1
 
 	local partial_line=`echo "${TEMP_READLINE_LINE:0:${TEMP_READLINE_POINT}}" | sed "s/\s\+$/A/"`
 
@@ -176,11 +176,13 @@ bind -x '"\201": READLINE_LINE=$TEMP_READLINE_LINE; READLINE_POINT=$TEMP_READLIN
 bind -x '"\205": "cd .."'
 bind '"\eu":"\200\C-a\C-k\205\C-m\201"'
 # Bind Alt+l to directory listing
-bind -x '"\206": _dt_smart_readline_ls'
+bind -x '"\206": _dt_smart_readline_ls lAhtr'
+bind -x '"\207": _dt_smart_readline_ls lh'
 bind '"\el":"\200\C-a\C-k\C-m\206\201"'
+bind '"\el\el":"\200\C-a\C-k\C-m\207\201"'
 # Bind Alt+k to directory listing command start
-bind -x '"\207":READLINE_LINE=""'
-bind '"\ek":"\207ls -lAhtr "'
+bind '"\ek":"\C-a\C-kls -lAhtr "'
+bind '"\ek\ek":"\C-a\C-kls -lh "'
 # Bind Alt+b to go back in directory history
 bind -x '"\208":"popd &>/dev/null; popd &>/dev/null"'
 bind '"\eb":"\200\C-a\C-k\208\C-m\201"'
