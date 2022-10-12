@@ -603,7 +603,7 @@ onoremap <Tab> <Esc>
 inoremap <Tab> <C-o>:stopinsert<CR>
 inoremap \<Tab> <Tab>
 
-inoremap {{ {<CR>}<ESC>ko
+inoremap <expr> {{ (GetPreviousChar() == '$') ? '{}<LEFT>' : '{<CR>}<ESC>ko'
 inoremap <expr> [[ (&filetype == 'sh' && getline('.')[0:col('.')-2] =~ '\(\<if\>\\|\<while\>\)\s*$\c') ? '[  ]<LEFT><LEFT>' : '[]<LEFT>'
 inoremap (( ()<LEFT>
 inoremap "" ""<LEFT>
