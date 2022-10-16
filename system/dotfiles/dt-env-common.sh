@@ -162,8 +162,13 @@ function _dt_smart_readline_ls {
 	fi
 }
 
+# Re-bind Ctrl-w to remove actual full words including spaces
+stty werase undef
+bind '"\C-w": shell-backward-kill-word'
 # Bind Ctrl-e to delete to end of current word
 bind '"\C-e": shell-kill-word'
+# Bind Alt+w to remove last portion of a path
+bind '"\ew":"\e[D\e\C-]/\e[C\e\C-d"'
 
 # Bind Up and Down arrows to history search
 bind '"\e[A": history-search-backward'
