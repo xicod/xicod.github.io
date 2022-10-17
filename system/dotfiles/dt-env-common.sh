@@ -199,15 +199,15 @@ bind '"\ec":"\209\210"'
 __dt_bash_init_lock_file=~/.bash_init_lock
 : >> $__dt_bash_init_lock_file #create a file if it doesn't exist
 {
-flock 3 #lock file by filedescriptor
+	flock 3 #lock file by filedescriptor
 
-if [ -f ~/.bash_history_extended ]; then
-	cat ~/.bash_history_extended | grep -v '^#' | tac | awk '!x[$0]++' | tac > ~/.tmp_history
-	cat ~/.tmp_history > ~/.bash_history_extended
-	rm ~/.tmp_history
-	history -c
-	history -r
-fi
+	if [ -f ~/.bash_history_extended ]; then
+		cat ~/.bash_history_extended | grep -v '^#' | tac | awk '!x[$0]++' | tac > ~/.tmp_history
+		cat ~/.tmp_history > ~/.bash_history_extended
+		rm ~/.tmp_history
+		history -c
+		history -r
+	fi
 } 3<$__dt_bash_init_lock_file
 
 HISTCONTROL="ignorespace"
