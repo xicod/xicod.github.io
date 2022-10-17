@@ -196,7 +196,8 @@ bind '"\eb":"\200\C-a\C-k\208\C-m\201"'
 bind -x '"\209": if [[ "$READLINE_LINE" =~ ^# ]]; then READLINE_LINE="${READLINE_LINE:1}"; let READLINE_POINT--; bind "\"\210\":\"\""; else READLINE_LINE="#${READLINE_LINE}"; bind "\"\210\":\"\n\""; fi'
 bind '"\ec":"\209\210"'
 
-: >> ~/.bash_init_lock #create a file if it doesn't exist
+__dt_bash_init_lock_file=~/.bash_init_lock
+: >> $__dt_bash_init_lock_file #create a file if it doesn't exist
 {
 flock 3 #lock file by filedescriptor
 
@@ -207,7 +208,7 @@ if [ -f ~/.bash_history_extended ]; then
 	history -c
 	history -r
 fi
-} 3<~/.bash_init_lock
+} 3<$__dt_bash_init_lock_file
 
 HISTCONTROL="ignorespace"
 HISTTIMEFORMAT="%s "
