@@ -2028,6 +2028,10 @@ set noexpandtab
 " fox python files, this prevents double indentation of dict values
 let g:pyindent_open_paren=shiftwidth()
 
+" this prevents loading python filetype's mappings
+" which collide with some of ours
+let g:no_python_maps = 1
+
 function! PyIndentAutoCfg()
 	let lnum = 1
 	let got_col = 0  " 1 if previous line ended with colon
