@@ -277,18 +277,29 @@ nnoremap <silent> s :call FindCharLastInWord('s', nr2char(getchar()))<CR>
 nnoremap <silent> S :call FindCharLastInWord('S', nr2char(getchar()))<CR>
 nnoremap <silent> ; :call FindCharRepeating(g:find_char_last_dir, g:find_char_last_chr)<CR>
 
-function! s:GetWrapBlockCommand(chr, twin)
-	return '((mode() == ''v'') '
-				\.'? ''"zc'.a:chr.a:twin.'<ESC>"zP`<'' '
-				\.': ''<ESC>`<O'.a:chr.'<ESC>`>o'.a:twin.'<ESC>=a'.a:chr.''')'
+function! s:AddWrap(chr, twin)
+	if visualmode() == 'v'
+		let l:v_len = getpos("'>")[2] - getpos("'<")[2]
+		normal! `>
+		call feedkeys("a".a:twin."\<ESC>", 'nx')
+		normal! `<
+		call feedkeys("i".a:chr."\<ESC>", 'nx')
+		call RepeatSet("v".l:v_len."l[".a:chr, 0)
+	else
+		normal! `<O
+		call feedkeys("i".a:chr."\<ESC>", 'nx')
+		normal! `>o
+		call feedkeys("i".a:twin."\<ESC>", 'nx')
+		execute "normal! =a".a:chr
+	endif
 endfunction
-execute 'xnoremap <expr> [{ ' . s:GetWrapBlockCommand('{', '}')
-execute 'xnoremap <expr> [[ ' . s:GetWrapBlockCommand('[', ']')
-execute 'xnoremap <expr> [( ' . s:GetWrapBlockCommand('(', ')')
-execute 'xnoremap <expr> [" ' . s:GetWrapBlockCommand('"', '"')
-execute 'xnoremap <expr> ['' ' . s:GetWrapBlockCommand("''", "''")
-execute 'xnoremap <expr> [` ' . s:GetWrapBlockCommand('`', '`')
-execute 'xnoremap <expr> [< ' . s:GetWrapBlockCommand('<', '>')
+vnoremap <silent> [{ :<c-u>call <SID>AddWrap('{', '}')<CR>
+vnoremap <silent> [[ :<c-u>call <SID>AddWrap('[', ']')<CR>
+vnoremap <silent> [( :<c-u>call <SID>AddWrap('(', ')')<CR>
+vnoremap <silent> [" :<c-u>call <SID>AddWrap('"', '"')<CR>
+vnoremap <silent> [' :<c-u>call <SID>AddWrap("'", "'")<CR>
+vnoremap <silent> [` :<c-u>call <SID>AddWrap('`', '`')<CR>
+vnoremap <silent> [< :<c-u>call <SID>AddWrap('<', '>')<CR>
 
 function! GetStringIndexesInLine(haystack, needle)
 	let l:ret = []
