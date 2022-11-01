@@ -1001,6 +1001,7 @@ function! ClearAllMatchesInBuffer()
 endfunction
 function! FindFiles(query)
 	let l:query = Trim(a:query)
+	let l:query = substitute(l:query, '/\+', '/', 'g')
 	try
 		execute 'b _FileSearch'
 		normal! ggVG"_x
