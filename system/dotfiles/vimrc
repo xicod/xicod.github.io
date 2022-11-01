@@ -1021,10 +1021,10 @@ function! FindFiles(query)
 	if l:query =~ '^/'
 		let l:base_search_path = split(l:query, '*')[0]
 		let l:grep_pat = l:query
-		let l:grep_pat = substitute(l:grep_pat, '\*\*', '@ANYPATH@', 'g')
+		let l:grep_pat = substitute(l:grep_pat, '/\*\*/', '/@ANYPATH@/', 'g')
 		let l:grep_pat = substitute(l:grep_pat, '\.', '\\.', 'g')
 		let l:grep_pat = substitute(l:grep_pat, '\*', '[^/]*', 'g')
-		let l:grep_pat = substitute(l:grep_pat, '@ANYPATH@/', '.*', 'g')
+		let l:grep_pat = substitute(l:grep_pat, '/@ANYPATH@/', '\\(/\\|/.*/\\)', 'g')
 		let l:grep_pat = l:grep_pat.'$'
 		execute "%!find ".l:base_search_path." -not -path './.git/*' -type f 2>/dev/null | grep -i '".l:grep_pat."'"
 	else
