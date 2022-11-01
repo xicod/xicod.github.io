@@ -1030,6 +1030,7 @@ function! FindFiles(query)
 	else
 		execute "%!find ./ -not -path './.git/*' -type f -iname '" . l:query . "' 2>/dev/null || :"
 	endif
+	call ClearAllMatchesInBuffer()
 	if getline('$') == ""
 		call append(line('$'), 'No results for search query '''. l:query . '''')
 		normal! gg"_dd
@@ -1043,7 +1044,6 @@ function! FindFiles(query)
 	let l:query = substitute(l:query, '\.', '\\.', 'g')
 	let l:query = substitute(l:query, '\*', '.*', 'g')
 	let g:filesearch_highlight = '\c^.*/.*\zs'.l:query
-	call ClearAllMatchesInBuffer()
 	call matchadd('FileSearchMark', g:filesearch_highlight, -1)
 	if line('$') == 1
 		call GotoFileAndCloseBuffer()
