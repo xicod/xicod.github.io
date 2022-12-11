@@ -1,0 +1,1 @@
+50 2    * * *   root    [ -f CRON_FILE_DIR/debian_auto_upgrade.sh ] && CRON_FILE_DIR/debian_auto_upgrade.sh

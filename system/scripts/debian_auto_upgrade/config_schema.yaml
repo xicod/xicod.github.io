@@ -1,0 +1,3 @@
+appName: debian_auto_upgrade
+confSchema:
+  enabled: false
