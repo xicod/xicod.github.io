@@ -12,9 +12,6 @@ if [ "$DTCONF_enabled" != "TRUE" ]; then
 	exit 0
 fi
 
-echo after
-exit 0
-
 LOGS_DIR=/root/logs/apt
 LOGFILE=${LOGS_DIR}/apt_upgrade-$(date +%Y%m%d%H%M%S).log
 
