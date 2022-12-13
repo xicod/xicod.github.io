@@ -11,5 +11,5 @@ setParam ChallengeResponseAuthentication no
 
 setParam KbdInteractiveAuthentication no
 
-setParam UsePAM no
+setParam UsePAM yes
 
