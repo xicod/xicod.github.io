@@ -13,3 +13,5 @@ setParam KbdInteractiveAuthentication no
 
 setParam UsePAM yes
 
+setParam PermitRootLogin prohibit-password
+
