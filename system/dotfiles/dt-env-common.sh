@@ -162,9 +162,6 @@ function _dt_smart_readline_ls {
 	fi
 }
 
-# Re-bind Ctrl-w to remove actual full words including spaces
-stty werase undef
-bind '"\C-w": shell-backward-kill-word'
 # Bind Ctrl-e to delete to end of current word
 bind '"\C-e": shell-kill-word'
 # Bind Alt+w to remove last portion of a path
@@ -195,6 +192,13 @@ bind '"\eb":"\200\C-a\C-k\208\C-m\201"'
 # if the line was commented
 bind -x '"\209": if [[ "$READLINE_LINE" =~ ^# ]]; then READLINE_LINE="${READLINE_LINE:1}"; let READLINE_POINT--; bind "\"\210\":\"\""; else READLINE_LINE="#${READLINE_LINE}"; bind "\"\210\":\"\n\""; fi'
 bind '"\ec":"\209\210"'
+# Re-bind Ctrl-w to remove actual full words including spaces.
+# Use unix-word-rubout (the original C-w) only in case we are about to
+# remove a pipe because shell-backward-kill-word doesn't consider it a word.
+stty werase undef
+bind -x '"\211": if [[ "${READLINE_LINE:0:${READLINE_POINT}}" =~ \|[[:space:]]*$ ]]; then bind "\"\212\": unix-word-rubout"; else bind "\"\212\": shell-backward-kill-word"; fi'
+bind '"\C-w": "\211\212"'
+
 
 __dt_bash_init_lock_file=~/.bash_init_lock
 : >> $__dt_bash_init_lock_file #create a file if it doesn't exist
