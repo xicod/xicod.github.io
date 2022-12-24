@@ -196,7 +196,7 @@ bind '"\ec":"\209\210"'
 # Use unix-word-rubout (the original C-w) only in case we are about to
 # remove a pipe because shell-backward-kill-word doesn't consider it a word.
 stty werase undef
-bind -x '"\211": if [[ "${READLINE_LINE:0:${READLINE_POINT}}" =~ \|[[:space:]]*$ ]]; then bind "\"\212\": unix-word-rubout"; else bind "\"\212\": shell-backward-kill-word"; fi'
+bind -x '"\211": if [[ "${READLINE_LINE:0:${READLINE_POINT}}" =~ [[:space:]]+\|[[:space:]]*$ ]]; then bind "\"\212\": unix-word-rubout"; else bind "\"\212\": shell-backward-kill-word"; fi'
 bind '"\C-w": "\211\212"'
 
 
