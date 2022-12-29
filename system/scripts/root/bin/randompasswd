@@ -40,7 +40,7 @@ else
 fi
 echo >> $temp_chpasswd_file
 
-chpasswd < $temp_chpasswd_file
+chpasswd < $temp_chpasswd_file >/dev/null
 
 [ $silent = 0 ] && cat $temp_chpasswd_file
 
