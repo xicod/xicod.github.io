@@ -198,6 +198,13 @@ bind '"\ec":"\209\210"'
 stty werase undef
 bind -x '"\211": if [[ "${READLINE_LINE:0:${READLINE_POINT}}" =~ [[:space:]]+\|[[:space:]]*$ ]]; then bind "\"\212\": unix-word-rubout"; else bind "\"\212\": shell-backward-kill-word"; fi'
 bind '"\C-w": "\211\212"'
+# re-bind Ctrl-(Left/Right) to better handle spaces and slashes
+bind -x '"\213": TEMP_JUMP_POINTS=`echo "$READLINE_LINE" | sed "s/\\\\\ /%%/g" | grep -bo "[^$/={[:space:]]\+" | cut -d: -f1`'
+bind -x '"\214": unset TEMP_JUMP_POINTS'
+bind -x '"\215": while read p; do if [ $p -lt $READLINE_POINT ]; then READLINE_POINT=$p; break; fi; done <<<$(echo "$TEMP_JUMP_POINTS" | tac)'
+bind -x '"\216": while read p; do if [ $p -gt $READLINE_POINT ]; then READLINE_POINT=$p; break; fi; done <<<$(echo "$TEMP_JUMP_POINTS")'
+bind '"\e[1;5D": "\213\215\214"'
+bind '"\e[1;5C": "\213\216\214"'
 
 
 __dt_bash_init_lock_file=~/.bash_init_lock
