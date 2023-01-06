@@ -1306,7 +1306,7 @@ function! ToggleDiffWithSaved()
 		normal! zR
 		wincmd l
 		normal! zR
-		normal! gg]cz.
+		normal! gg]c[czt
 		set splitright
 		setlocal nospell
 	endif
