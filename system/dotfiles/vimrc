@@ -615,7 +615,11 @@ inoremap <Tab> <C-o>:stopinsert<CR>
 inoremap \<Tab> <Tab>
 
 inoremap <expr> {{ (GetPreviousChar() == '$') ? '{}<LEFT>' : '{<CR>}<ESC>ko'
-inoremap <expr> [[ (&filetype == 'sh' && getline('.')[0:col('.')-2] =~ '\(\<if\>\\|\<while\>\)\s*$\c') ? '[  ]<LEFT><LEFT>' : '[]<LEFT>'
+function! s:ShCheckIfBracketsShouldComeWithSpaces()
+	 return &filetype == 'sh'
+				 \ && getline('.')[0:col('.')-2] =~ '\(\<if\>\|\<while\>\)\s*[!]*\s*$\c'
+endfunction
+inoremap <expr> [[ <SID>ShCheckIfBracketsShouldComeWithSpaces() ? '[  ]<LEFT><LEFT>' : '[]<LEFT>'
 inoremap (( ()<LEFT>
 inoremap "" ""<LEFT>
 inoremap '' ''<LEFT>
@@ -1708,7 +1712,7 @@ function! InnerAnythingChange()
 	let l:additional_actions = ""
 	if l:curr_chr == '{'
 		let l:additional_actions = "\<C-F>"
-	elseif l:curr_chr == '[' && &filetype == 'sh'
+	elseif l:curr_chr == '[' && s:ShCheckIfBracketsShouldComeWithSpaces()
 				\ && l:curr_type !~ '\cquote\|\ccomment'
 		let l:additional_actions = "  \<LEFT>"
 	endif
