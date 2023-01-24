@@ -38,7 +38,7 @@ handle_ssh_command(){
 		fi
 	done
 }
-if [ "$current_child" = "ssh" ]; then
+if [[ "$current_child" =~ ^ssh[x]*$ ]]; then
 	ret=$(handle_ssh_command)
 	if [ $? -eq 1 ]; then
 		# we got a socket file as response
