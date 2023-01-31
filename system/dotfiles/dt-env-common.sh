@@ -205,6 +205,11 @@ bind -x '"\215": while read p; do if [ $p -lt $READLINE_POINT ]; then READLINE_P
 bind -x '"\216": while read p; do if [ $p -gt $READLINE_POINT ]; then READLINE_POINT=$p; break; fi; done <<<$(echo "$TEMP_JUMP_POINTS")'
 bind '"\e[1;5D": "\213\215\214"'
 bind '"\e[1;5C": "\213\216\214"'
+# repeatable character search on the command line
+bind -x '"\217": bind -x "\"\\e;\": TEMP_CHR=\${READLINE_LINE:\${READLINE_POINT}:1}; TEMP_RN=\${READLINE_LINE:\${READLINE_POINT}+1}; TEMP_REST=\${TEMP_RN#*\${TEMP_CHR}}; READLINE_POINT=\$((\${#READLINE_LINE} - \${#TEMP_REST} - 1)); unset TEMP_CHR TEMP_RN TEMP_REST"'
+bind -x '"\218": bind -x "\"\\e;\": TEMP_CHR=\${READLINE_LINE:\${READLINE_POINT}:1}; TEMP_RN=\${READLINE_LINE:0:\${READLINE_POINT}}; TEMP_REST=\${TEMP_RN%\${TEMP_CHR}*}; READLINE_POINT=\${#TEMP_REST}; unset TEMP_CHR TEMP_RN TEMP_REST"'
+bind '"\e]": "\217\C-]"'
+bind '"\e[": "\218\e\C-]"'
 
 
 __dt_bash_init_lock_file=~/.bash_init_lock
