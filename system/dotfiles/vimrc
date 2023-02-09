@@ -913,12 +913,12 @@ function! OnVimEnter()
 	call SetStatusLine(0)
 	call OnBufEnter()
 	if &diff
-		call s:GoToFirstChange()
 		" this is needed for some reason when starting in diff mode
 		" and there is a 'setlocal spell' via an autocmd for a filetype
 		set nospell
 		wincmd =
 		wincmd l
+		call s:GoToFirstChange()
 	endif
 endfunction
 augroup GrpOnVimEnter
