@@ -918,6 +918,7 @@ function! OnVimEnter()
 		" and there is a 'setlocal spell' via an autocmd for a filetype
 		set nospell
 		wincmd =
+		wincmd l
 	endif
 endfunction
 augroup GrpOnVimEnter
