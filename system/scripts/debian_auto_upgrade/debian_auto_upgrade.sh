@@ -60,7 +60,7 @@ if [ -n "$new_confs" ]; then
 	echo
 	echo "$new_confs" | while read new_conf; do
 		old_conf=$(echo $new_conf | sed -e 's/\.dpkg-new$//' -e 's/\.ucf-dist$//')
-		echo "dt-conf-handle $old_conf $new_conf"
+		echo "vimdiff ${new_conf} ${old_conf}"
 	done
 	echo
 fi
