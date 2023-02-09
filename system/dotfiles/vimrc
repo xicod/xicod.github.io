@@ -913,7 +913,7 @@ function! OnVimEnter()
 	call SetStatusLine(0)
 	call OnBufEnter()
 	if &diff
-		normal! gg]c[cz.
+		call s:GoToFirstChange()
 		" this is needed for some reason when starting in diff mode
 		" and there is a 'setlocal spell' via an autocmd for a filetype
 		set nospell
@@ -1276,6 +1276,10 @@ function! BufferSkipQuickFix(command)
 	endwhile
 endfunction
 
+function! s:GoToFirstChange()
+	normal! gg]c[czt
+endfunction
+
 function! ToggleDiffWithSaved()
 	if &diff
 		let l:own_window = win_getid()
@@ -1306,7 +1310,7 @@ function! ToggleDiffWithSaved()
 		normal! zR
 		wincmd l
 		normal! zR
-		normal! gg]c[czt
+		call s:GoToFirstChange()
 		set splitright
 		setlocal nospell
 	endif
