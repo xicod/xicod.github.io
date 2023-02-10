@@ -99,10 +99,12 @@ cnoremap <C-c> <END><C-u><BACKSPACE>
 " enter a word wrapper into the prompt
 cnoremap <C-o> \<\><LEFT><LEFT>
 
-" disable automatic comment insertion
-augroup GrpNoAutoComments
+augroup GrpNoAutoFormatOptions
 	autocmd!
-	autocmd FileType * setlocal formatoptions-=c formatoptions-=r formatoptions-=o
+	" disable automatic comment insertion
+	autocmd FileType * setlocal formatoptions-=cro
+	" disable auto-wrapping
+	autocmd FileType * setlocal formatoptions-=t
 augroup end
 
 set autoread
