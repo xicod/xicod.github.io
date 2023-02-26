@@ -912,6 +912,12 @@ function! OnVimEnter()
 			vsplit
 		endif
 	endif
+
+	" when called with stdin, make it a scratch buffer
+	if get(v:argv, 1, '') == '-'
+		setlocal buftype=nofile bufhidden=hide noswapfile
+	endif
+
 	call SetStatusLine(0)
 	call OnBufEnter()
 	if &diff
