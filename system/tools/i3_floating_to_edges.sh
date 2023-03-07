@@ -15,10 +15,12 @@ function set_window_vars {
 
 set_window_vars
 
-if [ -n "$RESIZE_WINDOW_PERCENT_W" ]; then
+if [ -n "$WINDOW_OVERRIDE" ]; then
 	xdotool windowfocus --sync $WINDOW
-	i3-msg "resize set $RESIZE_WINDOW_PERCENT_W ppt"
+fi
 
+if [ -n "$RESIZE_WINDOW_PERCENT_W" ]; then
+	i3-msg "resize set $RESIZE_WINDOW_PERCENT_W ppt"
 	set_window_vars
 fi
 
@@ -35,10 +37,16 @@ case $1 in
 	down)
 		coord="x $((y+height-HEIGHT-WINDOW_BORDER_WIDTH))"
 		;;
+	center)
+		;;
 	*)
 		echo "Bad input"
 		exit 1
 		;;
 esac
 
-xdotool windowmove --sync $WINDOW $coord
+if [ $1 = "center" ]; then
+	i3-msg "move position center"
+else
+	xdotool windowmove --sync $WINDOW $coord
+fi
