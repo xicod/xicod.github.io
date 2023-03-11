@@ -171,7 +171,9 @@ bind 'set show-mode-in-prompt on'
 # vi mode bindings
 bind -m vi-command '"\e": emacs-editing-mode'
 bind -m vi-command '"\t": emacs-editing-mode'
+bind -m vi-command '"\em": emacs-editing-mode'
 bind -m vi-insert '"\t": vi-movement-mode'
+bind -m vi-insert '"\em": emacs-editing-mode'
 
 # Bind Ctrl-e to delete to end of current word
 bind '"\C-e": shell-kill-word'
