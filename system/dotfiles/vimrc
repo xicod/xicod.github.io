@@ -1949,6 +1949,13 @@ function! BreakToNewline()
 endfunction
 nnoremap <silent> <Space><CR> :call BreakToNewline()<CR>
 
+function! s:BreakToNewlineSh()
+	call feedkeys("i\\", 'nx')
+	normal! l
+	call BreakToNewline()
+endfunction
+nnoremap <silent> \\ :call <SID>BreakToNewlineSh()<CR>
+
 let g:move_action_undo_join = 0
 function! s:MoveLines(mode, movement)
 	if g:move_action_undo_join
