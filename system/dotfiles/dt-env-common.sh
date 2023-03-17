@@ -38,6 +38,13 @@ function printBoldPurple { echo -e "\e[1;35m${1}\e[0m"; }
 export -f printBoldPurple
 ## Colors
 
+function set_dbus_session_var {
+	eval $(cat /proc/$(pgrep -x mate-session)/environ | tr '\0' '\n' \
+		| grep '^DBUS_SESSION_BUS_ADDRESS=' \
+		| sed 's/^\([^=]\+\)=\(.*\)$/\1="\2"/')
+}
+export -f set_dbus_session_var
+
 # after this line only stuff for interactive shell should be defined
 ! [[ "$-" =~ i ]] && return
 
@@ -86,7 +93,10 @@ function xuniq {
 export -f xuniq
 
 function xopen {
-	gio open -- "$1" >/dev/null 2>&1
+	(
+	set_dbus_session_var
+	gio open -- "$1" &>/dev/null
+	)
 }
 
 function whoswap {
