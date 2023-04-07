@@ -25,6 +25,7 @@ find ./ -name cronfile.dist | while read app_cronfile; do
 
 	if [ $ret -eq 4 ]; then
 		echo "$msg" 1>&2
+		exit 1
 	elif [ $ret -eq 0 ]; then
 		(cat cronfile 2>/dev/null || cat cronfile.dist) | sed "s|CRON_FILE_DIR|${full_path}|g" >> "$cron_file"
 	fi
