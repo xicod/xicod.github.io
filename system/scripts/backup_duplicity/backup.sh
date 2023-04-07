@@ -55,5 +55,3 @@ PASSPHRASE=${DTCONF_backup_passphrase} \
 duplicity remove-all-but-n-full 1 --force --verbosity e \
 ${gpg_key_param} \
 file://${DTCONF_backup_dest}
-
-chown -R ${DTCONF_backup_owner} ${DTCONF_backup_dest}
