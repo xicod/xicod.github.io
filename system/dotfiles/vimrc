@@ -859,7 +859,7 @@ function! s:SetWindowSearchMatch(pat)
 endfunction
 function! s:QuickfixRemoveAll()
 	" remove previous quickfix windows by removing the quickfix buffer
-	let l:qf_buf_list = filter(range(1, bufnr('$')), 'buflisted(v:val) && getbufvar(v:val, "&buftype") ==# "quickfix"')
+	let l:qf_buf_list = filter(range(1, bufnr('$')), 'buflisted(v:val) && getbufvar(v:val, "&buftype") ==# "quickfix" && bufwinnr(v:val) != -1')
 	if !empty(l:qf_buf_list)
 		for l:buf in l:qf_buf_list
 			execute 'bwipeout! ' . l:buf
