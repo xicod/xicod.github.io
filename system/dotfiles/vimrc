@@ -79,7 +79,7 @@ cnoremap <C-k> <C-t>
 " add the query to history
 cnoremap <silent> <C-\> <CR>:call histdel("/", -1)<CR>:let @/ = ""<CR>
 " clear out the highlighting and close any quickfix windows
-nnoremap <silent> <C-\> :let @/ = ""<CR>:call <SID>QuickfixRemoveAll()<CR>
+nnoremap <silent> <C-\> :let @/ = ""<CR>:call <SID>QuickfixRemoveAll()<CR>:call <SID>ClearSearchMarkCurrWindow()<CR>
 
 set list listchars=tab:»·,trail:·
 set autoindent
@@ -865,7 +865,11 @@ function! s:QuickfixRemoveAll()
 			execute 'bwipeout! ' . l:buf
 		endfor
 	endif
-	call s:SearchResMarkClean()
+endfunction
+function! s:ClearSearchMarkCurrWindow()
+	if g:dt_search_res != {} && g:dt_search_res['winid'] == win_getid()
+		call s:SearchResMarkClean()
+	endif
 endfunction
 function! s:QuickfixWindowExists()
 	return !empty(filter(range(1, bufnr('$')), 'buflisted(v:val) && getbufvar(v:val, "&buftype") ==# "quickfix"'))
@@ -1561,6 +1565,7 @@ function! GotoDefinitionCustom()
 	if s:EclimExists() && l:ft != ''
 		let g:dt_search_focus = '\<'.expand("<cword>").'\>'
 		call s:QuickfixRemoveAll()
+		call s:SearchResMarkClean()
 		cclose
 		execute l:ft . 'SearchContext'
 		normal! zt^
@@ -1578,6 +1583,7 @@ function! GotoReferences()
 	if s:EclimExists() && l:ft != ''
 		let g:dt_search_focus = '\<'.expand("<cword>").'\>'
 		call s:QuickfixRemoveAll()
+		call s:SearchResMarkClean()
 		cclose
 		execute l:ft . 'Search -x references'
 		normal! zt^
