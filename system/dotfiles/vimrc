@@ -79,7 +79,7 @@ cnoremap <C-k> <C-t>
 " add the query to history
 cnoremap <silent> <C-\> <CR>:call histdel("/", -1)<CR>:let @/ = ""<CR>
 " clear out the highlighting and close any quickfix windows
-nnoremap <silent> <C-\> :let @/ = ""<CR>:call <SID>QuickfixRemoveAll()<CR>:call <SID>ClearSearchMarkCurrWindow()<CR>
+nnoremap <silent> <C-\> :let @/ = ""<CR>:call <SID>QuickfixRemoveAll(0)<CR>:call <SID>ClearSearchMarkCurrWindow()<CR>
 
 set list listchars=tab:»·,trail:·
 set autoindent
@@ -779,7 +779,7 @@ function! GrepFiles(path, ignore_case, fpat, ...)
 	let l:ignore_case = (a:ignore_case) ? '-i' : ''
 	let l:pat = join(a:000, ' ')
 
-	call s:QuickfixRemoveAll()
+	call s:QuickfixRemoveAll(1)
 	" clear previous search marks in any case
 	call s:SearchResMarkClean()
 
@@ -857,13 +857,16 @@ let g:dt_search_res = {}
 function! s:SetWindowSearchMatch(pat)
 	let g:dt_search_res = {'match': matchadd('FileSearchMark', a:pat, -1), 'winid': win_getid()}
 endfunction
-function! s:QuickfixRemoveAll()
-	" remove previous quickfix windows by removing the quickfix buffer
-	let l:qf_buf_list = filter(range(1, bufnr('$')), 'buflisted(v:val) && getbufvar(v:val, "&buftype") ==# "quickfix" && bufwinnr(v:val) != -1')
-	if !empty(l:qf_buf_list)
-		for l:buf in l:qf_buf_list
-			execute 'bwipeout! ' . l:buf
-		endfor
+function! s:QuickfixRemoveAll(force)
+	if (g:dt_search_res != {} && g:dt_search_res['winid'] == win_getid()) || a:force
+		" remove previous quickfix windows by removing the quickfix buffer
+		let l:qf_buf_list = filter(range(1, bufnr('$')), 'buflisted(v:val) && getbufvar(v:val, "&buftype") ==# "quickfix" && bufwinnr(v:val) != -1')
+
+		if !empty(l:qf_buf_list)
+			for l:buf in l:qf_buf_list
+				execute 'bwipeout! ' . l:buf
+			endfor
+		endif
 	endif
 endfunction
 function! s:ClearSearchMarkCurrWindow()
@@ -1564,7 +1567,7 @@ function! GotoDefinitionCustom()
 	let l:ft = s:EclimGetFiletype()
 	if s:EclimExists() && l:ft != ''
 		let g:dt_search_focus = '\<'.expand("<cword>").'\>'
-		call s:QuickfixRemoveAll()
+		call s:QuickfixRemoveAll(1)
 		call s:SearchResMarkClean()
 		cclose
 		execute l:ft . 'SearchContext'
@@ -1582,7 +1585,7 @@ function! GotoReferences()
 	let l:ft = s:EclimGetFiletype()
 	if s:EclimExists() && l:ft != ''
 		let g:dt_search_focus = '\<'.expand("<cword>").'\>'
-		call s:QuickfixRemoveAll()
+		call s:QuickfixRemoveAll(1)
 		call s:SearchResMarkClean()
 		cclose
 		execute l:ft . 'Search -x references'
