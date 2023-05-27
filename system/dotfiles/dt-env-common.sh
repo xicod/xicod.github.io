@@ -231,6 +231,8 @@ bind '"\e[1;5C": "\213\216\214"'
 # switch to vi mode using Alt-m (immediately press Tab to switch to normal mode)
 bind '"\217": vi-editing-mode'
 bind '"\em": "\217\tl"'
+# Alt+p to remove everything but the last param and add space
+bind '"\ep": "\e[F\e\C-b\C-x\C-? \e[D"'
 
 
 __dt_bash_init_lock_file=~/.bash_init_lock
