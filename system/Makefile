@@ -14,6 +14,9 @@ all:
 	bash -c "echo -e 'source /etc/tigrc\nsource /etc/tigrc-dt' > /etc/tigrc-custom"
 	cp -a ./dotfiles/tigrc /etc/tigrc-dt
 	@echo "-------------------------------------------"
+	@echo "Setting htoprc"
+	cp -a ./dotfiles/htoprc /etc/htoprc
+	@echo "-------------------------------------------"
 	@echo "Setting dt-env-common.sh"
 	cp -a ./dotfiles/dt-env-common.sh $(BASH_ENV_DEST)/
 	@echo "-------------------------------------------"
