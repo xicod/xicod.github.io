@@ -95,7 +95,12 @@ export -f xuniq
 function xopen {
 	(
 	set_dbus_session_var
-	gio open -- "$@" &>/dev/null
+	if [ $# -gt 0 ]; then
+		p=("$@")
+	else
+		p=""
+	fi
+	gio open -- "${p[@]}" &>/dev/null
 	)
 }
 
