@@ -2103,10 +2103,13 @@ augroup GrpFileTypes
 	autocmd!
 	" default format settings are tabs
 	autocmd FileType * call PySetTabParams(0)
+
 	autocmd FileType yaml call PySetTabParams(2)
 	autocmd FileType python call PySetTabParams(4)
+
 	" auto figure out the current indentation format
 	autocmd FileType python,yaml call PyIndentAutoCfg()
+
 	autocmd FileType json setlocal foldmethod=syntax
 	autocmd FileType gitcommit setlocal textwidth=0 spell
 	autocmd FileType markdown if !&diff | setlocal spell | endif
