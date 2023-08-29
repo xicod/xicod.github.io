@@ -2019,24 +2019,53 @@ nnoremap <silent> P :call PasteCustom('P')<CR>
 nnoremap - "_dd
 nnoremap + m`o<Esc>``
 
-let commentTextMap = {
-			\'c': '\/\/',
-			\'h': '\/\/',
-			\'cpp': '\/\/',
-			\'java': '\/\/',
-			\'php': '\/\/',
-			\'javascript': '\/\/',
-			\'groovy': '\/\/',
-			\'python': '#',
-			\'sh': '#',
-			\'vim': '"',
-			\'make': '#',
-			\'conf': '#',
-\}
-noremap <silent> <expr> <C-m> ((GetCurrentCharType() =~? 'comment\\|crontabCmnt') ?
-			\ ':<S-Right>:s/^\(\s*\)' . get(commentTextMap, &filetype, '#') . '/\1/' :
-			\ ':<S-Right>:s/^/' . get(commentTextMap, &filetype, '#') . '/'
-			\ ) . '<CR>:nohl<CR>:call histdel("/", -1)<CR>'
+function s:CommentToggle(mode)
+	let l:comment_text_map = {
+				\'c': '\/\/',
+				\'h': '\/\/',
+				\'cpp': '\/\/',
+				\'java': '\/\/',
+				\'php': '\/\/',
+				\'javascript': '\/\/',
+				\'groovy': '\/\/',
+				\'python': '#',
+				\'sh': '#',
+				\'vim': '"',
+				\'make': '#',
+				\'conf': '#',
+	\}
+
+	let l:comment_mark = get(l:comment_text_map, &filetype, '#')
+
+	normal! ^
+	let l:is_comment = (GetCurrentCharType() =~? 'comment\|crontabCmnt')
+
+	let l:range = (a:mode == 'v') ? "'<,'>" : ""
+
+	let l:orig_indent = substitute(getline('.'), '^\(\s*\).*', '\1', '')
+	" need to check if all of the range adheres to the first line's indent
+	if a:mode == 'v'
+		for l:l_num in range(line('.'), line("'>"))
+			let l:line = getline(l:l_num)
+			if l:line !~ '^\s*$' && l:line !~ '^'.l:orig_indent
+				let l:orig_indent = ''
+				break
+			endif
+		endfor
+	endif
+
+	if l:is_comment
+		execute l:range.'s/^\(\s*\)'.l:comment_mark.'/\1/'
+	else
+		execute l:range.'s/^'.l:orig_indent.'/'.l:orig_indent.l:comment_mark.'/'
+	endif
+
+	" don't pollute the search history
+	call histdel("/", -1)
+endfunction
+
+nnoremap <silent> <C-m> :call <SID>CommentToggle('n')<CR>
+vnoremap <silent> <C-m> :<c-u>call <SID>CommentToggle('v')<CR>
 
 function! PySetTabParams(v)
 	if a:v > 0
