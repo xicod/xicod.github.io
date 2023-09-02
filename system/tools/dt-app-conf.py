@@ -54,6 +54,8 @@ def parseConfig():
 				valStr = str(val).upper()
 			elif type(val) is list:
 				valStr = ','.join(str(x) for x in val)
+			elif val is None:
+				valStr = ''
 			else:
 				valStr = str(val)
 
