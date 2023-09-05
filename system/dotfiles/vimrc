@@ -2019,6 +2019,10 @@ nnoremap <silent> P :call PasteCustom('P')<CR>
 nnoremap - "_dd
 nnoremap + m`o<Esc>``
 
+function s:IsCurrentCharComment()
+	return (GetCurrentCharType() =~? 'comment\|crontabCmnt')
+endfunction
+
 function s:CommentToggle(mode)
 	let l:comment_text_map = {
 				\'c': '\/\/',
@@ -2038,7 +2042,16 @@ function s:CommentToggle(mode)
 	let l:comment_mark = get(l:comment_text_map, &filetype, '#')
 
 	normal! ^
-	let l:is_comment = (GetCurrentCharType() =~? 'comment\|crontabCmnt')
+	let l:is_comment = s:IsCurrentCharComment()
+	if l:is_comment && a:mode == 'v'
+		for l:l_num in range(line('.'), line("'>"))
+			let l:is_comment = s:IsCurrentCharComment()
+			if !l:is_comment
+				break
+			endif
+			normal! j^
+		endfor
+	endif
 
 	let l:range = (a:mode == 'v') ? "'<,'>" : ""
 
