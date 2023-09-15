@@ -222,9 +222,9 @@ bind -x '"\209": if [[ "$READLINE_LINE" =~ ^# ]]; then READLINE_LINE="${READLINE
 bind '"\ec":"\209\210"'
 # Re-bind Ctrl-w to remove actual full words including spaces.
 # Use unix-word-rubout (the original C-w) only in case we are about to
-# remove a pipe because shell-backward-kill-word doesn't consider it a word.
+# remove a special char because shell-backward-kill-word doesn't consider it a word.
 stty werase undef
-bind -x '"\211": if [[ "${READLINE_LINE:0:${READLINE_POINT}}" =~ [[:space:]]+\|[[:space:]]*$ ]]; then bind "\"\212\": unix-word-rubout"; else bind "\"\212\": shell-backward-kill-word"; fi'
+bind -x '"\211": if [[ "${READLINE_LINE:0:${READLINE_POINT}}" =~ [[:space:]]+(>|<|\|)[[:space:]]*$ ]]; then bind "\"\212\": unix-word-rubout"; else bind "\"\212\": shell-backward-kill-word"; fi'
 bind '"\C-w": "\211\212"'
 # re-bind Ctrl-(Left/Right) to better handle spaces and slashes
 bind -x '"\213": TEMP_JUMP_POINTS=`echo "$READLINE_LINE" | sed "s/\\\\\ /%%/g" | grep -bo "[^$/={@:[:space:]]\+" | cut -d: -f1`'
