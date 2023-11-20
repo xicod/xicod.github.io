@@ -13,7 +13,7 @@ function handle_btrfs_snapshots
 		echo
 
 		snapshot=${snapshot_base}$(date +%Y%m%d_%H%M%S)
-		printBoldBlue "$(btrfs subvolume snapshot -r / $snapshot)"
+		printBoldBlue "$(btrfs subvolume snapshot -r ${root_btrfs_mount}/@master ${snapshot})"
 		echo
 	fi
 }
