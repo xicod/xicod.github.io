@@ -1,0 +1,2 @@
+# nightly
+4 5     * * *   root    CRON_FILE_DIR/bounce_containers.sh -q

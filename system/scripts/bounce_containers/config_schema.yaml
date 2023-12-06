@@ -1,0 +1,3 @@
+appName: bounce_containers
+confSchema:
+  deployments: []
