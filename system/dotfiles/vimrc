@@ -123,10 +123,10 @@ endfunction
 function! OnInsertEnter()
 	call SetStatusLine(1)
 	set ignorecase
-	if &buftype != 'nofile'
-		execute "set tags=".getcwd()."/tags"
-	endif
 	let g:insert_mode_save_cwd = getcwd()
+	if &buftype != 'nofile'
+		execute "set tags=".fnameescape(g:insert_mode_save_cwd)."/tags"
+	endif
 	set autochdir
 	" for older vim versions, prefer keeping the macro
 	" functionality unbroken at the expense of repeating with insert
@@ -144,7 +144,7 @@ function! OnInsertLeave()
 	call SetStatusLine(0)
 	set noignorecase
 	set noautochdir
-	execute 'cd' fnameescape(g:insert_mode_save_cwd)
+	execute 'cd ' . fnameescape(g:insert_mode_save_cwd)
 	" create mark I for last global edit position
 	normal! mI
 endfunction
