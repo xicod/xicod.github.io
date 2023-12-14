@@ -1,14 +1,25 @@
 #!/bin/bash
 
+set -e
+set -x
+
 apt-get install -y ufw
 ufw --force enable
 
-# optional
+# optional ============================
 apt-get install -y openssh-server
+
+sshd_config_dir=/etc/ssh/sshd_config.d
+if [ -z "$(find ${sshd_config_dir} -maxdepth 0 -empty)" ]; then
+	echo "${sshd_config_dir} is not empty, please handle before running"
+	exit 1
+fi
+# =====================================
 
 apt-get install -y vim git tig python3-yaml docker.io docker-compose curl needrestart build-essential wireguard htop tmux iotop zip unzip jq mailutils ssmtp rsync duplicity gpg net-tools sudo
 
-mkdir ~/git && cd ~/git
+mkdir -p ~/git && cd ~/git
+rm xicod.github.io -rf
 git clone https://github.com/xicod/xicod.github.io.git
 cd xicod.github.io/system
 make
