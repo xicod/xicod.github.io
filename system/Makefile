@@ -25,7 +25,7 @@ all:
 	cp -a ./dotfiles/gitignore_global /etc/
 	@echo "-------------------------------------------"
 	@echo "Setting sshd_config"
-	cp -a ./dotfiles/sshd_config_99dt.conf /etc/ssh/sshd_config.d/99dt.conf
+	bash -c 'set -x; if [ -d /etc/ssh/sshd_config.d ]; then cp -a ./dotfiles/sshd_config_99dt.conf /etc/ssh/sshd_config.d/99dt.conf; fi'
 ifeq ($(shell cat /root/main_host 2>/dev/null), 1)
 	@echo "-------------------------------------------"
 	@echo "Setting system tmux.conf"
