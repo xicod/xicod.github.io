@@ -23,6 +23,9 @@ all:
 	@echo "Setting gitconfig"
 	cp -a ./dotfiles/gitconfig /etc/
 	cp -a ./dotfiles/gitignore_global /etc/
+	@echo "-------------------------------------------"
+	@echo "Setting sshd_config"
+	cp -a ./dotfiles/sshd_config_99dt.conf /etc/ssh/sshd_config.d/99dt.conf
 ifeq ($(shell cat /root/main_host 2>/dev/null), 1)
 	@echo "-------------------------------------------"
 	@echo "Setting system tmux.conf"
