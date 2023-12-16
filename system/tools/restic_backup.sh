@@ -60,3 +60,12 @@ ${restic_bin} --limit-upload=${DT_RESTIC_UPLOAD_LIMIT_KB} ${quiet} forget \
 	--prune --max-unused=1G
 
 #(source my.profile && restic prune --max-unused=0%)
+
+# some.profile example:
+#export B2_ACCOUNT_ID=
+#export B2_ACCOUNT_KEY=
+#export RESTIC_REPOSITORY=b2:
+#export RESTIC_PASSWORD=
+#export DT_RESTIC_BACKUP_DIRECTORY=
+#export DT_RESTIC_SNAPSHOTS_REMOVE_OLDER_THAN=2m
+#export DT_RESTIC_UPLOAD_LIMIT_KB=0
