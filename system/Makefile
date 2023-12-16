@@ -23,9 +23,11 @@ all:
 	@echo "Setting gitconfig"
 	cp -a ./dotfiles/gitconfig /etc/
 	cp -a ./dotfiles/gitignore_global /etc/
+ifeq ($(shell test -d /etc/ssh/sshd_config.d && echo 1 || echo 0), 1)
 	@echo "-------------------------------------------"
 	@echo "Setting sshd_config"
-	bash -c 'set -x; if [ -d /etc/ssh/sshd_config.d ]; then cp -a ./dotfiles/sshd_config_99dt.conf /etc/ssh/sshd_config.d/99dt.conf; fi'
+	cp -a ./dotfiles/sshd_config_99dt.conf /etc/ssh/sshd_config.d/99dt.conf
+endif
 ifeq ($(shell cat /root/main_host 2>/dev/null), 1)
 	@echo "-------------------------------------------"
 	@echo "Setting system tmux.conf"
