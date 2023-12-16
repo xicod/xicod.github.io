@@ -4,6 +4,7 @@ set -e
 set -x
 
 apt-get install -y ufw
+ufw --force reset
 ufw --force enable
 
 # optional ============================
