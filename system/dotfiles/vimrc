@@ -2037,6 +2037,7 @@ function s:CommentToggle(mode)
 				\'vim': '"',
 				\'make': '#',
 				\'conf': '#',
+				\'bindzone': ';',
 	\}
 
 	let l:comment_mark = get(l:comment_text_map, &filetype, '#')
