@@ -353,6 +353,9 @@ if [ -n "$__dt_fzf_bash_comp" ]; then
 	bind '"\ef":"\220**\t\221"'
 fi
 
+# use hosts completion for sshx
+complete -F _known_hosts sshx
+
 function _dt_write_to_clipboard {
 	local v=$(cat -)
 	local v_nonewline="${v//[$'\t\r\n']}"
