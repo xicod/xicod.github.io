@@ -242,6 +242,16 @@ bind '"\ep": "\e[F\e\C-b\C-x\C-? \e[D"'
 bind -x '"\218": printf -v TEMP_OLDPWD_ESCAPED "%q" "${OLDPWD}"; READLINE_LINE="${READLINE_LINE:0:${READLINE_POINT}}${TEMP_OLDPWD_ESCAPED}/ ${READLINE_LINE:${READLINE_POINT}}"; let "READLINE_POINT += ${#TEMP_OLDPWD_ESCAPED} + 1"; unset TEMP_OLDPWD_ESCAPED'
 bind '"\eo": "\218"'
 
+# Ctrl+Up/Down to make the forward word upper/lower case
+bind -x '"\219": TEMP_READLINE_POINT=${READLINE_POINT}'
+bind -x '"\220": READLINE_POINT=${TEMP_READLINE_POINT}; unset TEMP_READLINE_POINT'
+bind -x '"\221": TEMP_UPPER_LOWER_ACTION=U'
+bind -x '"\222": TEMP_UPPER_LOWER_ACTION=L'
+bind -x '"\223": unset TEMP_UPPER_LOWER_ACTION'
+bind -x '"\224": TEMP_LEN=$((${READLINE_POINT} - ${TEMP_READLINE_POINT})); READLINE_LINE=`echo "${READLINE_LINE}" | sed "s/\(.\{${TEMP_READLINE_POINT}\}\)\(.\{${TEMP_LEN}\}\)/\1\\\\${TEMP_UPPER_LOWER_ACTION}\2/"`; unset TEMP_LEN'
+bind '"\e[1;5A": "\219\213\216\221\224\214\223\220"'
+bind '"\e[1;5B": "\219\213\216\222\224\214\223\220"'
+
 
 __dt_bash_init_lock_file=~/.bash_init_lock
 : >> $__dt_bash_init_lock_file #create a file if it doesn't exist
