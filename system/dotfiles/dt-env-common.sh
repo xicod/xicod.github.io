@@ -351,9 +351,9 @@ elif [ -f /usr/share/bash-completion/completions/fzf ]; then
 fi
 if [ -n "$__dt_fzf_bash_comp" ]; then
 	source $__dt_fzf_bash_comp
-	bind -x '"\220":"_dt_fzf_compl set"'
-	bind -x '"\221":"_dt_fzf_compl unset"'
-	bind '"\ef":"\220**\t\221"'
+	bind -x '"\230":"_dt_fzf_compl set"'
+	bind -x '"\231":"_dt_fzf_compl unset"'
+	bind '"\ef":"\230**\t\231"'
 fi
 
 # use hosts completion for sshx
