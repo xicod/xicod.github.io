@@ -357,7 +357,9 @@ if [ -n "$__dt_fzf_bash_comp" ]; then
 fi
 
 # use hosts completion for sshx
-complete -F _known_hosts sshx
+if [ "$(type -t _known_hosts)" = "function" ]; then
+	complete -F _known_hosts sshx
+fi
 
 function _dt_write_to_clipboard {
 	local v=$(cat -)
