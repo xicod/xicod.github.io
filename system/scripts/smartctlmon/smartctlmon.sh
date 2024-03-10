@@ -2,9 +2,6 @@
 
 set -e
 
-# cron sometimes sets HOME=/
-export HOME=$(getent passwd $(whoami) | cut -d':' -f6)
-
 source /etc/profile.d/dt-profile.sh
 source dt-app-conf.sh
 

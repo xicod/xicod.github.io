@@ -4,3 +4,6 @@ if [ "$EUID" = "0" ] || [ "$USER" = "root" ] ; then
 fi
 
 export PATH="${PATH}:~/bin:__TOOLS_DIR__"
+
+# cron sometimes sets HOME=/
+export HOME=$(getent passwd $(whoami) | cut -d':' -f6)
