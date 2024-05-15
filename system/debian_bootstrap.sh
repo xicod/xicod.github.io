@@ -17,7 +17,7 @@ if [ -z "$(find ${sshd_config_dir} -maxdepth 0 -empty)" ]; then
 fi
 # =====================================
 
-apt-get install -y vim git tig python3-yaml docker.io docker-compose curl needrestart build-essential wireguard htop tmux iotop zip unzip jq mailutils ssmtp rsync duplicity gpg net-tools sudo
+apt-get install -y vim git tig python3-yaml docker.io docker-compose curl needrestart build-essential wireguard htop tmux iotop zip unzip jq mailutils ssmtp rsync duplicity gpg net-tools nethogs sudo
 
 mkdir -p ~/git && cd ~/git
 rm xicod.github.io -rf
