@@ -3,6 +3,7 @@
 set -e
 set -x
 
+apt-get update
 apt-get install -y ufw
 ufw --force reset
 ufw --force enable
