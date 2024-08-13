@@ -41,7 +41,7 @@ ufw allow ssh
 
 set +x
 echo
-echo ==========================
+echo ========================
 echo "Done. Consider a reboot."
-echo ==========================
+echo ========================
 echo
