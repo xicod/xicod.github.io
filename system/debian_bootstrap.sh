@@ -39,6 +39,7 @@ systemctl restart sshd
 ufw allow ssh
 # =====================================
 
+set +x
 echo
 echo ==========================
 echo "Done. Consider a reboot."
