@@ -38,3 +38,9 @@ echo 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQCnsE2OId858o+LHYkrI7bLQLghd8kwdA8pLq
 systemctl restart sshd
 ufw allow ssh
 # =====================================
+
+echo
+echo ==========================
+echo "Done. Consider a reboot."
+echo ==========================
+echo
