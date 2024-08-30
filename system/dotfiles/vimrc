@@ -1831,18 +1831,29 @@ nnoremap <silent> db :call DeleteBlockByCharacter(0)<CR>:call RepeatSet("db", 0)
 nnoremap <silent> cb :call RepeatSet("cb", 1)<CR>:call DeleteBlockByCharacter(1)<CR>
 
 function! FindParen(dir)
-	if index(['"', '''', '`'], GetCurrentChar()) >= 0 && a:dir == '/'
+	" if we're currently standing on an apos, make sure we move to the further
+	" twin, considering the direction of movement
+	if index(['"', '''', '`'], GetCurrentChar()) >= 0
 		let l:tmp_pos = CursorPositionStore()
 		call GotoTwinChar()
-		if CursorPositionCompare(CursorPositionStore(), l:tmp_pos) >= 0
-			call CursorPositionRestore(l:tmp_pos)
+		if a:dir == '/'
+			if CursorPositionCompare(CursorPositionStore(), l:tmp_pos) > 0
+				call CursorPositionRestore(l:tmp_pos)
+			endif
+		else
+			if CursorPositionCompare(CursorPositionStore(), l:tmp_pos) < 0
+				call CursorPositionRestore(l:tmp_pos)
+			endif
 		endif
 	endif
+
+	let l:tmp_pos = CursorPositionStore()
 	call SearchAndGo(a:dir, '[{[(<"''`]\{1\}')
-	if index(['"', '''', '`'], GetCurrentChar()) >= 0 && a:dir == '?'
+	if index(['"', '''', '`'], GetCurrentChar()) >= 0
+		" always end up on the left apos of the two
 		let l:tmp_pos = CursorPositionStore()
 		call GotoTwinChar()
-		if CursorPositionCompare(l:tmp_pos, CursorPositionStore()) >= 0
+		if CursorPositionCompare(CursorPositionStore(), l:tmp_pos) < 0
 			call CursorPositionRestore(l:tmp_pos)
 		endif
 	endif
