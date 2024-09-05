@@ -24,17 +24,20 @@ function setupLocalNet {
 		python3 -c \
 			$'import sys, json\nprint(json.load(sys.stdin)[0]["addr_info"][0]["local"])')
 
-	IFS=',' read -ra PORTS <<< "$DTCONF_local_ports_open"
+	IFS=',' read -ra PORTS <<< "$DTCONF_ports_open_local"
 	for p in "${PORTS[@]}"; do
 #		ufw allow from $local_net to any port $p
 		ufw allow in on $net_device to any port $p
 	done
 }
 
-function setupWg {
-	IFS=',' read -ra PORTS <<< "$DTCONF_int_wg_ports_open"
-	for p in "${PORTS[@]}"; do
-		ufw allow in on $DTCONF_int_wg_name to any port $p
+function setupCustom {
+	IFS=',' read -ra FWDECL <<< "$DTCONF_ports_open_custom"
+	for fwdecl in "${FWDECL[@]}"; do
+		interface=$(echo "$fwdecl" | cut -d: -f1)
+		port=$(echo "$fwdecl" | cut -d: -f2)
+
+		ufw allow in on $interface to any port $port
 	done
 }
 
@@ -44,13 +47,8 @@ function setupFw {
 
 	removeAllUfwRules
 
-	# allow out (completely) and in (specific ports) on local network
 	setupLocalNet
-
-	# to allow my vpn network access to specific ports
-	if [ -n "$DTCONF_int_wg_name" ]; then
-		setupWg
-	fi
+	setupCustom
 
 	ufw --force enable
 }

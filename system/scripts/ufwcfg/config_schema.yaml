@@ -1,9 +1,8 @@
 appName: ufwcfg
 confSchema:
-  local_ports_open:
+  ports_open_local:
     - 22
     - 139
     - 445
-  int_wg_name: wg9
-  int_wg_ports_open:
-    - 22
+  ports_open_custom:
+    - wg9:22
