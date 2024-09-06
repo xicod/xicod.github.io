@@ -238,7 +238,7 @@ bind '"\217": vi-editing-mode'
 bind '"\em": "\217\tl"'
 # Alt+p to remove everything but the last param and add space
 bind '"\ep": "\e[F\e\C-b\C-x\C-? \e[D"'
-# Alt+o to remove everything but the last param and add space
+# Alt+o to instert the previous directory into the prompt
 bind -x '"\218": printf -v TEMP_OLDPWD_ESCAPED "%q" "${OLDPWD}"; READLINE_LINE="${READLINE_LINE:0:${READLINE_POINT}}${TEMP_OLDPWD_ESCAPED}/ ${READLINE_LINE:${READLINE_POINT}}"; let "READLINE_POINT += ${#TEMP_OLDPWD_ESCAPED} + 1"; unset TEMP_OLDPWD_ESCAPED'
 bind '"\eo": "\218"'
 
