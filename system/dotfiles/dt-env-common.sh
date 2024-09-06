@@ -252,6 +252,11 @@ bind -x '"\224": TEMP_LEN=$((${READLINE_POINT} - ${TEMP_READLINE_POINT})); READL
 bind '"\e[1;5A": "\219\213\216\221\224\214\223\220"'
 bind '"\e[1;5B": "\219\213\216\222\224\214\223\220"'
 
+# Alt+a to inject the previous word again
+bind -x '"\225": TEMP_READLINE_POINT=${READLINE_POINT}'
+bind -x '"\226": TEMP_PARAM="${READLINE_LINE:${READLINE_POINT}:$((${TEMP_READLINE_POINT} - ${READLINE_POINT} -1))} "; READLINE_LINE="${READLINE_LINE:0:${TEMP_READLINE_POINT}}${TEMP_PARAM}${READLINE_LINE:${TEMP_READLINE_POINT}}"; READLINE_POINT=$((${TEMP_READLINE_POINT} + ${#TEMP_PARAM})); unset TEMP_PARAM; unset TEMP_READLINE_POINT'
+bind '"\ea": "\225\e\C-b\226"'
+
 
 __dt_bash_init_lock_file=~/.bash_init_lock
 : >> $__dt_bash_init_lock_file #create a file if it doesn't exist
