@@ -23,7 +23,17 @@ APT_LISTCHANGES_FRONTEND=none \
 NEEDRESTART_SUSPEND=1 \
 apt-get dist-upgrade -y
 
-apt-get install -y vim git tig python3-yaml docker.io docker-compose curl needrestart build-essential wireguard htop tmux iotop zip unzip jq mailutils ssmtp rsync duplicity gpg net-tools nethogs sudo
+apt-get install -y \
+	sudo git curl \
+	tig vim tmux \
+	needrestart build-essential \
+	jq python3-yaml \
+	docker.io docker-compose \
+	htop iotop nethogs \
+	zip unzip \
+	mailutils ssmtp \
+	wireguard rsync duplicity gpg \
+	net-tools iputils-ping dnsutils
 
 mkdir -p ~/git && cd ~/git
 rm xicod.github.io -rf
