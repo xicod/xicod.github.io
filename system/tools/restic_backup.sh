@@ -3,7 +3,7 @@
 set -e
 set -u
 
-v=0.16.5
+v=0.17.1
 restic_dl_url="https://github.com/restic/restic/releases/download/v${v}/restic_${v}_linux_amd64.bz2"
 restic_dl_file_compressed="restic_${v}_linux_amd64.bz2"
 restic_dl_file="restic_${v}_linux_amd64"
