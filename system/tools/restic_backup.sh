@@ -44,9 +44,9 @@ export RESTIC_READ_CONCURRENCY=1
 
 ${restic_bin} snapshots &>/dev/null || ${restic_bin} init
 
-echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
-echo "Running backup for $DT_RESTIC_BACKUP_DIRECTORY"
-echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+echo "/========================================"
+echo "| Running backup for $DT_RESTIC_BACKUP_DIRECTORY"
+echo "\========================================"
 echo
 backup_global_params="--limit-upload=${DT_RESTIC_UPLOAD_LIMIT_KB} ${quiet}"
 backup_specific_params="--read-concurrency=1"
@@ -74,9 +74,9 @@ fi
 
 
 echo
-echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
-echo " Running cleanup for $DT_RESTIC_BACKUP_DIRECTORY"
-echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+echo "/========================================"
+echo "| Running cleanup for $DT_RESTIC_BACKUP_DIRECTORY"
+echo "\========================================"
 echo
 
 # DT_RESTIC_SNAPSHOTS_REMOVE_OLDER_THAN example: 1y5m7d2h
