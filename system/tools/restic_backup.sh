@@ -64,9 +64,9 @@ else
 	parent_id=$(${restic_bin} --json snapshots ${snapshot_id} \
 				| jq -r '.[0].parent')
 	if [ "${parent_id}" = "null" ]; then
-		echo "Created snapshot ${snapshot_id} with no parent"
+		echo "Created snapshot ${snapshot_id:0:8} with no parent"
 	else
-		echo "Created snapshot ${snapshot_id} with parent ${parent_id}"
+		echo "Created snapshot ${snapshot_id:0:8} with parent ${parent_id:0:8}"
 		echo
 		${restic_bin} diff ${parent_id} ${snapshot_id}
 	fi
