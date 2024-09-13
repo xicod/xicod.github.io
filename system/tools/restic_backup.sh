@@ -3,6 +3,12 @@
 set -e
 set -u
 
+which jq &>/dev/null && jq_exists=1 || jq_exists=0
+if [ $jq_exists -eq 0 ]; then
+	echo "Please install the 'jq' utility before running."
+	exit 1
+fi
+
 v=0.17.1
 restic_dl_url="https://github.com/restic/restic/releases/download/v${v}/restic_${v}_linux_amd64.bz2"
 restic_dl_file_compressed="restic_${v}_linux_amd64.bz2"
@@ -42,10 +48,30 @@ echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
 echo "Running backup for $DT_RESTIC_BACKUP_DIRECTORY"
 echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
 echo
+backup_global_params="--limit-upload=${DT_RESTIC_UPLOAD_LIMIT_KB} ${quiet}"
+backup_specific_params="--read-concurrency=1"
+if [ -t 0 ]; then
+	# running interactivelly
+	${restic_bin} ${backup_global_params} backup \
+		${backup_specific_params} \
+		${DT_RESTIC_BACKUP_DIRECTORY}
+else
+	snapshot_id=$(${restic_bin} ${backup_global_params} --json --quiet backup \
+				${backup_specific_params} \
+				${DT_RESTIC_BACKUP_DIRECTORY} \
+			| jq -r '.snapshot_id')
 
-${restic_bin} --limit-upload=${DT_RESTIC_UPLOAD_LIMIT_KB} ${quiet} backup \
-	--read-concurrency=1 \
-	${DT_RESTIC_BACKUP_DIRECTORY}
+	parent_id=$(${restic_bin} --json snapshots ${snapshot_id} \
+				| jq -r '.[0].parent')
+	if [ "${parent_id}" = "null" ]; then
+		echo "Created snapshot ${snapshot_id} with no parent"
+	else
+		echo "Created snapshot ${snapshot_id} with parent ${parent_id}"
+		echo
+		${restic_bin} diff ${parent_id} ${snapshot_id}
+	fi
+fi
+
 
 echo
 echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
