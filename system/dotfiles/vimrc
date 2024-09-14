@@ -619,11 +619,11 @@ inoremap \<Tab> <Tab>
 inoremap <expr> {{ (GetPreviousChar() == '$') ? '{}<LEFT>' : '{<CR>}<ESC>ko'
 function! s:ShCheckIfBracketsShouldComeWithSpaces()
 	 return &filetype == 'sh'
-				 \ && getline('.')[0:col('.')-2] =~ '\(\<if\>\|\<while\>\)\s*[!]*\s*[\[]*\s*$\c'
+				 \ && getline('.')[0:col('.')-2] =~ '\(\<if\>\|\<elif\>\|\<while\>\)\s*[!]*\s*[\[]*\s*$\c'
 endfunction
 function! s:ShCheckIfDoubleSquareBracket()
 	return &filetype == 'sh'
-				\ && getline('.')[0:col('.')-2] =~ '\(\<if\>\|\<while\>\)\s*[!]*\s*\[\s*$\c'
+				\ && getline('.')[0:col('.')-2] =~ '\(\<if\>\|\<elif\>\|\<while\>\)\s*[!]*\s*\[\s*$\c'
 endfunction
 inoremap <expr> [[ (<SID>ShCheckIfBracketsShouldComeWithSpaces() ? '[  ]<LEFT><LEFT>' : '[]<LEFT>') . (<SID>ShCheckIfDoubleSquareBracket() ? '<LEFT><LEFT><BACKSPACE><RIGHT><RIGHT><RIGHT><RIGHT><RIGHT><BACKSPACE><LEFT><LEFT>' : '')
 inoremap (( ()<LEFT>
