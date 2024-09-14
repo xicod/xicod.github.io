@@ -279,10 +279,14 @@ HISTSIZE=1000000
 HISTFILE=~/.bash_history_extended
 
 function run_time_format() {
-	if [ $1 -lt 86400 ]; then
-		date -d@${1} -u '+%Hh:%Mm:%Ss'
-	else 
+	if [ $1 -ge 86400 ]; then
 		echo "$(($1/86400)) days $(date -d@$(($1%86400)) -u '+%Hh:%Mm:%Ss')"
+	elif [ $1 -ge 3600 ]; then
+		date -d@${1} -u '+%Hh:%Mm:%Ss'
+	elif [ $1 -ge 60 ]; then
+		date -d@${1} -u '+%Mm:%Ss'
+	else
+		date -d@${1} -u '+%Ss'
 	fi
 }
 function notifen (){
