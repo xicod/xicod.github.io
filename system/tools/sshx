@@ -34,4 +34,4 @@ done &
 )
 
 ssh -S$t -t DUMMY_HOST \
-"tmux attach -t remote || tmux new -s remote\; split-window -v -p 35\; send-keys 'htop || top -c' C-m\; split-window -h -p 40\; send-keys 'nethogs' C-m\; select-pane -t 0\; set -s escape-time 0\; set-option -g history-limit 10000"
+"tmux attach -t remote || tmux new -s remote\; split-window -v -p 35\; send-keys 'htop || top -c' C-m\; split-window -h -p 40\; select-pane -t 0\; set -s escape-time 0\; set-option -g history-limit 10000"
