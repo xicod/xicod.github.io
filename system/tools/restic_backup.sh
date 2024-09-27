@@ -3,6 +3,17 @@
 set -e
 set -u
 
+function print_header {
+	local msg="$1"
+	local length=${#msg}
+	local title_pattern="======================================="
+	local to_print="${title_pattern:0:$((${length} +2))}"
+
+	echo "/${to_print}\\"
+	echo "| ${msg} |"
+	echo "\\${to_print}/"
+}
+
 which jq &>/dev/null && jq_exists=1 || jq_exists=0
 if [ $jq_exists -eq 0 ]; then
 	echo "Please install the 'jq' utility before running."
@@ -44,9 +55,7 @@ export RESTIC_READ_CONCURRENCY=1
 
 ${restic_bin} snapshots &>/dev/null || ${restic_bin} init
 
-echo "/========================================"
-echo "| Running backup for $DT_RESTIC_BACKUP_DIRECTORY"
-echo "\========================================"
+print_header "Running backup for $DT_RESTIC_BACKUP_DIRECTORY"
 echo
 backup_global_params="--limit-upload=${DT_RESTIC_UPLOAD_LIMIT_KB} ${quiet}"
 backup_specific_params="--read-concurrency=1"
@@ -74,9 +83,7 @@ fi
 
 
 echo
-echo "/========================================"
-echo "| Running cleanup for $DT_RESTIC_BACKUP_DIRECTORY"
-echo "\========================================"
+print_header "Running cleanup for $DT_RESTIC_BACKUP_DIRECTORY"
 echo
 
 # DT_RESTIC_SNAPSHOTS_REMOVE_OLDER_THAN example: 1y5m7d2h
