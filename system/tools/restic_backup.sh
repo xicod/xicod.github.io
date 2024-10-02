@@ -6,7 +6,7 @@ set -u
 function print_header {
 	local msg="$1"
 	local length=${#msg}
-	local title_pattern="======================================="
+	local title_pattern="=================================================="
 	local to_print="${title_pattern:0:$((${length} +2))}"
 
 	echo "/${to_print}\\"
