@@ -140,7 +140,7 @@ function mmv {
 	echo $'# replace only in the new filename block: \'%s/\\t\\t.*\zsSOMETEXT/NEWTEXT/\''
 	ls -1d --quoting-style=shell "$@" | sed 's/^\(.*\)$/mv -nT \1\t\1/' \
 		| column -t -s $'\t' -o $'\t\t'
-	) | vim - -c 'setlocal filetype=bash buftype=nofile nolist'
+	) | vim - -c 'setlocal filetype=bash buftype=nofile nolist nowrap'
 }
 
 function _dt_expand_homedir_tilde {
