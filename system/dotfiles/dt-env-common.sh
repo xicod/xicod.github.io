@@ -2,7 +2,7 @@
 
 if [ -z "$BASH" ]; then
 	echo "dt-env-common.sh: This is not loading in bash. Skipping."
-	return
+	return 0
 fi
 
 # set HOME just in case it wasn't set properly
