@@ -1,3 +1,6 @@
+# This is done with gentoo in mind, where under /etc/bash/bashrc.d
+# there are various overrides for PS1, PROMPT_COMMAND vars, etc.
+# So we can't put our configs in /etc/profile.d, which is loaded prior.
 BASH_ENV_DEST := $(shell bash -c '[ -d /etc/bash/bashrc.d ] && echo "/etc/bash/bashrc.d" || echo /etc/profile.d')
 
 all:
