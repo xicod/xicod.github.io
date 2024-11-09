@@ -1721,6 +1721,7 @@ function! InnerAnythingChange()
 	" for indent-formatted files, if cursor is in beginning of text,
 	" use the block mark function and change contents
 	if index(['python', 'yaml', 'sh', 'vim'], &filetype) >= 0 && col('.') > 1
+				\ && index(["(", ")", "[", "]", "{", "}", "<", ">", '"', '''', '`'], GetCurrentChar()) < 0
 		let l:t = CursorPositionStore()
 		normal! ^
 		if CursorPositionCompare(CursorPositionStore(), l:t) == 0
