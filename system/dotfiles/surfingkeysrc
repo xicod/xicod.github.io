@@ -19,5 +19,13 @@ api.map('<Ctrl-k>', 'u');
 api.map('<Esc>', 'cS');
 api.map('<Tab>', 'cS');
 api.map('\\', 'f');
+// get used to stop using the f key
+api.map('f', '');
 
 api.unmap('f', /youtube.com/);
+api.unmap('c', /youtube.com/);
+api.unmap('k', /youtube.com/);
+api.mapkey('p', 'play/pause on youtube', function() {
+	var e = new KeyboardEvent('keydown', {'keyCode': 75, 'which': 75}); // 75 is 'k'
+	document.dispatchEvent(e);
+}, {domain: /youtube.com/});
