@@ -23,7 +23,7 @@ trap "trap_tempConfFilesDelete" EXIT
 : \
 && source <(curl -sSf ${dt_repo_dl_prefix}/dt-env-common.sh) \
 && createTempFileFromUrl ${dt_repo_dl_prefix}/vimrc \
-&& export VIMINIT="source ${tmp_files[-1]}" \
+&& alias vim="vim -u ${tmp_files[-1]}" && alias vimdiff="vimdiff -u ${tmp_files[-1]}" \
 && createTempFileFromUrl ${dt_repo_dl_prefix}/tigrc \
 && export TIGRC_USER=${tmp_files[-1]} \
 && createTempFileFromUrl ${dt_repo_dl_prefix}/gitconfig \
