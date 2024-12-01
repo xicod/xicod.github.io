@@ -8,7 +8,7 @@ color main-head blue default bold
 bind main M <bash -c 'echo "" > ~/.tig_param'
 bind main ! >bash -c 'git revert $(git rev-parse %(commit)^2 &>/dev/null && echo "-m 1") --no-edit %(commit)'
 bind main p >git pull --rebase
-bind main P !git push %(remote) %(commit):%(branch)
+bind main P !git push %(remote) %(commit):%(repo:head)
 bind main ) >bash -c 'git reset --soft %(commit)~1 && git commit --edit -m"$(git log --format=%B --reverse HEAD..HEAD@{1})"'
 bind main u >git reset --soft HEAD~1
 bind main , >git rebase -i %(commit)~1
