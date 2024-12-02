@@ -1934,6 +1934,8 @@ nnoremap <C-n> ]cz.
 nnoremap <C-p> [cz.
 nnoremap do :diffget<BAR>normal! ]cz.<CR>
 
+let g:dt_escape_chars_for_regex_search = '~.*^$[]/\'
+
 nnoremap <expr> K ":call setreg(has('unnamedplus') ? '+' : 'z', '<C-R>=expand('<cword>')<CR>')<CR>"
 			\.":Grep ./ 0 "
 			\."*".(len(expand('%:e')) > 0 ? '.'.expand('%:e') : '')
@@ -1942,11 +1944,11 @@ nnoremap <expr> K ":call setreg(has('unnamedplus') ? '+' : 'z', '<C-R>=expand('<
 vnoremap <expr> K ":<c-u>exec 'normal! gv\"".(has('unnamedplus') ? '+' : 'z')."y'<CR>"
 			\.":Grep ./ 0 "
 			\."*".(len(expand('%:e')) > 0 ? '.'.expand('%:e') : '')
-			\. " '<C-R>=getreg(has('unnamedplus') ? '+' : 'z')<CR>'"
+			\. " '<C-R>=escape(getreg(has('unnamedplus') ? '+' : 'z'), g:dt_escape_chars_for_regex_search)<CR>'"
 			\."<C-B><C-RIGHT><C-RIGHT><C-RIGHT><C-RIGHT>"
 
 " search for selection by copying to clipboard, escaping, then looking for it
-vnoremap <silent> * "zy:let @/=escape(@z, '~.*^$[]/\')<CR>:set hls<CR>:call histadd('/', @/)<CR>
+vnoremap <silent> * "zy:let @/=escape(@z, g:dt_escape_chars_for_regex_search)<CR>:set hls<CR>:call histadd('/', @/)<CR>
 nnoremap <silent> * :let @/='\<'.expand("<cword>").'\>'<CR>:set hls<CR>:call histadd('/', @/)<CR>
 
 function! s:DumpContToFile(reg_cont, fname)
