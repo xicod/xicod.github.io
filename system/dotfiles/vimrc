@@ -55,7 +55,12 @@ set statusline=%(%y\ %)%f%(\ %m%)%(\ %r%)%=%l(%L),%c\ \[%{&fileformat}\]
 set scrolloff=20
 
 " place current line on top of window although scrolloff is set
-nnoremap zT :execute "normal! " . (line(".") + &scrolloff) . "Gzt"<CR>
+nnoremap zT :execute "normal! " . (line(".")
+			\+ (winheight(0) > &scrolloff*2
+				\? &scrolloff
+				\: float2nr(floor((winheight(0)-0.1)/2))
+				\)
+			\) . "Gzt"<CR>
 
 set mouse=
 set clipboard=unnamedplus
