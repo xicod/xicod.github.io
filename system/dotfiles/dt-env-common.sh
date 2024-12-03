@@ -164,16 +164,34 @@ function _dt_expand_homedir_tilde {
 function _dt_smart_readline_ls {
 	local ls_param=$1
 
-	local partial_line=`echo "${TEMP_READLINE_LINE:0:${TEMP_READLINE_POINT}}" | sed "s/\s\+$/A/"`
+	local partial_line="${TEMP_READLINE_LINE:0:${TEMP_READLINE_POINT}}"
 
-	local param_arr
-	read -a param_arr <<< "${partial_line}"
+	# for the sake of understanding whether we're trying to list a specific path
+	# or the cursor is currently focusing an empty space, we need to treat
+	# escaped spaces as a valid character.
+	local partial_line_unescaped_spaces=`echo "${partial_line}" | sed 's|\\\\\s|A|g'`
 
-	if [[ ${#param_arr[@]} -gt 0 ]] && [[ "${param_arr[-1]}" =~ /$ ]]; then
-		local parsed_path=`_dt_expand_homedir_tilde "${param_arr[-1]}"`
-		ls -${ls_param} "$parsed_path"
-	else
+	if [[ -z "${partial_line}" ]] \
+		|| [[ "${partial_line_unescaped_spaces}" =~ [[:blank:]]+$ ]]; then
 		ls -${ls_param}
+	else
+		local last_param="${partial_line:${TEMP_READLINE_POINT2}}"
+		local expanded_path=`_dt_expand_homedir_tilde "${last_param}"`
+		local path_dir=`echo "${expanded_path}" | sed 's|^\(.*/\).*$|\1|'`
+		local file_pat=`echo "${expanded_path}" | sed 's|^.*/\(.*\)$|\1|'`
+		(
+		if [ "${path_dir}" != "${file_pat}" ]; then
+			read path_dir_unescaped <<< "${path_dir}"
+			cd "${path_dir_unescaped}"
+		fi
+
+		if [ -n "${file_pat}" ]; then
+			read file_pat_unescaped <<< "${file_pat}"
+			ls -d${ls_param} "${file_pat_unescaped}"*
+		else
+			ls -${ls_param}
+		fi
+		)
 	fi
 }
 
@@ -202,14 +220,16 @@ bind '"\e[B": history-search-forward'
 # maintain state
 bind -x '"\200": TEMP_READLINE_LINE=$READLINE_LINE; TEMP_READLINE_POINT=$READLINE_POINT'
 bind -x '"\201": READLINE_LINE=$TEMP_READLINE_LINE; READLINE_POINT=$TEMP_READLINE_POINT; unset TEMP_READLINE_POINT; unset TEMP_READLINE_LINE'
+bind -x '"\202": TEMP_READLINE_LINE2=$READLINE_LINE; TEMP_READLINE_POINT2=$READLINE_POINT'
+bind -x '"\203": unset TEMP_READLINE_LINE2; unset TEMP_READLINE_POINT2'
 # Bind Alt+u to got up in directory tree
 bind -x '"\205": "cd .."'
 bind '"\eu":"\200\C-a\C-k\205\C-m\201"'
 # Bind Alt+l to directory listing
 bind -x '"\206": _dt_smart_readline_ls lAhtr'
 bind -x '"\207": _dt_smart_readline_ls lh'
-bind '"\el":"\200\C-a\C-k\C-m\206\201"'
-bind '"\el\el":"\200\C-a\C-k\C-m\207\201"'
+bind '"\el":"\200\e\C-b\202\C-a\C-k\C-m\206\201\203"'
+bind '"\el\el":"\200\e\C-b\202\C-a\C-k\C-m\207\201\203"'
 # Bind Alt+k to directory listing command start
 bind '"\ek":"\C-a\C-kls -lAhtr "'
 bind '"\ek\ek":"\C-a\C-kls -lh "'
