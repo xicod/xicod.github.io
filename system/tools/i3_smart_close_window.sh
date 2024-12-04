@@ -14,7 +14,12 @@ i3-msg kill &>/dev/null || exit 1
 
 if [ x${isfloating} = xTRUE ]; then
 	# it might take seconds for an active window to actually close
-	while [ x`xdotool getactivewindow 2>/dev/null` = x${focused_window_id} ]; do sleep 0.1; done
+	for ((i=0 ; i<100 ; i++)); do
+		if [ x`xdotool getactivewindow 2>/dev/null` != x${focused_window_id} ]; then
+			break
+		fi
+		sleep 0.1
+	done
 
 	# Might fail if there's no more floating windows left. We don't care.
 	i3-msg 'focus floating' &>/dev/null
