@@ -49,6 +49,8 @@ systemctl restart sshd
 ufw allow ssh
 # =====================================
 
+timedatectl set-timezone America/Vancouver
+
 set +x
 echo
 echo ========================
