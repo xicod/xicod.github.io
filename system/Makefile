@@ -31,10 +31,11 @@ ifeq ($(shell test -d /etc/ssh/sshd_config.d && echo 1 || echo 0), 1)
 	@echo "Setting sshd_config"
 	cp -a ./dotfiles/sshd_config_99dt.conf /etc/ssh/sshd_config.d/99dt.conf
 endif
-ifeq ($(shell cat /root/main_host 2>/dev/null), 1)
 	@echo "-------------------------------------------"
 	@echo "Setting system tmux.conf"
 	cp -a ./dotfiles/tmux.conf /etc/
+ifeq ($(shell cat /root/main_host 2>/dev/null), 1)
+	cp -a ./dotfiles/tmux-main.conf /etc/
 endif
 	@echo "-------------------------------------------"
 	./place_default_dt_config.sh
