@@ -10,13 +10,63 @@ if [ "$automatic_rename" = "no" ]; then
 	exit 0
 fi
 
-home_dir=$(getent passwd `whoami` | cut -d':' -f6)
+user=`whoami`
 
 current_child=""
-p=$(set -o pipefail; pgrep -P $curr_pane_pid | tail -n1)
-if [ $? -eq 0 ]; then
-	current_child=$(ps -p $p -o comm=)
+child_is_su=FALSE
+
+p=${curr_pane_pid}
+while [ 1 ]; do
+	p=`pgrep -P ${p} | tail -n1`
+	if [ -z "$p" ]; then
+		break
+	fi
+	current_child=`ps -p $p -o comm=`
+	case "${current_child}" in
+		su|sudo)
+			child_is_su=TRUE
+			;;
+		*)
+			break
+			;;
+	esac
+done
+
+if [ $child_is_su = TRUE ]; then
+	# this happens while su/sudo is prompting for password
+	# and still has no children
+	if [ -z "$p" ]; then
+		child_is_su=FALSE
+	else
+		curr_dir=`readlink /proc/${p}/cwd 2>/dev/null`
+		user=`ps -o uname= -p $p`
+
+		# skip the shell process
+		if [[ "$current_child" =~ ^(sh|bash|zsh|dash)$ ]]; then
+			p=`pgrep -P ${p} | tail -n1`
+		fi
+
+		if [ -n "$p" ]; then
+			current_child=`ps -p $p -o comm=`
+		else
+			current_child=""
+		fi
+	fi
 fi
+
+# while in insert mode, vim changes it's own cwd
+# so we have to use parent's cwd
+if [ "${current_child}" = "vim" ]; then
+	ppid=`ps -o ppid= ${p}`
+	curr_dir=`readlink /proc/${ppid}/cwd 2>/dev/null`
+fi
+
+# couldn't find cwd because of permissions
+if [ -z "$curr_dir" ]; then
+	curr_dir="_"
+fi
+
+home_dir=`getent passwd ${user} | cut -d':' -f6`
 
 handle_ssh_command(){
 	proc_args=$(ps -p $p -o args=)
@@ -38,6 +88,7 @@ handle_ssh_command(){
 		fi
 	done
 }
+
 if [[ "$current_child" =~ ^ssh[x]*$ ]]; then
 	ret=$(handle_ssh_command)
 	if [ $? -eq 1 ]; then
@@ -49,6 +100,10 @@ if [[ "$current_child" =~ ^ssh[x]*$ ]]; then
 		echo -n "$ret"
 	fi
 else
+	if [ $child_is_su = TRUE ]; then
+		echo -n "(${user}) "
+	fi
+
 	echo -n $curr_dir | sed -E \
 		-e "s|^${home_dir}|~|" \
 		-e "s|([^/]{1})[^/]*/|\1/|g" \
