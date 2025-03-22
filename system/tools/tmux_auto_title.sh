@@ -89,6 +89,10 @@ handle_ssh_command(){
 	done
 }
 
+if [ $child_is_su = TRUE ]; then
+	echo -n "(${user}) "
+fi
+
 if [[ "$current_child" =~ ^ssh[x]*$ ]]; then
 	ret=$(handle_ssh_command)
 	if [ $? -eq 1 ]; then
@@ -100,10 +104,6 @@ if [[ "$current_child" =~ ^ssh[x]*$ ]]; then
 		echo -n "$ret"
 	fi
 else
-	if [ $child_is_su = TRUE ]; then
-		echo -n "(${user}) "
-	fi
-
 	echo -n $curr_dir | sed -E \
 		-e "s|^${home_dir}|~|" \
 		-e "s|([^/]{1})[^/]*/|\1/|g" \
