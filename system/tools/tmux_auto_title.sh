@@ -57,7 +57,7 @@ fi
 # while in insert mode, vim changes it's own cwd
 # so we have to use parent's cwd
 if [ "${current_child}" = "vim" ]; then
-	ppid=`ps -o ppid= ${p} | xargs echo`
+	ppid=`grep '^PPid:' /proc/${p}/status | awk '{print $2}'`
 	curr_dir=`readlink /proc/${ppid}/cwd 2>/dev/null`
 fi
 
