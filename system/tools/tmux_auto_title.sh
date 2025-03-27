@@ -4,6 +4,7 @@ automatic_rename=$1
 curr_dir="$2"
 curr_title="$3"
 curr_pane_pid=$4
+window_zoomed_flag=$5
 
 if [ "$automatic_rename" = "no" ]; then
 	echo -n "$curr_title"
@@ -88,6 +89,10 @@ handle_ssh_command(){
 		fi
 	done
 }
+
+if [ "$window_zoomed_flag" = 1 ]; then
+	echo -n "Z "
+fi
 
 if [ $child_is_su = TRUE ]; then
 	echo -n "(${user}) "
