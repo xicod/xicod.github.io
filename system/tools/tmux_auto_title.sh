@@ -6,7 +6,7 @@ curr_title="$3"
 curr_pane_pid=$4
 window_zoomed_flag=$5
 
-if [ "$window_zoomed_flag" = 1 ]; then
+if [ "$window_zoomed_flag" = "1" ]; then
 	echo -n "Z "
 fi
 
