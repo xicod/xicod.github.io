@@ -1768,6 +1768,9 @@ vnoremap <C-k> 5k
 vnoremap <C-l> 5l
 vnoremap <C-h> 5h
 
+vnoremap <C-Up> Ugv
+vnoremap <C-Down> gugv
+
 function! DuplicateLine()
 	normal! "zyy"zp
 endfunction
