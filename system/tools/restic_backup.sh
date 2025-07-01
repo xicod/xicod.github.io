@@ -20,7 +20,7 @@ if [ $jq_exists -eq 0 ]; then
 	exit 1
 fi
 
-v=0.17.3
+v=0.18.0
 restic_dl_url="https://github.com/restic/restic/releases/download/v${v}/restic_${v}_linux_amd64.bz2"
 restic_dl_file_compressed="restic_${v}_linux_amd64.bz2"
 restic_dl_file="restic_${v}_linux_amd64"
