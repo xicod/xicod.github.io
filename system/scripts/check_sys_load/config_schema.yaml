@@ -1,0 +1,3 @@
+appName: check_sys_load
+confSchema:
+  report_threshold: "0.80"
