@@ -1338,6 +1338,7 @@ function! ToggleDiffWithSaved()
 		call s:GoToFirstChange()
 		set splitright
 		setlocal nospell
+		let @/ = ""
 	endif
 endfunction
 nnoremap <silent> ,ds :call ToggleDiffWithSaved()<cr>
