@@ -71,6 +71,11 @@ alias psmem='ps -eo pid,rss,args | sort -b -k2,2n | cut -c -`tput cols`'
 # Capture the current pane into a vim buffer
 alias tmux-cap='tmux capture-pane -p -S- -E- | vim -c "setlocal filetype=none buftype=nofile nolist | normal! zRG" -'
 
+# docker aliases only for root
+if [ "$EUID" = "0" ] || [ "$USER" = "root" ] ; then
+	alias dop="docker ps -a"
+	alias doi="docker images"
+fi
 
 # use a custom config loader that will load the system and then
 # our own tigrc
