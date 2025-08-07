@@ -61,7 +61,7 @@ alias fgrep='fgrep --colour=auto'
 alias grep='grep --colour=auto'
 alias ls='ls --color=auto'
 
-alias ping="ping -c 5"
+alias ping="ping -c 10"
 alias top="top -c"
 alias lfp="pgrep -aif"
 alias systemctl="systemctl -l"
