@@ -55,7 +55,7 @@ export RESTIC_READ_CONCURRENCY=1
 
 ${restic_bin} snapshots &>/dev/null || ${restic_bin} init
 
-print_header "Running backup for $DT_RESTIC_BACKUP_DIRECTORY"
+print_header "Running backup for ${DT_RESTIC_BACKUP_DIRECTORY[@]}"
 echo
 backup_global_params="--limit-upload=${DT_RESTIC_UPLOAD_LIMIT_KB} ${quiet}"
 backup_specific_params="--read-concurrency=1"
@@ -63,11 +63,11 @@ if [ -t 0 ]; then
 	# running interactivelly
 	${restic_bin} ${backup_global_params} backup \
 		${backup_specific_params} \
-		${DT_RESTIC_BACKUP_DIRECTORY}
+		"${DT_RESTIC_BACKUP_DIRECTORY[@]}"
 else
 	snapshot_id=$(${restic_bin} ${backup_global_params} --json --quiet backup \
 				${backup_specific_params} \
-				${DT_RESTIC_BACKUP_DIRECTORY} \
+				"${DT_RESTIC_BACKUP_DIRECTORY[@]}" \
 			| jq -r '.snapshot_id')
 
 	parent_id=$(${restic_bin} --json snapshots ${snapshot_id} \
@@ -83,7 +83,7 @@ fi
 
 
 echo
-print_header "Running cleanup for $DT_RESTIC_BACKUP_DIRECTORY"
+print_header "Running cleanup for ${DT_RESTIC_BACKUP_DIRECTORY[@]}"
 echo
 
 # DT_RESTIC_SNAPSHOTS_REMOVE_OLDER_THAN example: 1y5m7d2h
