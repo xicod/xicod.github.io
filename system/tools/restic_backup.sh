@@ -61,12 +61,6 @@ if [ -v DT_RESTIC_IEXCLUDE ] && [ ${#DT_RESTIC_IEXCLUDE[@]} -gt 0 ]; then
 	done
 fi
 
-if [ ${#exclude_params[@]} -gt 0 ]; then
-	echo
-	echo "Using excludes: ${exclude_params[@]}"
-	echo
-fi
-
 # always read one file at a time, prevents fragmentation
 export RESTIC_READ_CONCURRENCY=1
 
@@ -74,6 +68,13 @@ ${restic_bin} snapshots &>/dev/null || ${restic_bin} init
 
 print_header "Running backup for ${DT_RESTIC_BACKUP_DIRECTORY[@]}"
 echo
+
+if [ ${#exclude_params[@]} -gt 0 ]; then
+	echo
+	echo "Using excludes: ${exclude_params[@]}"
+	echo
+fi
+
 backup_global_params="--limit-upload=${DT_RESTIC_UPLOAD_LIMIT_KB} ${quiet}"
 backup_specific_params=("--read-concurrency=1" "${exclude_params[@]}")
 if [ -t 0 ]; then
