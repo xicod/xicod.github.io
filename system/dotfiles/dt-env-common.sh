@@ -15,6 +15,9 @@ if [ -f /usr/bin/vi ]; then
 	export EDITOR=vi
 fi
 
+# doesn't look good on a white background
+export LESSCOLOR=no
+
 ## Colors
 function printRed { echo -e "\e[0;31m${1}\e[0m"; }
 export -f printRed
