@@ -5,20 +5,13 @@ set -e
 PRINT_FUNC_OK=echo
 PRINT_FUNC_ERROR=echo
 
-OPTIND=1
-while getopts "c" opt; do
-	case "$opt" in
-		c)
-			PRINT_FUNC_OK=printGreen
-			PRINT_FUNC_ERROR=printRed
-			;;
-	esac
-done
-shift $((OPTIND-1))
-[ "${1:-}" = "--" ] && shift
+if [ -v DT_OUTPUT_USE_COLOR ] && [ "${DT_OUTPUT_USE_COLOR}" = "1" ]; then
+	PRINT_FUNC_OK=printGreen
+	PRINT_FUNC_ERROR=printRed
+fi
 
 if [ $# -lt 2 ]; then
-	$PRINT_FUNC_ERROR "Need exactly two parameters: [-c] MAX_AGE_SECONDS 'PATTERN'"
+	$PRINT_FUNC_ERROR "Need exactly two parameters: MAX_AGE_SECONDS 'PATTERN'"
 	exit 1
 fi
 

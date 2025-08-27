@@ -6,14 +6,8 @@ function handle_btrfs_snapshots
 {
 	root_btrfs_mount=/mnt/btrfs/root
 	if [ -d ${root_btrfs_mount} ] && [ $(stat -f -c %T ${root_btrfs_mount}) = "btrfs" ]; then
-		snapshot_base=${root_btrfs_mount}/snapshots/@sysupdate_
-
 		printBoldBlue "Clearing old root filesystem snapshots.."
-		btrfs_clean_snapshots.sh -c $((60*60*24*5)) ${snapshot_base}'*'
-		echo
-
-		snapshot=${snapshot_base}$(date +%Y%m%d_%H%M%S)
-		printBoldBlue "$(btrfs subvolume snapshot -r ${root_btrfs_mount}/@master ${snapshot})"
+		DT_OUTPUT_USE_COLOR=1 btrfs_rotate_snapshots.sh ${root_btrfs_mount} sysupdate 5
 		echo
 	fi
 }
