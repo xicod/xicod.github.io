@@ -48,6 +48,11 @@ for i in range(0, len(drives)):
 
 	j = json.loads(output)
 
+	if j["smartctl"]["exit_status"] != 0:
+		print("smartctl: " + j["smartctl"]["messages"][0]["string"], file=sys.stderr)
+		exit_code = 1
+		continue
+
 	temperature = j["temperature"]["current"]
 	if temperature > acceptable_temperature:
 		print_err(drive, j["model_name"], "temperature", temperature)
