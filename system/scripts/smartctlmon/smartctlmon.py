@@ -30,7 +30,7 @@ def check_ata_drive(j, drive):
 		global exit_code
 		exit_code = 1
 		for param in acceptable_values:
-			print(f'Could not locate parameter {param} for {drive} ({j["model_name"]})!!')
+			print(f'Could not locate parameter {param} for {drive} ({j["model_name"]})!!', file=sys.stderr)
 
 drives = os.environ["DTCONF_drives"].split(",")
 acceptable_temperatures = [int(x) for x in os.environ["DTCONF_acceptable_temperatures"].split(",")]
