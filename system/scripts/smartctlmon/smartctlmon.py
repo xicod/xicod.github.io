@@ -15,7 +15,6 @@ def print_err(device, device_name, param, value):
 def check_ata_drive(j, drive):
 	acceptable_values = {
 		"Reallocated_Sector_Ct": 0,
-		"UDMA_CRC_Error_Count": 0,
 	}
 
 	for attr in j["ata_smart_attributes"]["table"]:
