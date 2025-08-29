@@ -7,29 +7,51 @@ import sys
 
 cmd = ['smartctl', '-a', '-j']
 
-def print_err(device, device_name, param, value):
+def print_err(drive, device_name, param, value):
 	global exit_code
 	exit_code = 1
-	print(f"Device {device} ({device_name}) has {param} with value {value}!!", file=sys.stderr)
+	print(f"{drive} ({device_name}): has {param} with value {value}!!", file=sys.stderr)
 
 def check_ata_drive(j, drive):
+	global exit_code
+
 	acceptable_values = {
-		"Reallocated_Sector_Ct": 0,
+		5: {
+			"names": [
+				"Reallocated_Sector_Ct",
+			],
+			"acceptable_value": 0,
+		},
+		199: {
+			"names": [
+				"UDMA_CRC_Error_Count",
+				"CRC_Error_Count",
+			],
+			"acceptable_value": 0,
+		},
 	}
 
 	for attr in j["ata_smart_attributes"]["table"]:
-		if attr["name"] in acceptable_values:
+
+		attr_id = attr["id"]
+		attr_name = attr["name"]
+
+		if attr_id in acceptable_values:
+			if attr_name not in acceptable_values[attr_id]["names"]:
+				exit_code = 1
+				print(f'{drive} ({j["model_name"]}): attribute {{id={attr_id}, name={attr_name}}} is not recognized!!', file=sys.stderr)
+				continue
+
 			val = attr["raw"]["value"]
-			ok_val = acceptable_values[attr["name"]]
+			ok_val = acceptable_values[attr_id]["acceptable_value"]
 			if val != ok_val:
-				print_err(drive, j["model_name"], attr["name"], val)
-			del acceptable_values[attr["name"]]
+				print_err(drive, j["model_name"], attr_name, val)
+			del acceptable_values[attr_id]
 
 	if len(acceptable_values) > 0:
-		global exit_code
 		exit_code = 1
 		for param in acceptable_values:
-			print(f'Could not locate parameter {param} for {drive} ({j["model_name"]})!!', file=sys.stderr)
+			print(f'{drive} ({j["model_name"]}): Could not locate parameter {param} ({acceptable_values[param]["names"]})!!', file=sys.stderr)
 
 drives = os.environ["DTCONF_drives"].split(",")
 acceptable_temperatures = [int(x) for x in os.environ["DTCONF_acceptable_temperatures"].split(",")]
@@ -78,6 +100,6 @@ for i in range(0, len(drives)):
 		check_ata_drive(j, drive)
 
 	else:
-		raise Exception(f"{drive} has unrecognized type: {device_type}")
+		raise Exception(f'{drive} ({j["model_name"]}): unrecognized type: {device_type}')
 
 sys.exit(exit_code)
