@@ -1336,6 +1336,11 @@ function! ToggleDiffWithSaved()
 		wincmd l
 		normal! zR
 		call s:GoToFirstChange()
+
+		wincmd h
+		call s:GoToFirstChange()
+		wincmd l
+
 		set splitright
 		setlocal nospell
 		let @/ = ""
