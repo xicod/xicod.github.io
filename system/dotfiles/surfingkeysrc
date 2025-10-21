@@ -1,5 +1,6 @@
 settings.hintAlign = "left";
 settings.modeAfterYank = "Normal";
+settings.hintShiftNonActive = true;
 
 api.Hints.style('font-size: 12pt;');
 api.Hints.style('font-size: 12pt;', 'text');
