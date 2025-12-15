@@ -24,7 +24,7 @@ NEEDRESTART_SUSPEND=1 \
 apt-get dist-upgrade -y
 
 apt-get install -y \
-	sudo git curl \
+	cron sudo git curl \
 	tig vim tmux \
 	needrestart build-essential \
 	jq python3-yaml \
