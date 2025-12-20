@@ -49,6 +49,9 @@ systemctl restart sshd
 ufw allow ssh
 # =====================================
 
+gpg --keyserver keys.openpgp.org --recv-keys D42B7B2502A056EFB5EC92CBD8B0A486CA9CA2F5
+echo -e "5\ny\n" | gpg --command-fd 0 --edit-key D42B7B2502A056EFB5EC92CBD8B0A486CA9CA2F5 trust
+
 timedatectl set-timezone America/Vancouver
 
 set +x
