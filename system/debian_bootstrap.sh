@@ -35,11 +35,14 @@ apt-get install -y \
 	wireguard rsync duplicity gpg \
 	net-tools iputils-ping dnsutils
 
-mkdir -p ~/git && cd ~/git
+(
+mkdir -p ~/git
+cd ~/git
 rm xicod.github.io -rf
 git clone https://github.com/xicod/xicod.github.io.git
 cd xicod.github.io/system
 make
+)
 
 # optional ============================
 mkdir -p ~/.ssh
