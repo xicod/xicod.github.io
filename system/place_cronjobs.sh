@@ -10,6 +10,9 @@ echo
 echo "Adding $cron_file"
 echo
 
+touch ${cron_file}
+chmod 644 ${cron_file}
+
 grep '^[A-Z]\+' /etc/crontab > $cron_file
 echo >> $cron_file
 
