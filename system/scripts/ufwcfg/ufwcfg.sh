@@ -15,6 +15,20 @@ function removeAllUfwRules {
 	done
 }
 
+function getPortProtoUfwParam {
+	local port_decl="$1"
+	local port=$(echo "${port_decl}" | cut -d/ -f1)
+	local proto=$(echo "${port_decl}" | cut -d/ -f2)
+
+	local ret="port ${port}"
+
+	if [ "${port}" != "${proto}" ]; then
+		ret="${ret} proto ${proto}"
+	fi
+	
+	echo "${ret}"
+}
+
 function setupLocalNet {
 	net_device=$(ip -json route show | \
 		python3 -c \
@@ -26,8 +40,10 @@ function setupLocalNet {
 
 	IFS=',' read -ra PORTS <<< "$DTCONF_ports_open_local"
 	for p in "${PORTS[@]}"; do
+		port_proto_param=`getPortProtoUfwParam ${p}`
+
 #		ufw allow from $local_net to any port $p
-		ufw allow in on $net_device to any port $p
+		ufw allow in on $net_device to any ${port_proto_param}
 	done
 }
 
@@ -37,7 +53,9 @@ function setupCustom {
 		interface=$(echo "$fwdecl" | cut -d: -f1)
 		port=$(echo "$fwdecl" | cut -d: -f2)
 
-		ufw allow in on $interface to any port $port
+		port_proto_param=`getPortProtoUfwParam ${port}`
+
+		ufw allow in on $interface to any ${port_proto_param}
 	done
 }
 
