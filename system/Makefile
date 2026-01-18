@@ -26,6 +26,9 @@ all:
 	@echo "Setting gitconfig"
 	cp -a ./dotfiles/gitconfig /etc/
 	cp -a ./dotfiles/gitignore_global /etc/
+	@echo "-------------------------------------------"
+	@echo "Setting systemd settings"
+	./dotfiles/systemd/copy_config.sh
 ifeq ($(shell test -d /etc/ssh/sshd_config.d && echo 1 || echo 0), 1)
 	@echo "-------------------------------------------"
 	@echo "Setting sshd_config"
