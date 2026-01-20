@@ -43,8 +43,8 @@ for depl in \
 $(echo $DTCONF_deployments | tr ',' ' ') \
 ; do
 	(
-	docker-compose --ansi=never `getYmlsParam $depl` pull
-	docker-compose --ansi=never `getYmlsParam $depl` up -d
+	docker compose --ansi=never `getYmlsParam $depl` pull
+	docker compose --ansi=never `getYmlsParam $depl` up -d
 	) 2>&1
         # this redirection is wrong. but compose spills everything to stderr
 done
