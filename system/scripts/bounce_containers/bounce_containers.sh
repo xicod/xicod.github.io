@@ -50,10 +50,19 @@ $(echo $DTCONF_deployments | tr ',' ' ') \
 done
 
 echo
-echo "Cleaning up dangling images.."
+echo "Cleaning up dangling images and build cache.."
 echo
+# Don't want to use that because it also removes stopped containers
+#docker system prune -f
+
 #for img in $(docker images "docker.xicod.com/xicod/*" --filter "dangling=true" -q --no-trunc); do docker rmi $img; done
-for img in $(docker images --filter "dangling=true" -q --no-trunc); do docker rmi $img; done
+#for img in $(docker images --filter "dangling=true" -q --no-trunc); do docker rmi $img; done
+docker image prune -f
+
+# Don't use --all (-a) here. That will remove absolutely all cache, except
+# currently running build processes. Without --all, it's only dangling cache
+# objects, like expected.
+docker builder prune -f
 
 echo
 echo '!! DONE RUN !!'
