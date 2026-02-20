@@ -56,8 +56,11 @@ echo
 #docker system prune -f
 
 #for img in $(docker images "docker.xicod.com/xicod/*" --filter "dangling=true" -q --no-trunc); do docker rmi $img; done
-#for img in $(docker images --filter "dangling=true" -q --no-trunc); do docker rmi $img; done
-docker image prune -f
+
+#docker image prune -f
+# It's better to clean images this way, because it will actually complain
+# when a running container is still using a dangling image (no tag):
+for img in $(docker images --filter "dangling=true" -q --no-trunc); do docker rmi $img || :; done
 
 # Don't use --all (-a) here. That will remove absolutely all cache, except
 # currently running build processes. Without --all, it's only dangling cache
