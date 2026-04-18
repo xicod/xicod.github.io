@@ -13,7 +13,9 @@ apt-get install -y openssh-server
 
 sshd_config_dir=/etc/ssh/sshd_config.d
 if [ -z "$(find ${sshd_config_dir} -maxdepth 0 -empty)" ]; then
+	{ set +x; } 2>/dev/null
 	echo "${sshd_config_dir} is not empty, please handle before running"
+	set -x
 	exit 1
 fi
 # =====================================
