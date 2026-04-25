@@ -763,6 +763,9 @@ function! ToggleBooleanValue()
 				\'yes': 'no', 'no': 'yes',
 				\'Yes': 'No', 'No': 'Yes',
 				\'YES': 'NO', 'NO': 'YES',
+				\'ON': 'OFF', 'OFF': 'ON',
+				\'on': 'off', 'off': 'on',
+				\'On': 'Off', 'Off': 'On',
 				\}
 	let l:w = expand('<cword>')
 	if !has_key(l:m, l:w)
