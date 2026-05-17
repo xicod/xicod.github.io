@@ -46,8 +46,13 @@ set diffopt+=internal
 set diffopt+=filler
 " best algorithm (?)
 set diffopt+=algorithm:patience
+
 " prefer aligning diff to words, not characters
-set diffopt+=inline:word
+try
+	set diffopt+=inline:word
+catch
+endtry
+
 " without it, new lines were not highlighted in whole
 set diffopt+=linematch:60
 " not sure it's needed with algorithm:histogram
@@ -57,7 +62,7 @@ function! s:ToggleDiffAlgorithm()
 	let l:alg1 = "histogram"
 	let l:alg2 = "patience"
 
-	if &diffopt =~ "algorithm:" . l:alg1
+	if index(split(&diffopt, ','), "algorithm:" . l:alg1) >= 0
 		let l:alg_set = l:alg2
 		let l:alg_unset = l:alg1
 	else
@@ -65,8 +70,8 @@ function! s:ToggleDiffAlgorithm()
 		let l:alg_unset = l:alg2
 	endif
 
-	execute "set diffopt+=algorithm:" . l:alg_set
 	execute "set diffopt-=algorithm:" . l:alg_unset
+	execute "set diffopt+=algorithm:" . l:alg_set
 
 	echo "Diff algorithm: " . l:alg_set
 
