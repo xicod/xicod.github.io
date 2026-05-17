@@ -39,6 +39,20 @@ filetype indent on
 " lets bouncing between buffers without saving
 set hidden
 
+" better diff options:
+" faster, internal lib
+set diffopt+=internal
+" default, but just in case - add filler lines for removed lines
+set diffopt+=filler
+" best algorithm (?)
+set diffopt+=algorithm:histogram
+" prefer aligning diff to words, not characters
+set diffopt+=inline:word
+" without it, new lines were not highlighted in whole
+set diffopt+=linematch:60
+" not sure it's needed with algorithm:histogram
+set diffopt+=indent-heuristic
+
 " Set status line properties
 function! SetStatusLine(mode)
 	if a:mode == 1
