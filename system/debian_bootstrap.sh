@@ -8,6 +8,9 @@ apt-get install -y ufw
 ufw --force reset
 ufw --force enable
 
+# this pre-check prevents ssmpt from failing to configure later
+getent hosts $(hostname -s)
+
 # optional ============================
 apt-get install -y openssh-server
 
