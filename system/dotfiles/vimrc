@@ -652,6 +652,10 @@ function! s:StartInsert()
 endfunction
 nnoremap <silent> i :call <SID>StartInsert()<CR>
 
+" Without this, hitting Enter on the first, already selected completion
+" suggestion doesn't work and just enters a newline.
+inoremap <expr> <CR> pumvisible() ? "\<C-y>" : "\<CR>"
+
 " Escape everything
 " remapping Tab also remaps Ctrl-i, which breaks going forward in jump history
 "nnoremap <Tab> <Esc>
