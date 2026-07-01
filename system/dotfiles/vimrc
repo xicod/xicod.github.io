@@ -2230,6 +2230,7 @@ augroup GrpFileTypes
 
 	autocmd FileType json setlocal foldmethod=syntax
 	autocmd FileType gitcommit setlocal textwidth=0 spell
+	autocmd FileType gitrebase setlocal indentexpr=-1
 	autocmd FileType markdown if !&diff | setlocal spell | endif
 augroup end
 
