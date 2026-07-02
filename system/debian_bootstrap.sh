@@ -29,7 +29,7 @@ NEEDRESTART_SUSPEND=1 \
 apt-get dist-upgrade -y
 
 apt-get install -y \
-	cron sudo git curl \
+	cron sudo git curl file \
 	tig vim tmux \
 	needrestart build-essential \
 	jq python3-yaml \
@@ -38,7 +38,8 @@ apt-get install -y \
 	zip unzip \
 	mailutils ssmtp \
 	wireguard rsync duplicity gpg \
-	net-tools iputils-ping dnsutils
+	net-tools iputils-ping dnsutils traceroute \
+	bsdextrautils
 
 (
 mkdir -p ~/git
