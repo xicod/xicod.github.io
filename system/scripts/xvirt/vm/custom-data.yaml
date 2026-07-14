@@ -1,0 +1,14 @@
+#cloud-config
+
+merge_how:
+  - name: list
+    settings: [append]
+  - name: dict
+    settings: [no_replace, recurse_list]
+
+#ssh_authorized_keys:
+#  - ssh-rsa A...
+
+#packages:
+#  - docker.io
+#  - docker-compose

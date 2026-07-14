@@ -1,0 +1,62 @@
+#cloud-config
+
+merge_how:
+  - name: list
+    settings: [append]
+  - name: dict
+    settings: [no_replace, recurse_list]
+
+timezone: America/Vancouver
+
+manage_etc_hosts: true
+
+manage_resolv_conf: true
+resolv_conf:
+  nameservers:
+    - 9.9.9.9
+
+disable_root: false
+ssh_pwauth: false
+
+#user: root
+
+# Disable default user generation (this prevents the creation of the 'debian' user)
+users: []
+
+#users:
+#  - name: debian
+#    shell: /bin/bash
+#    sudo: ALL=(ALL) NOPASSWD:ALL
+#    lock_passwd: true
+#    ssh_authorized_keys:
+#      - ssh-rsa A...
+
+# Automatically expand the partition and filesystem to fill the resized disk
+growpart:
+  mode: auto
+  devices: ['/']
+
+resize_rootfs: true
+
+packages:
+  - cron
+  - sudo
+  - git
+  - curl
+  - file
+  - vim
+  - needrestart
+  - jq
+  - python3-yaml
+  - htop
+  - iotop
+  - nethogs
+  - zip
+  - unzip
+  - rsync
+  - gpg
+  - net-tools
+  - iputils-ping
+  - dnsutils
+  - traceroute
+  - bsdextrautils

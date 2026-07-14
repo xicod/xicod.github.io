@@ -1,0 +1,12 @@
+#cloud-config
+
+merge_how:
+  - name: list
+    settings: [append]
+  - name: dict
+    settings: [no_replace, recurse_list]
+
+runcmd:
+  - [ systemctl, stop, unattended-upgrades.service ]
+  - [ systemctl, disable, unattended-upgrades.service ]
+  - [ apt-get, remove, --purge, -y, -qq, unattended-upgrades ]
