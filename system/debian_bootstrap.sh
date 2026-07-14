@@ -38,7 +38,7 @@ apt-get install -y \
 	zip unzip \
 	mailutils ssmtp \
 	wireguard rsync duplicity gpg \
-	net-tools iputils-ping dnsutils traceroute \
+	net-tools iputils-ping bind9-dnsutils traceroute \
 	bsdextrautils
 
 (
