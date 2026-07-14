@@ -62,6 +62,7 @@ function setupCustom {
 function setupFw {
 	ufw default allow outgoing
 	ufw default deny incoming
+	ufw default deny forward
 
 	removeAllUfwRules
 
