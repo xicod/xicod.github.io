@@ -6,7 +6,19 @@ merge_how:
   - name: dict
     settings: [no_replace, recurse_list]
 
+packages:
+  - build-essential
+
 runcmd:
-  - [ systemctl, stop, unattended-upgrades.service ]
-  - [ systemctl, disable, unattended-upgrades.service ]
-  - [ apt-get, remove, --purge, -y, -qq, unattended-upgrades ]
+  - |
+    #!/bin/bash
+
+    set -e
+    set -u
+    set -x
+
+    systemctl stop unattended-upgrades.service
+    systemctl disable unattended-upgrades.service
+    apt-get remove --purge -y -qq unattended-upgrades
+
+

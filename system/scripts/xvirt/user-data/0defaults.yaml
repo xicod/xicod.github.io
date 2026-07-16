@@ -70,3 +70,22 @@ packages:
   - bind9-dnsutils
   - traceroute
   - bsdextrautils
+
+runcmd:
+  - |
+    #!/bin/bash
+
+    set -e
+    set -u
+    set -x
+
+    (
+    mkdir -p ~/git
+    cd ~/git
+    rm xicod.github.io -rf
+    git clone https://github.com/xicod/xicod.github.io.git
+    cd xicod.github.io/system
+    make
+    )
+
+
