@@ -38,6 +38,16 @@ growpart:
 
 resize_rootfs: true
 
+# swap drive
+disk_setup:
+  /dev/vdb:
+    table_type: mbr
+    layout: true
+    overwrite: true
+fs_setup:
+  - device: /dev/vdb1
+    filesystem: swap
+
 packages:
   - cron
   - sudo

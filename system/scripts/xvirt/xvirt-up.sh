@@ -5,7 +5,8 @@ set -u
 
 CURR_DIR=$(readlink -f $(dirname $0))
 
-disk_image_file=os.qcow2
+disk_image_file=disk-os.qcow2
+swap_image_file=disk-swap.raw
 
 set -x
 source vm.profile
@@ -16,10 +17,14 @@ source ${CURR_DIR}/os_variants/${DT_VM_OS_VARIANT}.inc.sh
 set -x
 xvirt_os_variant_get
 qemu-img resize ${disk_image_file} ${DT_VM_DISK_SIZE}
+qemu-img create -f raw -o preallocation=falloc ${swap_image_file} ${DT_VM_SWAP_SIZE}
 set +x
 
 install_param_passthrough_fs=()
-user_data_mount_entries=""
+user_data_mount_entries=$(cat <<EOF
+  - [ /dev/vdb1, none, swap, "sw,nofail", "0", "0" ]
+EOF
+)
 
 if [ ${#DT_VM_PASSTHROUGH_FS[@]} -ge 0 ]; then
 	for fs_decl in ${DT_VM_PASSTHROUGH_FS[@]}; do
@@ -57,7 +62,8 @@ virt-install \
 	--name ${DT_VM_HOSTNAME} \
 	--memory ${DT_VM_RAM_MB} \
 	--vcpus ${DT_VM_VCPUS} \
-	--disk path=`pwd`/${disk_image_file},format=qcow2 \
+	--disk path=`pwd`/${disk_image_file},bus=virtio,format=qcow2 \
+	--disk path=`pwd`/${swap_image_file},bus=virtio,format=raw \
 	--os-variant ${DT_VM_OS_VARIANT} \
 	--network network=default \
 	--import \
