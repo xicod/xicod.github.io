@@ -117,5 +117,9 @@ else
 	ssh -t \
 		-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null \
 		${ip} \
-		cloud-init status --long --wait
+		"bash -c 'cloud-init status --long --wait && reboot'"
+
+	sleep 10
+
+	virsh start ${DT_VM_HOSTNAME}
 fi
