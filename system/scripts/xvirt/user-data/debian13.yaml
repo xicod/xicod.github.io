@@ -8,6 +8,11 @@ merge_how:
 
 packages:
   - build-essential
+  - cron
+  - iputils-ping
+  - bind9-dnsutils
+  - bsdextrautils
+
 
 runcmd:
   - |
