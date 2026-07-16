@@ -5,44 +5,19 @@ set -u
 
 CURR_DIR=$(readlink -f $(dirname $0))
 
-set -x
-
-source vm.profile
-
-set +x
-
 disk_image_file=os.qcow2
 
-function os_debian13_get {
-	wget https://cloud.debian.org/images/cloud/trixie/latest/debian-13-genericcloud-amd64.qcow2 \
-		-O debian-13-genericcloud-amd64.qcow2
-	wget https://cloud.debian.org/images/cloud/trixie/latest/SHA512SUMS \
-		-O SHA512SUMS
-	sha512sum -c --ignore-missing SHA512SUMS
-	mv debian-13-genericcloud-amd64.qcow2 ${disk_image_file}
-	#cp debian-13-genericcloud-amd64.qcow2 ${disk_image_file}
-}
-
-# func_to_get_img
-declare -A OS_VARIANTS=(
-	["debian13"]="os_debian13_get"
-)
-
-if ! [[ -v OS_VARIANTS[${DT_VM_OS_VARIANT}] ]]; then
-	echo "Couldn't get config for os variant '${DT_VM_OS_VARIANT}'"
-	exit 1
-fi
-
-os_variant_conf=${OS_VARIANTS[${DT_VM_OS_VARIANT}]}
 set -x
-
-os_variant_get_func=`echo "${os_variant_conf}" | cut -d: -f1`
-
-${os_variant_get_func}
-
-qemu-img resize ${disk_image_file} ${DT_VM_DISK_SIZE}
-
+source vm.profile
 set +x
+
+source ${CURR_DIR}/os_variants/${DT_VM_OS_VARIANT}.inc.sh
+
+set -x
+xvirt_os_variant_get
+qemu-img resize ${disk_image_file} ${DT_VM_DISK_SIZE}
+set +x
+
 install_param_passthrough_fs=()
 user_data_mount_entries=""
 
