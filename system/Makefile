@@ -11,7 +11,7 @@ all:
 	./place_tools.sh
 	@echo "-------------------------------------------"
 	@echo "Setting vimrc"
-	cp -a ./dotfiles/vimrc /etc/vim/vimrc.local
+	bash -c 'cp -a ./dotfiles/vimrc $$([ -d /etc/vim ] && echo /etc/vim || echo /etc)/vimrc.local'
 	@echo "-------------------------------------------"
 	@echo "Setting tigrc"
 	bash -c "echo -e 'source /etc/tigrc\nsource /etc/tigrc-dt' > /etc/tigrc-custom"
