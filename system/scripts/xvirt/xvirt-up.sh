@@ -81,6 +81,8 @@ merge_how:
   - name: dict
     settings: [no_replace, recurse_list]
 
+hostname: ${DT_VM_HOSTNAME}
+
 ssh_authorized_keys:
   - `cat ~/.ssh/id_rsa.pub`
 
