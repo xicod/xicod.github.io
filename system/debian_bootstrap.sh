@@ -11,17 +11,28 @@ ufw --force enable
 # this pre-check prevents ssmpt from failing to configure later
 getent hosts $(hostname -s)
 
-# optional ============================
 apt-get install -y openssh-server
 
-sshd_config_dir=/etc/ssh/sshd_config.d
-if [ -z "$(find ${sshd_config_dir} -maxdepth 0 -empty)" ]; then
-	{ set +x; } 2>/dev/null
-	echo "${sshd_config_dir} is not empty, please handle before running"
-	set -x
+{ set +x; } 2>/dev/null
+
+EMPTY_CONFIG_DIRS=(
+	/etc/ssh/sshd_config.d
+	/etc/default/grub.d
+)
+
+can_continue=1
+for config_dir in "${EMPTY_CONFIG_DIRS[@]}"; do
+	if [ -z "$(find ${config_dir} -maxdepth 0 -empty)" ]; then
+		echo "${config_dir} is not empty, please handle before running"
+		can_continue=0
+	fi
+done
+
+if [ ${can_continue} -ne 1 ]; then
 	exit 1
 fi
-# =====================================
+
+set -x
 
 DEBIAN_FRONTEND=noninteractive \
 APT_LISTCHANGES_FRONTEND=none \
