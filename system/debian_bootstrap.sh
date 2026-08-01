@@ -18,6 +18,7 @@ apt-get install -y openssh-server
 EMPTY_CONFIG_DIRS=(
 	/etc/ssh/sshd_config.d
 	/etc/default/grub.d
+	/etc/apt/sources.list.d
 )
 
 can_continue=1
