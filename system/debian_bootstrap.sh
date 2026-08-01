@@ -18,7 +18,6 @@ apt-get install -y openssh-server
 EMPTY_CONFIG_DIRS=(
 	/etc/ssh/sshd_config.d
 	/etc/default/grub.d
-	/etc/apt/sources.list.d
 )
 
 can_continue=1
@@ -32,6 +31,8 @@ done
 if [ ${can_continue} -ne 1 ]; then
 	exit 1
 fi
+
+rm /etc/apt/sources.list.d/debian.sources || :
 
 sources_list=/etc/apt/sources.list
 debian_release=`lsb_release -cs`
