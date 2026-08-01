@@ -1,5 +1,9 @@
 #!/bin/bash
 
+LOG_FILE=~/deb_bootstrap.log
+
+exec > >(tee -ia ${LOG_FILE}) 2>&1
+
 set -e
 
 bundled_debian_sources=/etc/apt/sources.list.d/debian.sources
