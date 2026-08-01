@@ -99,6 +99,9 @@ apt-get remove --purge -y -qq unattended-upgrades
 
 timedatectl set-timezone America/Vancouver
 
+# don't run it again
+chmod -x $0
+
 set +x
 echo
 echo ========================
