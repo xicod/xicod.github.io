@@ -1,6 +1,23 @@
 #!/bin/bash
 
 set -e
+
+rm /etc/apt/sources.list.d/debian.sources || :
+
+sources_list=/etc/apt/sources.list
+debian_release=`lsb_release -cs`
+echo -e "\nWriting ${sources_list} with '${debian_release}' mirrors.\n"
+cat << EOF > ${sources_list}
+deb https://deb.debian.org/debian/ ${debian_release} main contrib non-free-firmware #non-free
+#deb-src https://deb.debian.org/debian/ ${debian_release} main contrib non-free-firmware #non-free
+
+deb https://deb.debian.org/debian/ ${debian_release}-updates main contrib non-free-firmware #non-free
+#deb-src https://deb.debian.org/debian/ ${debian_release}-updates main contrib non-free-firmware #non-free
+
+deb https://security.debian.org/debian-security ${debian_release}-security main contrib non-free-firmware #non-free
+#deb-src https://security.debian.org/debian-security ${debian_release}-security main contrib non-free-firmware #non-free
+EOF
+
 set -x
 
 apt-get update
@@ -20,6 +37,7 @@ EMPTY_CONFIG_DIRS=(
 	/etc/default/grub.d
 )
 
+echo
 can_continue=1
 for config_dir in "${EMPTY_CONFIG_DIRS[@]}"; do
 	if [ -z "$(find ${config_dir} -maxdepth 0 -empty)" ]; then
@@ -27,26 +45,11 @@ for config_dir in "${EMPTY_CONFIG_DIRS[@]}"; do
 		can_continue=0
 	fi
 done
+echo
 
 if [ ${can_continue} -ne 1 ]; then
 	exit 1
 fi
-
-rm /etc/apt/sources.list.d/debian.sources || :
-
-sources_list=/etc/apt/sources.list
-debian_release=`lsb_release -cs`
-echo -e "\nWriting ${sources_list} with '${debian_release}' mirrors.\n"
-cat << EOF > ${sources_list}
-deb https://deb.debian.org/debian/ ${debian_release} main contrib non-free-firmware #non-free
-#deb-src https://deb.debian.org/debian/ ${debian_release} main contrib non-free-firmware #non-free
-
-deb https://deb.debian.org/debian/ ${debian_release}-updates main contrib non-free-firmware #non-free
-#deb-src https://deb.debian.org/debian/ ${debian_release}-updates main contrib non-free-firmware #non-free
-
-deb https://security.debian.org/debian-security ${debian_release}-security main contrib non-free-firmware #non-free
-#deb-src https://security.debian.org/debian-security ${debian_release}-security main contrib non-free-firmware #non-free
-EOF
 
 set -x
 
