@@ -2,7 +2,11 @@
 
 set -e
 
-rm /etc/apt/sources.list.d/debian.sources || :
+bundled_debian_sources=/etc/apt/sources.list.d/debian.sources
+if [ -f ${bundled_debian_sources} ]; then
+	echo -e "\nRemoving '${bundled_debian_sources}'\n"
+	rm ${bundled_debian_sources}
+fi
 
 sources_list=/etc/apt/sources.list
 debian_release=`lsb_release -cs`
