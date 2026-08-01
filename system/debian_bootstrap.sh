@@ -33,6 +33,20 @@ if [ ${can_continue} -ne 1 ]; then
 	exit 1
 fi
 
+sources_list=/etc/apt/sources.list
+debian_release=`lsb_release -cs`
+echo -e "\nWriting ${sources_list} with '${debian_release}' mirrors.\n"
+cat << EOF > ${sources_list}
+deb https://deb.debian.org/debian/ ${debian_release} main contrib non-free-firmware #non-free
+#deb-src https://deb.debian.org/debian/ ${debian_release} main contrib non-free-firmware #non-free
+
+deb https://deb.debian.org/debian/ ${debian_release}-updates main contrib non-free-firmware #non-free
+#deb-src https://deb.debian.org/debian/ ${debian_release}-updates main contrib non-free-firmware #non-free
+
+deb https://security.debian.org/debian-security ${debian_release}-security main contrib non-free-firmware #non-free
+#deb-src https://security.debian.org/debian-security ${debian_release}-security main contrib non-free-firmware #non-free
+EOF
+
 set -x
 
 DEBIAN_FRONTEND=noninteractive \
