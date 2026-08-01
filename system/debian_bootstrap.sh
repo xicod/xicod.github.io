@@ -6,6 +6,9 @@ exec > >(tee -ia ${LOG_FILE}) 2>&1
 
 set -e
 
+# the fancy dialog default messes with the logging
+export DEBIAN_FRONTEND=readline
+
 bundled_debian_sources=/etc/apt/sources.list.d/debian.sources
 if [ -f ${bundled_debian_sources} ]; then
 	echo -e "\nRemoving '${bundled_debian_sources}'\n"
