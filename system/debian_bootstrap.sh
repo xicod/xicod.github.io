@@ -6,9 +6,6 @@ exec > >(tee -ia ${LOG_FILE}) 2>&1
 
 set -e
 
-# the fancy dialog default messes with the logging
-export DEBIAN_FRONTEND=readline
-
 bundled_debian_sources=/etc/apt/sources.list.d/debian.sources
 if [ -f ${bundled_debian_sources} ]; then
 	echo -e "\nRemoving '${bundled_debian_sources}'\n"
@@ -32,6 +29,10 @@ EOF
 set -x
 
 apt-get update
+
+# don't have any interruptions during the process
+export DEBIAN_FRONTEND=noninteractive
+
 apt-get install -y ufw
 ufw --force reset
 ufw --force enable
