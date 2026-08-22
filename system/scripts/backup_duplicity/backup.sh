@@ -5,17 +5,15 @@ set -e
 source /etc/profile.d/dt-profile.sh
 source dt-app-conf.sh
 
-INCLUDE_EXCLUDE_STR=""
+INCLUDE_EXCLUDE_PARAMS=()
 
 while read line; do
 	if [[ "$line" =~ ^- ]]; then
-		INCLUDE_EXCLUDE_STR="${INCLUDE_EXCLUDE_STR} --exclude"
-		line=$(echo $line | sed 's/^-//')
+		line=$(echo "$line" | sed 's/^-//')
+		INCLUDE_EXCLUDE_PARAMS+=("--exclude=${line}")
 	else
-		INCLUDE_EXCLUDE_STR="${INCLUDE_EXCLUDE_STR} --include"
+		INCLUDE_EXCLUDE_PARAMS+=("--include=${line}")
 	fi
-	
-	INCLUDE_EXCLUDE_STR="${INCLUDE_EXCLUDE_STR} $line"
 done < <(echo "$DTCONF_include_exclude_list" | tr ',' '\n')
 
 ################################################################################
@@ -52,7 +50,7 @@ PASSPHRASE=${DTCONF_backup_passphrase} \
 duplicity incr --full-if-older-than ${DTCONF_full_backup_rotation} \
 --verbosity e --no-print-statistics \
 ${gpg_key_param} \
-${INCLUDE_EXCLUDE_STR} \
+"${INCLUDE_EXCLUDE_PARAMS[@]}" \
 / \
 file://${DTCONF_backup_dest}
 
