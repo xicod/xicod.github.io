@@ -77,7 +77,7 @@ alias tmux-cap='tmux capture-pane -p -S- -E- | vim -c "setlocal filetype=none bu
 # docker aliases only for root
 if [ "$EUID" = "0" ] || [ "$USER" = "root" ] ; then
 	alias dop="docker ps -a"
-	alias doi="docker image ls --format=table"
+	alias doi="docker image ls --format=table --all"
 fi
 
 # use a custom config loader that will load the system and then
