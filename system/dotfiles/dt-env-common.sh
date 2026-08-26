@@ -139,14 +139,31 @@ function hdl {
 }
 
 function mmv {
+	local shell_safe=0
+
+	if [ "$1" = "-s" ]; then
+		shell_safe=1
+		shift
+	fi
+
 	if [ $# -eq 0 ]; then
 		echo "Need files to rename"
 		return 1
 	fi
+
 	(
 	echo $'# execute with \':%!bash\''
 	echo $'# replace only in the new filename block: \'%s/\\t\\t.*\zsSOMETEXT/NEWTEXT/\''
-	ls -1d --quoting-style=shell "$@" | sed 's/^\(.*\)$/mv -nT \1\t\1/' \
+	ls -1d "$@" | while read line; do \
+			escaped=`printf "%q\n" "${line}"`; \
+			if [ ${shell_safe} -eq 1 ]; then \
+				nn=`echo "${line}" | sed -e 's/[^-_a-zA-Z0-9.[:space:]]//g' -e 's/[[:space:]]\+/./g'`; \
+			else \
+				nn=`ls -1d --quoting-style=shell "${line}"`; \
+			fi; \
+			echo -e "mv -nT ${escaped}\t${nn}"; \
+		done \
+		| awk -F$'\t' '{print $1 "\t" (($2 ~ /^["'\'']/) ? $2 : " " $2)}' \
 		| column -t -s $'\t' -o $'\t\t'
 	) | vim - -c 'setlocal filetype=bash buftype=nofile nolist nowrap | normal! 2j^'
 }
