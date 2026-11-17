@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 if [ -z "$BASH" ]; then
-	echo "dt-env-common.sh: This is not loading in bash. Skipping."
+	echo "dt-env-common.sh: This is not loading in bash. Skipping." 1>&2
 	return 0
 fi
 
