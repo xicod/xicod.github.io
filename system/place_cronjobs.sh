@@ -2,6 +2,11 @@
 
 set -e
 
+if [ -f /run/qubes/this-is-*vm ]; then
+	echo "In a Qubes VM. Not installing cron."
+	exit 0
+fi
+
 source /etc/profile.d/dt-profile.sh
 
 cron_file="/etc/cron.d/dt-cron"
