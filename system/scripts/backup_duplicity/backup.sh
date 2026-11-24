@@ -40,13 +40,7 @@ else
 	gpg_key_param=""
 fi
 
-if [ -f /run/qubes/this-is-*vm ]; then
-	os_var=qubes
-else
-	os_var=regular
-fi
-
-if [ "${os_var}" = "qubes" ]; then
+if [ "${DT_OS_VARIANT}" = "qubes" ]; then
 	export sysbackup_sync_marker_file=/root/sysbackup_sync_marker
 	if ! [ -f ${sysbackup_sync_marker_file} ]; then
 		touch ${sysbackup_sync_marker_file}
@@ -67,7 +61,7 @@ duplicity remove-all-but-n-full 1 --force --verbosity e \
 ${gpg_key_param} \
 file://${DTCONF_backup_dest}
 
-if [ "${os_var}" = "qubes" ]; then
+if [ "${DT_OS_VARIANT}" = "qubes" ]; then
 	(
 	# dest vm needs to be a config
 	find ${DTCONF_backup_dest} -type f -newer ${sysbackup_sync_marker_file} -print0 \

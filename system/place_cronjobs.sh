@@ -2,23 +2,17 @@
 
 set -e
 
-if [ -f /run/qubes/this-is-*vm ]; then
-	os_var=qubes
-else
-	os_var=regular
-fi
-
 source /etc/profile.d/dt-profile.sh
 
 function remove_user_from_entry_if_needed {
-	if [ "${os_var}" = "qubes" ]; then
+	if [ "${DT_OS_VARIANT}" = "qubes" ]; then
 		sed -E '/^\s*(#|$)/! s/^((\S+\s+){5})\S+\s+/\1/'
 	else
 		cat
 	fi
 }
 
-if [ "${os_var}" = "qubes" ]; then
+if [ "${DT_OS_VARIANT}" = "qubes" ]; then
 	cron_src=${HOME}/.cron.d
 	mkdir -p ${cron_src}
 
@@ -70,14 +64,14 @@ find ./ -name cronfile.dist | while read app_cronfile; do
 	)
 done
 
-if [ "${os_var}" = "qubes" ]; then
+if [ "${DT_OS_VARIANT}" = "qubes" ]; then
 	cat ${cron_src}/* | crontab -
 fi
 
 echo
 echo "This is the cronfile:"
 echo
-if [ "${os_var}" = "qubes" ]; then
+if [ "${DT_OS_VARIANT}" = "qubes" ]; then
 	crontab -l
 else
 	cat "${cron_file}"

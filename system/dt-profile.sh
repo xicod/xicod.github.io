@@ -7,3 +7,9 @@ export PATH="${PATH}:~/bin:__TOOLS_DIR__:__XVIRT_DIR__"
 
 # cron sometimes sets HOME=/
 export HOME=$(getent passwd $(whoami) | cut -d':' -f6)
+
+if [ -f /run/qubes/this-is-*vm ]; then
+	export DT_OS_VARIANT=qubes
+else
+	export DT_OS_VARIANT=regular
+fi
