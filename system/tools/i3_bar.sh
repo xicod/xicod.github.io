@@ -4,8 +4,6 @@ if [ -z "$DT_I3_BAR_DRIVES" ]; then
 	DT_I3_BAR_DRIVES="/"
 fi
 
-# fontawesome drive icon: 
-
 echo '{"version":1,"click_events":true}'
 echo '[[]'
 echo ',[{"full_text":""}]'
