@@ -40,6 +40,20 @@ else
 	gpg_key_param=""
 fi
 
+if [ -f /run/qubes/this-is-*vm ]; then
+	os_var=qubes
+else
+	os_var=regular
+fi
+
+if [ "${os_var}" = "qubes" ]; then
+	export sysbackup_sync_marker_file=/root/sysbackup_sync_marker
+	if ! [ -f ${sysbackup_sync_marker_file} ]; then
+		touch ${sysbackup_sync_marker_file}
+		sleep 2
+	fi
+fi
+
 PASSPHRASE=${DTCONF_backup_passphrase} \
 duplicity incr --full-if-older-than ${DTCONF_full_backup_rotation} \
 --verbosity e --no-print-statistics \
@@ -52,3 +66,13 @@ PASSPHRASE=${DTCONF_backup_passphrase} \
 duplicity remove-all-but-n-full 1 --force --verbosity e \
 ${gpg_key_param} \
 file://${DTCONF_backup_dest}
+
+if [ "${os_var}" = "qubes" ]; then
+	(
+	# dest vm needs to be a config
+	find ${DTCONF_backup_dest} -type f -newer ${sysbackup_sync_marker_file} -print0 \
+		| xargs -0 -r qvm-copy-to-vm --without-progress backups
+	) 2> >(grep -v '^In order to avoid typing target qube name twice' >&2)
+
+	touch ${sysbackup_sync_marker_file}
+fi
