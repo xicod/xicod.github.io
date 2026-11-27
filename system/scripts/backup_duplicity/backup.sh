@@ -38,7 +38,7 @@ else
 	gpg_key_param=""
 fi
 
-if [ "${DT_OS_VARIANT}" = "qubes" ]; then
+if [ -n "${DTCONF_qvm_upload_target}" ]; then
 	export sysbackup_sync_marker_file=/root/sysbackup_sync_marker
 	if ! [ -f ${sysbackup_sync_marker_file} ]; then
 		touch ${sysbackup_sync_marker_file}
@@ -59,11 +59,10 @@ duplicity remove-all-but-n-full 1 --force --verbosity e \
 ${gpg_key_param} \
 file://${DTCONF_backup_dest}
 
-if [ "${DT_OS_VARIANT}" = "qubes" ]; then
+if [ -n "${DTCONF_qvm_upload_target}" ]; then
 	(
-	# dest vm needs to be a config
 	find ${DTCONF_backup_dest} -type f -newer ${sysbackup_sync_marker_file} -print0 \
-		| xargs -0 -r qvm-copy-to-vm --without-progress backups
+		| xargs -0 -r qvm-copy-to-vm --without-progress ${DTCONF_qvm_upload_target}
 	) 2> >(grep -v '^In order to avoid typing target qube name twice' >&2)
 
 	touch ${sysbackup_sync_marker_file}

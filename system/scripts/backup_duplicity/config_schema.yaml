@@ -16,3 +16,4 @@ confSchema:
     - -/home/user/.cache
     - -/home/user/Downloads
   pre_backup_bash_func: "echo pre_backup_function"
+  qvm_upload_target: backups
