@@ -23,6 +23,8 @@ if args.do_set and args.value is None:
 
 try:
     config = configparser.ConfigParser()
+    # to prevent everything becoming lower case
+    config.optionxform = str
 
     if not os.path.isfile(args.file):
         raise Exception("No such file: " + args.file)
